@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Additives View</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'costmanagement/css/font-face.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'costmanagement/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'costmanagement/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'costmanagement/css/style.css' %}" rel="stylesheet" media="all">
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Additive Formation Details</h3>
+               </div>
+            </div>
+         </div>
+         <table class="table table0 table-dark table-bordered tableedit " id="myTable">
+            <thead>
+               <tr>
+                  <!-- <th scope="col">S.N</th> -->
+                  <th scope="col">Product</th>
+                  <th scope="col">Import Rate</th>
+                  <th scope="col">Add Cost</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">MT to KL</th>
+                  <th scope="col">Usage</th>
+                  <th scope="col">Net Cost</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for i in raws %}
+               <tr>
+                  <!-- <td></td> -->
+                  <td>{{i.product}}</td>
+                  <td>{{i.importRate}}</td>
+                  <td>{{i.addCost}}</td>
+                  <td>{{i.total}}</td>
+                  <td>{{i.mtToKl}}</td>
+                  <td>{{i.usage}}</td>
+                  <td>{{i.netCost}}</td>
+                 
+               </tr>
+              {% endfor %}
+               
+               <tr>
+                  <td colspan="5" contenteditable="false">
+                     Totals Per KL
+                  </td>
+                  <td>{{usage}}</td>
+                  <td>{{net}} </td>
+               </tr>
+               <tr>
+                  <td colspan="6" contenteditable="false">Per Liter Cost</td>
+                  <td> {{per_liter}}</td>
+               </tr>
+            </tbody>
+         </table>
+         <table class="table table0 table-dark table-bordered tableedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Information</h4>
+            </div>
+            <thead>
+             
+               <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Product Name</th>
+                  <th scope="col">Net Blending Quantity Liters</th>
+                  <th scope="col">Gross Vol CrossCheck</th>
+                  <th scope="col">% Cross Check</th>
+               </tr>
+             
+            </thead>
+            <tbody>
+               
+               <tr>
+                  <td>{{additive.date}}</td>
+                  <td >{{additive.product}}</td>
+                  <td>{{additive.netBlendingQtyLiter}}</td>
+                  <td>{{additive.grossVolCrosscheck}}</td>
+                  <td>{{additive.percentCrosscheck}}</td>
+               </tr>
+              
+            </tbody>
+         </table>
+         <table class="table table0 table-dark table-bordered tableedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Polymers</h4>
+            </div>
+            <thead>
+               <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity in %</th>
+                  <th scope="col">Quantity in Liters</th>
+                  <th scope="col">Density</th>
+                  <th scope="col">Quantity in Kgs</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for i in polymers %}
+               <tr>
+                   <td>{{i.name}}</td>
+                  <td >{{i.qtyInPercent}}</td>
+                  <td>{{i.qtyInLiters}}</td>
+                  <td>{{i.density}}</td>
+                  <td>{{i.qtyInKgs}}</td>
+               </tr>
+               {% endfor%}
+            </tbody>
+         </table>
+         <table class="table table0 table-dark table-bordered tableedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Base Oils</h4>
+            </div>
+            <thead>
+               <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity in %</th>
+                  <th scope="col">Quantity in Liters</th>
+                  <th scope="col">Density</th>
+                  <th scope="col">Quantity in Kgs</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for i in oils %}
+               <tr>
+                  <td>{{i.name}}</td>
+                  <td >{{i.qtyInPercent}}</td>
+                  <td>{{i.qtyInLiters}}</td>
+                  <td>{{i.density}}</td>
+                  <td>{{i.qtyInKgs}}</td>
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+         <input type="submit" class="btn btn-primary"  value="Save">
+         <button type="button" class="btn btn-danger">Delete</button>
+      </div>
+   </div>
+   {% include 'footer.html'%}
+   </div>
+   </div>
+   </body>
+</html>
+<!-- end document

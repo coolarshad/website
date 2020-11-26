@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+ {% load custom_tags %}
+{% temp as i %}
+{% load mathfilters %}
+<body>
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Prepayments Overdue</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css'%}" rel="stylesheet" media="all">
+
+      <script type="text/javascript">
+         function displayref(){
+
+            var scompany=document.getElementById('salescompany-input');
+            if(scompany.options[scompany.selectedIndex].text=='KS'){
+               document.getElementById('salestraderefno-input').value="KS{{ ksref|stringformat:"07d" }}";
+            }
+            if(scompany.options[scompany.selectedIndex].text=='KP'){
+               document.getElementById('salestraderefno-input').value="KP{{ kpref|stringformat:"07d" }}";
+            }
+
+            var pcompany=document.getElementById('purchasecompany-input');
+            if(pcompany.options[pcompany.selectedIndex].text=='KS'){
+               document.getElementById('purchasetraderefno-input').value="KS{{ ksref|stringformat:"07d" }}";
+            }
+            if(pcompany.options[pcompany.selectedIndex].text=='KP'){
+               document.getElementById('purchasetraderefno-input').value="KP{{kpref|stringformat:"07d"}}";
+            }
+         }
+      </script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript">
+         $(document).ready(function(){
+             $('.excel').click(function(){
+               // alert('in');
+                $(this).attr('href',"{% url 'home:checkpre' %}");
+             });
+         });
+      </script>
+
+
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Prepayments/LC Details</h3> </div>
+                <input type="text" placeholder="Filter Using TRN" class="table-searchone payreceive" id="table-search" data-table-search="myTable"></input>
+            </div>
+         </div>
+        <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table2 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">TRN</th>
+                     <th scope="col">Company Name</th>
+                      <th scope="col">LC no / value</th>
+                     <th scope="col">Due Date</th>
+                     <th scope="col">Due Amount</th>
+                    
+                  </tr>
+               </thead>
+               <tbody>
+                     {% for i in payments %}
+
+                  <tr>
+                     <td scope="row" id="sn">{{i.trn.trn}}</td>
+                     <td id="types">{{i.trn.client}}</td>
+                     <td id="lc">{{i.lcNumberValue}}</td>
+                     <td id="company">{{i.dueDate}}</td>
+                     {% if i.trn.types == 'Sales' %}
+                     <td id="trd">{{i.advance|sub:i.advanceFromBuyers|floatformat:2}}</td>
+                     {% else %}
+                     <td id="trd">{{i.advance|sub:i.advanceToSellers|floatformat:2}}</td>
+                     {% endif %}
+                     <td id="lc_value"></td>
+                    </tr>
+
+               {% endfor %}
+               </tbody>
+
+            </table>
+         </div>
+      </div>
+   </div>
+</div>
+
+    {% include 'footer.html'%}
+   </div>
+   </div>
+   </body>
+</html>
+<!-- end document

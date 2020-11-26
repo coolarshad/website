@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Additives</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'costmanagement/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'costmanagement/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'costmanagement/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'costmanagement/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'costmanagement/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'costmanagement/css/style.css' %}" rel="stylesheet" media="all">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<style>
+	input[type="checkbox"]{
+		height:18px;width:25px;}
+	</style>
+      <script type="text/javascript">
+         var countraw=1;
+         var countpolymer=1;
+         var countoil=1;
+         
+         $(document).ready(function(){
+
+
+$("#additivesformation_date-input-date").datepicker({
+    dateFormat: 'dd/mm/yy'
+}).on("changeDate", function (e) {
+   var dateFormat= 'dd/mm/yy';
+   var d=new Date();
+   d=e.date;
+
+  $('#additivesformation_date-input').val(d.toLocaleDateString());
+    // console.log(e.date);
+    // alert('hi');
+});
+
+
+
+            var num=1;
+            $('.addadditives').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="additives-block"]:last');
+                  num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'additives-block'+num );
+                  $clone.find('#additivesformationproduct-input').prop('name','additivesformationproduct-input'+num);
+                  $clone.find('#additivesformationproduct-input').val("").end();
+         
+                  $clone.find('#additivesformation_importrate-input').prop('name','additivesformation_importrate-input'+num);
+                  $clone.find('#additivesformation_importrate-input').val("").end();
+         
+                  $clone.find('#additivesformation_addcost-input').prop('name','additivesformation_addcost-input'+num);
+                  $clone.find('#additivesformation_addcost-input').val("").end();
+         
+                  $clone.find('#additivesformation_total-input').prop('name','additivesformation_total-input'+num);
+                  $clone.find('#additivesformation_total-input').val("").end();
+         
+                  $clone.find('#additivesformation_mttokl-input').prop('name','additivesformation_mttokl-input'+num);
+                  $clone.find('#additivesformation_mttokl-input').val("").end();
+         
+                  $clone.find('#additivesformation_usage-input').prop('name','additivesformation_usage-input'+num);
+                  $clone.find('#additivesformation_usage-input').val("").end();
+         
+                  $clone.find('#additivesformation_netcost-input').prop('name','additivesformation_netcost-input'+num);
+                  $clone.find('#additivesformation_netcost-input').val("").end();
+         
+                  $div.after($clone);
+         
+                   countraw=countraw+1;
+               $('#count-raw').val(countraw);
+         
+         
+                  });
+               
+            $('.addpolymer').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="polymer-block"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'polymer-block'+num );
+                  $clone.find('#additivesformationpolymername-input').prop('name','additivesformationpolymername-input'+num);
+                  $clone.find('#additivesformationpolymername-input').val("").end();
+         
+                  $clone.find('#additivesformationpolymer_percent-input').prop('name','additivesformationpolymer_percent-input'+num);
+                  $clone.find('#additivesformationpolymer_percent-input').val("").end();
+         
+                  $clone.find('#additivesformationpolymer_liter-input').prop('name','additivesformationpolymer_liter-input'+num);
+                  $clone.find('#additivesformationpolymer_liter-input').val("").end();
+         
+                  $clone.find('#additivesformationpolymer_density-input').prop('name','additivesformationpolymer_density-input'+num);
+                  $clone.find('#additivesformationpolymer_density-input').val("").end();
+         
+                  $clone.find('#additivesformationpolymer_kg-input').prop('name','additivesformationpolymer_kg-input'+num);
+                  $clone.find('#additivesformationpolymer_kg-input').val("").end();
+         
+                  $div.after($clone);
+         
+                   countpolymer=countpolymer+1;
+               $('#count-polymer').val(countpolymer);
+                  });
+         
+            $('.addbaseoil').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="baseoil-block"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'baseoil-block'+num );
+                  $clone.find('#additivesformation_baseoilname-input').prop('name','additivesformation_baseoilname-input'+num);
+                  $clone.find('#additivesformation_baseoilname-input').val("").end();
+         
+                  $clone.find('#additivesformation_baseoil_percent-input').prop('name','additivesformation_baseoil_percent-input'+num);
+                  $clone.find('#additivesformation_baseoil_percent-input').val("").end();
+         
+                  $clone.find('#additivesformation_baseoil_liter-input').prop('name','additivesformation_baseoil_liter-input'+num);
+                  $clone.find('#additivesformation_baseoil_liter-input').val("").end();
+         
+                  $clone.find('#additivesformation_baseoil_density-input').prop('name','additivesformation_baseoil_density-input'+num);
+                  $clone.find('#additivesformation_baseoil_density-input').val("").end();
+         
+                  $clone.find('#additivesformation_baseoil_kgs-input').prop('name','additivesformation_baseoil_kgs-input'+num);
+                  $clone.find('#additivesformation_baseoil_kgs-input').val("").end();
+         
+                  $div.after($clone);
+                  countoil=countoil+1;
+                    $('#count-oil').val(countoil);
+         
+                  });
+
+
+         $('.edit').click(function(){
+            var product=this.value;
+            // alert(product);
+            $.post("{% url 'costmanagement:alterAdditives'%}",
+            {
+               'product':product,
+            },
+            function(data,status){
+               $('#edit-additivesname-input').val(data.product);
+               $('#edit-additivescfrprice-input').val(data.crfPrice.toFixed(4));
+               $('#edit-additivesaddcost-input').val(data.addCost.toFixed(4));
+               $('#edit-additiveslitercost_price-input').val(data.costPriceInLiter.toFixed(4));
+               $('#edit-additives_densityat15deg-input').val(data.density);
+               $('#edit-additives_totalcost_exdk-input').val(data.totalCost.toFixed(4));
+               $('#edit-additives-remarks_input').val(data.remarks);
+		$('.additive-approve-btn').prop("id",data.product);
+                if(data.approved){
+                $('.additive-approve-btn').prop("disabled","true");
+                }
+                else{
+                        $('.additive-approve-btn').removeAttr("disabled");
+                }
+                {% if user.authority == 'Accounts' %}
+                        if(data.approved){
+                $('#additive-save').prop("disabled","true");
+                }
+                else{
+		<!--	$('.additive-approve-btn').prop("disabled","true");-->
+                        $('#additive-save').removeAttr("disabled");
+                }
+
+                {% endif %}
+		{%if user.authority == 'Manager 1' %}
+		$('.additive-approve-btn').prop("disabled","true");
+		$('#additive-save').prop("disabled","true");
+		{%endif%}
+            
+           });
+         }); 
+	
+	$('.approve').click(function(){
+            var i=this.id;
+         $.post("{% url 'costmanagement:additive_approve'%}",
+         {
+            'product':i,
+           'csrfmiddlewaretoken':'{{csrf_token}}',
+         },
+         function(data,status){
+            // alert(data);
+		window.location.reload();
+         });
+
+         });
+
+	
+         $('#additivesaddcost-input').focusout(function(){
+            if($('#additivescfrprice-input').val()!=""){
+               $('#additives_totalcost_exdk-input').val((parseFloat($('#additivescfrprice-input').val())+parseFloat(this.value)).toFixed(4));
+            }
+            else{
+               $('#additives_totalcost_exdk-input').val((parseFloat(this.value)).toFixed(4));
+            }
+         });
+
+         $('#additives_densityat15deg-input').focusout(function(){
+            if($('#additives_totalcost_exdk-input').val()!=""){
+               $('#additiveslitercost_price-input').val((parseFloat($('#additives_totalcost_exdk-input').val())*parseFloat(this.value)).toFixed(4));
+            }
+         });
+
+         $('#additivescfrprice-input').focusout(function(){
+            if($('#additivesaddcost-input').val()!=""){
+               $('#additives_totalcost_exdk-input').val((parseFloat($('#additivesaddcost-input').val())+parseFloat(this.value)).toFixed(4));
+            }
+         });
+         
+         $('#edit-additivesaddcost-input').focusout(function(){
+
+            if($('#edit-additivescfrprice-input').val()!=""){
+               $('#edit-additives_totalcost_exdk-input').val((parseFloat($('#edit-additivescfrprice-input').val())+parseFloat(this.value)).toFixed(4));
+            }
+            else{
+               $('#edit-additives_totalcost_exdk-input').val(this.value);
+            }
+         });
+
+         $('#edit-additives_densityat15deg-input').focusout(function(){
+            if($('#edit-additives_totalcost_exdk-input').val()!=""){
+               $('#edit-additiveslitercost_price-input').val((parseFloat($('#edit-additives_totalcost_exdk-input').val())*parseFloat(this.value)).toFixed(4));
+            }
+         });
+
+         $('.excel').click(function(){
+            $(this).attr('href',"{% url 'costmanagement:exportAdditives'%}");
+         });
+         
+         $('.delete').click(function(){
+            var product=this.id;
+            // alert(product);
+            $.post("{% url 'costmanagement:deleteadditives'%}",
+            {
+               'product':product,
+            },
+            function(data,status){
+
+            });
+         });
+         });
+      </script>
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingrow">
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New Request
+               </button>
+            </div>
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Additives Details</h3>
+               </div>
+               <input type="text" placeholder="Filter Using Additives" class='table-search-costmanagement' data-table-search="myTable"></input>
+            </div>
+         </div>
+         <div class="boxone drag">
+		<style type="text/css">
+              th:nth-child(1), td:nth-child(1)
+              {
+              position:sticky;
+              left:0px;
+              background-color:grey;
+              }
+              th:nth-child(2), td:nth-child(2)
+              {
+              position:sticky;
+              left:50px;
+              background-color:grey;
+              }
+              
+            </style>
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+                  <tr>
+                   <th>S.N</th>
+                     <th scope="col">Name of Additives</th>
+                     <th scope="col">CFR Price/KG in USD</th>
+                     <th scope="col">Add Cost</th>
+                     <th scope="col">Cost Price in Liters</th>
+                     <th scope="col">Density at 15 Degree Celsius</th>
+                     <th scope="col">Total Cost EX DKin Kgs</th>
+                     <th scope="col">Remarks</th>
+		     <th scope="col">Approved</th>
+                     <th scope="col">Status</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for i in records %}
+                  <tr>
+                   <td>{{forloop.counter}}</td>
+                     <td >{{i.product}}</td>
+                     <td>{{i.crfPrice|floatformat:4}}</td>
+                     <td>{{i.addCost|floatformat:4}}</td>
+                     <td>{{i.costPriceInLiter|floatformat:4}}</td>
+                     <td>{{i.density|floatformat:4}}</td>
+                     <td>{{i.totalCost|floatformat:4}}</td>
+                     <td>{{i.remarks}}</td>
+		{% if i.approved %}
+			<td><input type="checkbox" checked ></td>
+		{% else %}
+			<td><input type="checkbox"></td>
+		{% endif %}
+	<td>
+			{% if user.authority == 'Manager 2' or user.authority == 'Accounts' or user.authority == 'Manager 1' %}
+                 <button type="button" value="{{i.product}}" class="btn btn-primary edit" data-toggle="modal" data-target="#edit0">Edit</button>
+                {% else %}
+		
+		{%endif%}
+		{% if user.authority == 'Manager 2' %}
+    <input type="button" class="btn btn-danger delete" id="{{i.product}}" value="Delete"><!--<input type="button" class= value="Detail" title="Click for additive formation details">-->
+                        {% endif %}
+		{% comment %}
+		{% if user.authority == 'Manager 2' or user.authority == 'Accounts' %}
+		<input type="button" class="btn btn-primary approve" id="{{i.product}}"  value="Approve"}>
+		{% endif %}
+		{% endcomment %}
+                     </td>
+			
+                  </tr>
+                {% endfor %}
+               </tbody>
+            </table>
+         </div>
+         </div>
+      <form action="{% url 'costmanagement:saveadditive'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+         {% csrf_token %}
+<!--          <div class="modal fade" id="entry0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Additives Formation Entry Data</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                      <div class="heading">
+                                 <h4 class="tradetitle">Additive Name</h4>
+                              </div>
+                        {% csrf_token %}
+                         <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    -->
+                                   <!-- already comented --> <!-- <input type="text" class="form-control date" id="additivesformation_date-input" name="additivesformation_date-input" placeholder="Choose the date">
+
+ -->                                 <!--   <label for="additivesformation_date-input" class=" form-control-label">Date</label>
+                                    <div class="datefield">
+                                    <input type="text" class="form-control date" name="additivesformation_date-input" id="additivesformation_date-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="additivesformation_date-input-date" ></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="additivesformation_productname-input" class=" form-control-label">Product Name</label>
+                                    <input type="text" id="additivesformationproductname-input" name="additivesformationproductname-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="additivesformation_netblendingqnty_liter-input" class=" form-control-label">Net Blending Quantity Liters</label>
+                                    <input type="text" id="additivesformation_netblendingqnty_liter-input" name="additivesformation_netblendingqnty_liter-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="additivesformation_grossvol_crosscheck-input" class=" form-control-label">Gross Vol CrossCheck</label>
+                                    <input type="text" id="additivesformation_grossvol_crosscheck-input" name="additivesformation_grossvol_crosscheck-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="additivesformation_percent_crosscheck-input" class=" form-control-label">%  CrossCheck</label>
+                                    <input type="text" id="additivesformation_percent_crosscheck-input" name="additivesformation_percent_crosscheck-input" class="form-control">
+                                 </div>
+                              </div>
+                           <div id="additive">
+                              
+                                 <div class="heading">
+                                 <h4 class="tradetitle">Raw Materials</h4>
+                              </div>
+                              <div id="additives-block1">
+                                 <div class="row form-group"> -->
+                                    <!--already commented earlier <div class="col-12 col-md-4">
+                                       <label for="additivesformationnum-input"  class="form-control-label">S.N</label>
+                                       <input type="text" id="additivesformationnum-input" name="additivesformationnum-input" class="form-control">
+                                       </div> -->
+    <!--                                 <div class="col col-md-6">
+                                       <label for="additivesformationproduct-input" class=" form-control-label">Product</label>
+                                       <input type="text" id="additivesformationproduct-input" name="additivesformationproduct-input1" class="form-control">
+                                    </div>
+                                    <div class="col col-md-6">
+                                       <label for="additivesformation_importrate-input" class=" form-control-label">Import Rate</label>
+                                       <input type="text" id="additivesformation_importrate-input" name="additivesformation_importrate-input1" class="form-control">
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-6">
+                                       <label for="additivesformation_addcost-input" class=" form-control-label">Add Cost</label>
+                                       <input type="text" id="additivesformation_addcost-input" name="additivesformation_addcost-input1" class="form-control">
+                                    </div>
+                                    <div class="col col-md-6">
+                                       <label for="additivesformation_total-input" class=" form-control-label">Total</label>
+                                       <input type="text"  id="additivesformation_total-input" name="additivesformation_total-input1" class="form-control">
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-4">
+                                       <label for="additivesformation_mttokl-input" class=" form-control-label">MT to Kl</label>
+                                       <input type="text"  id="additivesformation_mttokl-input" name="additivesformation_mttokl-input1" class="form-control">
+                                    </div>
+                                    <div class="col col-md-4">
+                                       <label for="additivesformation_usage-input" class=" form-control-label">Usage</label>
+                                       <input type="text"  id="additivesformation_usage-input" name="additivesformation_usage-input1" class="form-control">
+                                    </div>
+                                    <div class="col col-md-4">
+                                       <label for="additivesformation_netcost-input" class=" form-control-label">Net Cost</label>
+                                       <input type="text"  id="additivesformation_netcost-input" name="additivesformation_netcost-input1" class="form-control">
+                                    </div>
+                                 </div>
+                                 <br/>
+                              </div>
+                              <input type="hidden" value="1" id="count-raw" name="count-raw" />
+                              <input type="button" class="btn btn-primary addadditives" value="Add Product">
+                             
+                           </div>
+                           <div class="additives">
+                              <div class="heading">
+                                 <h4 class="tradetitle">Polymer</h4>
+                              </div>
+                              <div id="polymers">
+                                 <div id="polymer-block1">
+                                    <div class="row form-group">
+                                       <div class="col-md-6">
+                                          <label for="additivesformationpolymername-input" class=" form-control-label">Name</label>
+                                          <input type="text" id="additivesformationpolymername-input" name="additivesformationpolymername-input1" class="form-control">
+                                       </div>
+                                       <div class="col col-md-6">
+                                          <label for="additivesformationpolymer_percent-input" class=" form-control-label">Quantity in %</label>
+                                          <input type="text" id="additivesformationpolymer_percent-input" name="additivesformationpolymer_percent-input1" class="form-control">
+                                       </div>
+                                    </div>
+                                    <div class="row form-group">
+                                       <div class="col col-md-4">
+                                          <label for="additivesformationpolymer_liter-input" class=" form-control-label">Quantity in liters</label>
+                                          <input type="text" id="additivesformationpolymer_liter-input" name="additivesquantity_liter-input1" class="form-control">
+                                       </div>
+                                       <div class="col col-md-4">
+                                          <label for="additivesformationpolymer_density-input" class=" form-control-label">Density</label>
+                                          <input type="text" id="additivesformationpolymer_density-input" name="additivesformationpolymer_density-input1" class="form-control">
+                                       </div>
+                                       <div class="col col-md-4">
+                                          <label for="additivesformationpolymer_kg-input" class=" form-control-label">Quantity in Kgs</label>
+                                          <input type="text" id="additivesformationpolymer_kg-input" name="additivesformationpolymer_kg-input1" class="form-control">
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <input type="hidden" value="1" id="count-polymer" name="count-polymer" />
+                              <input type="button" class="btn btn-primary addpolymer"  value="Add More">
+                           </div>
+                           <div class="baseoils">
+                              <div class="heading">
+                                 <h4 class="tradetitle"> Base oils</h4>
+                              </div>
+                              <div id="baseoil">
+                                 <div id="baseoil-block1">
+                                    <div class="row form-group">
+                                       <div class="col col-md-6">
+                                          <label for="additivesformation_baseoilname-input" class=" form-control-label">Name</label>
+                                          <input type="text" id="additivesformation_baseoilname-input" name="additivesformation_baseoilname-input1" class="form-control">
+                                       </div>
+                                       <div class="col col-md-6">
+                                          <label for="additivesformation_baseoil_percent-input" class=" form-control-label">Quantity in %</label>
+                                          <input type="text" id="additivesformation_baseoil_percent-input" name="additivesformation_baseoil_percent-input1" class="form-control">
+                                       </div>
+                                    </div>
+                                    <div class="row form-group">
+                                       <div class="col col-md-4">
+                                          <label for="additivesformation_baseoil_liter-input" class=" form-control-label">Quantity in Liters</label>
+                                          <input type="text" id="additivesformation_baseoil_liter-input" name="additivesformation_baseoil_liter-input1" class="form-control">
+                                       </div>
+                                       <div class="col col-md-4">
+                                          <label for="additivesformation_baseoil_density-input" class=" form-control-label">Density</label>
+                                          <input type="text" id="additivesformation_baseoil_density-input" name="additivesformation_baseoil_density-input1" class="form-control">
+                                       </div>
+                                       <div class="col col-md-4">
+                                          <label for="additivesformation_baseoil_kgs-input" class=" form-control-label">Quantity in Kgs</label>
+                                          <input type="text" id="additivesformation_baseoil_kgs-input" name="additivesformation_baseoil_kgs-input1" class="form-control">
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <input type="hidden" value="1" id="count-oil" name="count-oil" />
+                              <input type="button" class="btn btn-primary addbaseoil"  value="Add More">
+                              <div class="modal-footer">
+                                 <button type="button" class="btn btn-default btn-next"  data-dismiss="modal" data-toggle="modal" data-target="#entry1">Next</button>
+                     
+                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              </div>
+                           </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div> -->
+         <div class="modal fade" id="entry0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <h3 class="modal-title title" id="exampleModalLabel">Additives Entry Data</h3>
+                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                           <span aria-hidden="true">&times;</span>
+                           </button>
+                        </div>
+                        <div class="modal-body">
+                           <div class="card-body card-block">
+                           
+                                 <div class="row form-group">
+                               
+                                    <div class="col col-md-6">
+                                       <label for="additivesname-input" class=" form-control-label">Name of additives</label>
+                                       <input type="text" id="additivesname-input" name="additivesname-input" class="form-control">
+                                    </div>
+                                    <div class="col col-md-6">
+                                       <label for="additivescfrprice-input" class=" form-control-label">CFR Price/KG in USD</label>
+                                       <input type="text" id="additivescfrprice-input" name="additivescfrprice-input" class="form-control">
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-6">
+                                       <label for="additivesaddcost-input" class=" form-control-label">Add Cost</label>
+                                       <input type="text" id="additivesaddcost-input" name="additivesaddcosta-input" class="form-control">
+                                    </div>
+                                    
+                                    <div class="col col-md-6">
+                                       <label for="additives_totalcost_exdk-input" class=" form-control-label">Total cost EX DK in Kgs</label>
+                                       <input type="text"  id="additives_totalcost_exdk-input" name="  additives_totalcost_exdk-input" class="form-control">
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-6">
+                                       <label for="additives_densityat15deg-input" class=" form-control-label">Density @ 15 Degree Celsius</label>
+                                       <input type="text"  id="additives_densityat15deg-input" name="additives_densityat15deg-input" class="form-control">
+                                    </div>
+                                   <div class="col col-md-6">
+                                       <label for="additiveslitercost_price-input" class=" form-control-label">Cost Price in Liters</label>
+                                       <input type="text"  id="additiveslitercost_price-input" name="additiveslitercost_price-input" class="form-control">
+                                    </div>
+                                 </div>
+                                  <div class="row form-group">
+                              <div class="col-md-12">
+                                 <label for="remarks">Remarks</label>
+                                 <input type="text" name="additives-remarks" id="additives-remarks_input" class="form-control">
+                              </div>
+                           </div>
+                                 <div class="modal-footer">
+                              <!--       <button type="button" class="btn btn-default btn-prev">Previous</button> -->
+			
+                                    <input type="submit" class="btn btn-primary" value="Save Details">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                 </div>
+                             
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+         </div>
+      </form>
+         <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <h3 class="modal-title title" id="exampleModalLabel">Additives Entry Data</h3>
+                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                           <span aria-hidden="true">&times;</span>
+                           </button>
+                        </div>
+                        <div class="modal-body">
+                           <div class="card-body card-block">
+                                 <form action="{% url 'costmanagement:editAdditives' %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                                    {% csrf_token %}
+                                 <div class="row form-group">
+                                   
+                                    <div class="col col-md-6">
+                                       <label for="additivesname-input" class=" form-control-label">Name of additives</label>
+                                       <input type="text" id="edit-additivesname-input" name="additivesname-input" class="form-control">
+                                    </div>
+                                    <div class="col col-md-6">
+                                       <label for="additivescfrprice-input" class=" form-control-label">CFR Price/KG in USD</label>
+                                       <input type="text" id="edit-additivescfrprice-input" name="additivescfrprice-input" class="form-control">
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-6">
+                                       <label for="additivesaddcost-input" class=" form-control-label">Add Cost</label>
+                                       <input type="text" id="edit-additivesaddcost-input" name="additivesaddcosta-input" class="form-control">
+                                    </div>
+                                     <div class="col col-md-6">
+                                       <label for="additives_totalcost_exdk-input" class=" form-control-label">Total cost EX DK in Kgs</label>
+                                       <input type="text"  id="edit-additives_totalcost_exdk-input" name="additives_totalcost_exdk-input" class="form-control">
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-6">
+                                       <label for="additives_densityat15deg-input" class=" form-control-label">Density @ 15 Degree Celsius</label>
+                                       <input type="text"  id="edit-additives_densityat15deg-input" name="additives_densityat15deg-input" class="form-control">
+                                    </div>
+                                   
+                                    <div class="col col-md-6">
+                                       <label for="additiveslitercost_price-input" class=" form-control-label">Cost Price in Liters</label>
+                                       <input type="text"  id="edit-additiveslitercost_price-input" name="additiveslitercost_price-input" class="form-control">
+                                    </div>
+                                 </div>
+                                        <div class="row form-group">
+                              <div class="col-md-12">
+                                 <label for="remarks">Remarks</label>
+                                 <input type="text" name="additives-remarks" id="edit-additives-remarks_input" class="form-control">
+                              </div>
+                           </div>
+                                 <div class="modal-footer">
+				<input type="button" class="btn btn-primary approve additive-approve-btn"  value="Approve">
+                                    <input type="submit" class="btn btn-primary" id="additive-save" value="Save Details">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                 </div>
+                              </form>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+         </div>
+      </div>
+   </div>
+         {% include 'footer.html'%}
+      </div>
+   </div>
+   </body>
+</html>
+<!-- end document

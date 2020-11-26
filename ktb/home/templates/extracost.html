@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+{%load staticfiles%}
+<html lang="en">
+
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Extra Cost Related</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+     <!--  <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript">
+
+          $(document).ready(function(){
+
+             $("#dropdown").change(function(){
+                    var id=this.value;
+
+                    $.post("{% url 'home:getextras'%}",
+                    {
+                        'type':id,
+                    },
+                    function(data,status){
+
+                       $('#rowid').empty();
+                       for (var i = 0; i < data.data.length; i++) {
+
+                        $("#rowid").append("<tr><th>"+data.trn[i].sn+"</th><td>"+data.trn[i].types+"</td><td>"+data.trn[i].company+"</td><td>"+data.trn[i].trn+"</td><td>"+data.trn[i].client+"</td><td>"+data.trn[i].baseproduct+"</td><td>"+data.trn[i].tuq+" "+data.trn[i].contractUnit+"</td><td>"+data.data[i].bankCharges+"</td><td>"+data.data[i].billFee+"</td><td>"+data.data[i].remarks+"</td><td><button type='button' class='btn btn-primary view' id="+data.trn[i].trn+" value="+data.trn[i].trn+" data-toggle='modal' data-target='#view0'>View</button> {% if user.authority != 'Viewer' and user.authority != 'Accounts'%}<button type='button' class='btn btn-primary editbtn0' id="+data.trn[i].trn+" value="+data.trn[i].trn+" data-toggle='modal' data-target='#edit0'>Edit</button> {% endif %}{% if user.authority == 'Manager 2'%}<button type='button' class='btn btn-danger delete' value="+data.trn[i].trn+">Delete</button>{% endif %}</td></tr>");
+                           //alert(data.data[i].trn);
+                       }
+                    });
+                });
+
+              $('#traderefno').change(function(){
+              var trn=this.value;
+              $.post("{% url 'home:extrashelper'%}",
+              {
+                'trn':trn,
+              },
+              function(data,status){
+                // alert(data.types);
+                $('#tradetype-input').val(data.types);
+                $('#extracostparty').val(data.client);
+              });
+            });
+
+            $(document).on('click','.editbtn0',function(){
+                  var trn=this.value;
+                  $.post("{% url 'home:alterExtras' %}",
+                  {
+                     'trn':trn
+                  },
+              function(data,status){
+                // alert(data.lcExpiryDate);
+               $('#edit-number-input').val(data.sn);
+               $('#edit-company-input').val(data.company);
+               $('#edit-traderefdate-input').val(data.trd);
+               $('#edit-traderefno-input').val(data.trn);
+               $('#edit-tradetype-input').val(data.types);
+
+                $('#edit-bankcharges-input').val(data.bankCharges.toFixed(2));
+            $('#edit-blfee-input').val(data.billFee.toFixed(2));
+            $('#edit-blcollectioncharge-input').val(data.billCollectionCharges.toFixed(2));
+            $('#edit-othercharges-input').val(data.otherCharges.toFixed(2));
+
+            $('#edit-traderefno').val(data.trn);
+            $('#edit-extracostparty').val(data.client);
+            $('#edit-extracost_remarks-input').val(data.remarks);
+             });
+            });
+
+            $(document).on('click','.view',function(){
+                  var trn=this.value;
+                  $.post("{% url 'home:alterExtras' %}",
+                  {
+                     'trn':trn
+                  },
+              function(data,status){
+                // alert(data.lcExpiryDate);
+               $('#sn').text(data.sn);
+               $('#company').text(data.company);
+               $('#trd').text(data.trd);
+               $('#trn').text(data.trn);
+               // $('#edit-tradetype-input').val(data.types);
+
+            $('#bankCharges').text(data.bankCharges.toFixed(2));
+            $('#billFee').text(data.billFee.toFixed(2));
+            $('#billCollectionCharges').text(data.billCollectionCharges.toFixed(2));
+            $('#otherCharges').text(data.otherCharges.toFixed(2));
+            $('#viewremarks').text(data.remarks.toFixed(2));
+            // $('#edit-traderefno').val(data.trn);
+
+             });
+            });
+
+            $('.delete').click(function(){
+                    var trn=this.value;
+                    $.post("{% url 'home:delExtra' %}",
+                        {
+                            'trn':trn
+                        },
+                        function(data,status){
+                            // alert(data.result);
+                        });
+                });
+
+             $('.excel').click(function(){
+                        $(this).attr('href',"{% url 'home:exportExtras'%}");
+                     });
+          });
+
+
+          function Validate(){
+            if($('#tradetype-input').val()!="Sales" && $('#tradetype-input').val()!="Purchase"){
+               // alert($('#tradetype-input').val());
+               $('#tradetype-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+            }
+
+             else if($('#bankcharges-input').val()==''){
+             $('#bankcharges-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#blfee-input').val()==''){
+             $('#blfee-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#blcollectioncharge-input').val()==''){
+             $('#blcollectioncharge-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#othercharges-input').val()==''){
+             $('#othercharges-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#extracostparty').val()==''){
+             $('#extracostparty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else{
+              return true;
+             }
+          }
+          function ValidateEdit(){
+            if($('#edit-tradetype-input').val()!="Sales" && $('#edit-tradetype-input').val()!="Purchase"){
+               // alert($('#tradetype-input').val());
+               $('#edit-tradetype-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+            }
+
+             else if($('#edit-bankcharges-input').val()==''){
+             $('#edit-bankcharges-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#edit-blfee-input').val()==''){
+             $('#edit-blfee-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#edit-blcollectioncharge-input').val()==''){
+             $('#edit-blcollectioncharge-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#edit-othercharges-input').val()==''){
+             $('#edit-othercharges-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#edit-extracostparty').val()==''){
+             $('#edit-extracostparty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else{
+              return true;
+             }
+          }
+      </script>
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+             <div class="headingtitle">
+               <div class="title">
+                  <h3>Extra Cost Related Details</h3>
+               </div>
+              <input type="text" placeholder="Filter Using TRN" class='table-search' id="table-search" data-table-search="myTable">
+                  <select class="form-control" id="dropdown">
+                    <option value="" id="" selected disabled >By Trade</option>
+                      <option value="salestrade" id="salestrade">By Sales Trade</option>
+                      <option value="purchasetrade" id="purchasetrade">By Purchase Trade</option>
+                      <option value="cancelsales" id="cancelsales">By Cancel Sales </option>
+                      <option value="cancelpurchase" id="cancelpurchase">By Cancel Purchase</option>
+                      <option value="salesamendment" id="salesamendment">By Sales Amendment</option>
+                      <option value="purchaseamendment" id="purchaseamendment">By Purchase Amendment</option>
+                  </select>
+                  </input>
+            </div>
+
+            <div class="headingrow">
+              {% if user.authority != 'Viewer' and user.authority != 'Accounts' %}
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New Entry
+               </button>
+               {% else %}
+               <button type="button" class="btn btn-primary" disabled>
+               New Entry
+               </button>
+               {% endif %}
+            </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="entry0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">Extra Cost Related Data Entry</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+
+                     <div class="modal-body">
+                        <div class="card-body card-block">
+                           <form action="{%url 'home:saveExtras'%}" method="post" class="form-horizontal">
+                               {%csrf_token%}
+                                      <div class="numbertraderef">
+                        <label for="traderefno">Trade Reference Number</label>
+                        <select class="form-control" name="traderefno" id="traderefno">
+                          <option value="">select trn</option>
+                            {%for trn in trns %}
+                            {% if trn.trade_status == 'Approved' %}
+                          <option value="{{trn.trn}}">{{trn.trn}}</option>
+                             {% endif %}
+                              {% endfor %}
+                        </select>
+                           </div>
+                   <div class="tradeselect">
+                     <div class="row form-group">
+                         <div class="col-md-6">
+                      <!--   <select class="form-control" id="tradetype-input" name="tradetype-input">
+                                       <option value="company" selected="true">Select your trade type</option>
+                                       <option value="Sales">Sales</option>
+                                       <option value="Purchase">Purchase</option>
+
+                                    </select> -->
+
+
+                             <input type="text" id="tradetype-input" name="tradetype-input" value="Sales" class="form-control">
+                           </div>
+                               <div class="col-md-6">
+                                <input type="text" class="form-control" id="extracostparty" placeholder="Buyer/ Seller Name" name="extracostparty">
+                                 <!--   <select class="form-control" id="extracost">
+                                    <option value="name1" selected disabled>Buyer/Seller Name</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                   </select> -->
+                                 </div>
+                   </div>
+                </div>
+
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="bankcharges-input" class=" form-control-label">Bank Charges</label>
+                                 <input type="text" id="bankcharges-input" name="bankcharges-input" class="validatenum form-control ">
+
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="blfee-input" class=" form-control-label">BL Fee</label>
+                                 <input type="text" id="blfee-input" name="blfee-input" class="validatenum form-control ">
+
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="blcollectioncharge-input" class=" form-control-label">
+                                 BL Collection Charges</label>
+                                 <input type="text" id="blcollectioncharge-input" name="blcollectioncharge-input" class="validatenum form-control ">
+
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="othercharges-input" class=" form-control-label">Other Charges</label>
+                                 <input type="text" id="othercharges-input" name="othercharges-input" class="validatenum form-control">
+
+                              </div>
+                           </div>
+
+                                <div class="row form-group">
+                                <div class="col-md-12">
+                                  <label for="extracost_remarks-input" class="form-control-label">Remarks</label>
+                                  <input type="text" class="form-control" id="extracost_remarks-input" name="extracost_remarks-input">
+                                </div>
+                              </div>
+                           <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <input type="submit" onclick="return Validate()" class="btn btn-primary"  value="Save Details">
+                           </div>
+                         </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+
+<!-- view div -->
+
+ <div class="modal fade table1" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Extra Cost Details</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <div class="displaydata ">
+                           <div class="description companytitle">
+
+                              <ul>
+                                 <li>S.N :<span id="sn"></span></li>
+                                 <li>Company :<span id="company"></span></li>
+                                 <li>Trade Ref. Date :<span id="trd"></span></li>
+                                 <li>Trade Ref. No :<span id="trn"></span></li>
+                              </ul>
+                           </div>
+                               <table class="table tableview table-bordered">
+
+  <tbody>
+     <tr>
+      <th scope="col">Bank Charges</th>
+ <td id="bankCharges"></td>
+    </tr>
+    <tr>
+           <th scope="col">Purchase/Sales BL Fee</th>
+ <td id="billFee"></td>
+
+    </tr>
+    <tr>
+           <th scope="col">BL Collection Charges</th>
+ <td id="billCollectionCharges"></td>
+
+    </tr>
+    <tr>
+          <th scope="col">Other Charges</th>
+ <td id="otherCharges"></td>
+
+    </tr>
+     <tr>
+          <th scope="col">Remarks</th>
+ <td id="viewremarks"></td>
+
+    </tr>
+  </tbody>
+</table>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+
+
+<!-- edit div -->
+ <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">Extra Cost Related Data Entry</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+
+                         <div class="modal-body">
+                        <div class="card-body card-block">
+                           <form action="{%url 'home:editExtras'%}" method="post" class="form-horizontal">
+                               {%csrf_token%}
+                                      <div class="numbertraderef">
+                        <label for="traderefno">Trade Reference Number</label>
+                        <select class="form-control" name="traderefno" id="edit-traderefno">
+                            {%for trn in trns %}
+
+                          <option value="{{trn.trn}}">{{trn.trn}}</option>
+
+                              {% endfor %}
+                        </select>
+                           </div>
+                   <div class="tradeselect">
+                    <div class="row form-group">
+                         <div class="col-md-6">
+                     <!--    <select class="form-control" id="edit-tradetype-input" name="tradetype-input">
+                                       <option value="company" disabled="disabled" selected="true">Select your trade type</option>
+                                       <option value="Sales">Sales</option>
+                                       <option value="Purchase">Purchase</option>
+
+                                    </select> -->
+
+                             <input type="text" id="edit-tradetype-input" name="tradetype-input" value="Sales" class="form-control">
+                           </div>
+
+                       <div class="col-md-6">
+                        <input type="text" class="form-control" id="edit-extracostparty" name="edit-extracostparty">
+                                  <!--  <select class="form-control" id="edit-extracost">
+                                    <option value="name1" selected disabled>Buyer/Seller Name</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                   </select> -->
+                                 </div>
+                               </div>
+                </div>
+
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="bankcharges-input" class=" form-control-label">Bank Charges</label>
+                                 <input type="text" id="edit-bankcharges-input" name="bankcharges-input" class="validatenum form-control ">
+
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="blfee-input" class=" form-control-label">BL Fee</label>
+                                 <input type="text" id="edit-blfee-input" name="blfee-input" class="validatenum form-control ">
+
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="blcollectioncharge-input" class=" form-control-label">
+                                 BL Collection Charges</label>
+                                 <input type="text" id="edit-blcollectioncharge-input" name="blcollectioncharge-input" class="validatenum form-control ">
+
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="othercharges-input" class=" form-control-label">Other Charges</label>
+                                 <input type="text" id="edit-othercharges-input" name="othercharges-input" class="validatenum form-control">
+
+                              </div>
+                           </div>
+                         <div class="row form-group">
+                                <div class="col-md-12">
+                                  <label for="edit-extracost_remarks-input" class="form-control-label">Remarks</label>
+                                  <input type="text" class="form-control" id="edit-extracost_remarks-input" name="extracost_remarks-input">
+                                </div>
+                              </div>
+
+                           <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <input type="submit" onclick="return ValidateEdit()" class="btn btn-primary"  value="Save Details">
+                           </div>
+                         </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered tablecolumnfixed" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">S.N</th>
+                     <th scope="col">Trade Type</th>
+                     <th scope="col">Company</th>
+                     <th scope="col">TRN</th>
+                     <th scope="col">Buyer/Seller Name</th>
+                     <!-- <th scope="col">Product Code</th> -->
+                     <th scope="col">Product Name</th>
+                     <th scope="col">Qty</th>
+                     <th scope="col">Bank Charges</th>
+                     <th scope="col">BL Fee</th>
+                     <th scope="col">Remarks</th>
+                     <th scope="col">Status</th>
+
+                  </tr>
+               </thead>
+               <tbody id="rowid">
+                  {% for i in records %}
+                  <tr>
+                     <td>{{i.trn.sn}}</td>
+                     <td>{{i.trn.types}}</td>
+                     <td>{{i.trn.company}}</td>
+                     <td>{{i.trn.trn}}</td>
+                    <td>{{i.trn.client}}</td>
+                     <!-- <td></td> -->
+                     <td>{{i.trn.baseproduct}}</td>
+                     <td>{{i.trn.tuq}} {{i.trn.contractUnit}}</td>
+                     <td>{{i.bankCharges|floatformat:2}}</td>
+
+                     <td id="billFee">{{i.billFee|floatformat:2}}</td>
+                    <td>{{i.remarks}}</td>
+
+                     <td>   <button type="button" class="btn btn-primary view" value="{{i.trn.trn}}" data-toggle="modal" id="{{i.trn.trn}}"  data-target="#view0">
+                        View
+                        </button>
+                       {% if user.authority != 'Viewer' and user.authority != 'Accounts'%}
+                      <button type="button" class="btn btn-primary editbtn0" value="{{i.trn.trn}}" data-toggle="modal" id="{{i.trn.trn}}"  data-target="#edit0">
+                        Edit
+                        </button>
+                        {% endif %}
+                        {% if user.authority == 'Manager 2'%}
+                         <button type="button" class="btn btn-danger delete" value="{{i.trn.trn}}">Delete</button>
+                        {% endif %}
+                     </td>
+
+                  </tr>
+
+                {% endfor %}
+               </tbody>
+            </table>
+         </div>
+       </div>
+      </div>
+   </div>
+   {% include 'footer.html'%}
+   </div>
+   </body>
+</html>
+<!-- end document-->

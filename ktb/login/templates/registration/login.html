@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{%load staticfiles%}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Login Page</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'login/font-face.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'login/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'login/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'login/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'login/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'login/login.css'%}" rel="stylesheet" media="all">
+    
+   </head>
+   <body class="login">
+      <div class="container">
+         <div class="card">
+            <a class="logo">
+            <img src="{%static 'images/kismatlogo.png'%}" alt="kismatlogo" />
+            </a>
+            <div class="card-header">
+               <h4>Log into your account <i class="fas fa-sign-in-alt"></i></h4>
+            </div>
+            <div class="card-body">
+               <form action="{%url 'home:userlogin' %}" method="POST">
+                 {% csrf_token %}
+                 
+                  <div class="input-group form-group">
+                     <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                     </div>
+                     <input type="text" name='user' id='user' class="form-control" placeholder="Username">
+                  </div>
+                  <div class="input-group form-group">
+                     <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                     </div>
+                     <input type="password" name="password" id="password" class="form-control" placeholder="Password">
+                  </div>
+                  <!-- <div class="row align-items-center remember">
+                     <input type="checkbox">Remember Me
+                  </div> -->
+
+                  <div class="form-group">
+
+                     <input type="submit" value="Login" class="btn float-right login_btn">
+                  </div>
+               </form>
+            </div>
+           <!--  <div class="card-footer">
+               <div class="passwordlink">
+
+                    <a href="#">Sign up</a> <span>|</span><a href="#">Forgot your password?</a>
+               </div>
+            </div> -->
+         </div>
+      </div>
+   </body>
+</html>
+<!-- end document

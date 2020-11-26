@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+{%load staticfiles%}
+ {% load custom_tags %}
+{% temp as i %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Trade Approval</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+           <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0-RC1/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+      <style type="text/css">
+          select#dropdownList {
+           right: 50%;
+          }
+          select#dropdown {
+              right: 0;
+          }
+          .filter_year{
+            left: -15px;
+          }
+          input.approved{
+            right: 27%;
+          }
+
+      </style>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript">
+        $(document).ready(function(){
+          $('.dropdown-menu li a').click(function(){
+                   $('#product-name,#edit-product-name').val('');
+                   // alert('clicked');
+                  $(this).parents('.dropdown').find('input.billno').val($(this).attr('data-value'));
+              })
+          var filterDate=false;
+
+          $("#dropdown").change(function(){
+            filterDate=false;
+
+                    var id=this.value;
+                    
+                    $.post("{% url 'home:gettradeapproved'%}",
+                    {
+                        'type':id,
+                    },
+                    function(data,status){
+                       $('#rowid').empty();
+                       for (var i = 0; i < data.data.length; i++) {
+                        
+                        $("#rowid").append("<tr><td>"+data.data[i].sn+"</th><td >"+data.data[i].types+"</td><td>"+data.data[i].company+"</td><td>"+data.data[i].trn+"</td><td>"+data.data[i].trd+"</td><td>"+parseFloat(data.data[i].tuq).toFixed(4)+" "+data.data[i].contractUnit+"</td><td>"+data.data[i].product+"</td><td>"+data.data[i].baseproduct+"</td><td>"+data.data[i].client+"</td><td>"+parseFloat(data.data[i].ratePMT).toFixed(4)+"</td><td scope='row'><button type='button' class='btn btn-primary view' value="+data.data[i].trn+" data-target='#view0' data-toggle='modal'>View</button>{% if user.authority == 'Manager 2' or user.authority == 'Manager 1'%}<button type='button' class='btn btn-primary editbtn0' value="+data.data[i].trn+" data-target='#edit0' data-toggle='modal'>Edit</button>{% endif %}{% if user.authority == 'Manager 2' %}<button type='button' class='btn btn-danger delete' value="+data.data[i].trn+">Delete</button>{% endif %}</td></tr>");
+                           //alert(data.data[i].trn);
+                       }
+                    });
+                });
+
+          $(document).on('click','#filter_btn',function(){
+            filterDate=true;
+
+             var year=$('#by_year').val();
+            var month=$('#by_month').val();
+
+            $.post("{% url 'home:filterapproved'%}",
+            {
+              'year':year,
+              'month':month,
+            },
+            function(data,status){
+             $('#rowid').empty();
+                       for (var i = 0; i < data.data.length; i++) {
+                         $("#rowid").append("<tr><td>"+data.data[i].sn+"</th><td >"+data.data[i].types+"</td><td>"+data.data[i].company+"</td><td>"+data.data[i].trn+"</td><td>"+data.data[i].trd+"</td><td>"+parseFloat(data.data[i].tuq).toFixed(4)+" "+data.data[i].contractUnit+"</td><td>"+data.data[i].product+"</td><td>"+data.data[i].baseproduct+"</td><td>"+data.data[i].client+"</td><td>"+parseFloat(data.data[i].ratePMT).toFixed(4)+"</td><td scope='row'><button type='button' class='btn btn-primary view' value="+data.data[i].trn+" data-target='#view0' data-toggle='modal'>View</button>{% if user.authority == 'Manager 2' or user.authority == 'Manager 1'%}<button type='button' class='btn btn-primary editbtn0' value="+data.data[i].trn+" data-target='#edit0' data-toggle='modal'>Edit</button>{% endif %}{% if user.authority == 'Manager 2' %}<button type='button' class='btn btn-danger delete' value="+data.data[i].trn+">Delete</button>{% endif %}</td></tr>");
+                      
+           }
+           });
+          });
+
+          $("#edit-traderefdate-input-date").datepicker({
+ 
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+  $('#edit-traderefdate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#edit-eta-input-date").datepicker({
+   
+}).on("changeDate", function (e) {
+ var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+  $('#edit-eta-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#edit-etd-input-date").datepicker({
+   
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+  $('#edit-etd-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+
+         
+         $(document).on('click','.editbtn0',function(){
+                  var trn=this.value;
+                  $.post("{% url 'home:alterTradeApproved' %}",
+                  {
+                     'trn':trn
+        },
+         function(data,status){
+            $('#edit-tradetype-input').val(data.types);
+            $('#edit-number-input').val(data.sn);
+            $('#edit-company-input').val(data.company);
+            $('#edit-traderefdate-input').val(data.trd);
+            $('#edit-traderefno-input').val(data.trn);
+            $('#edit-types-input').val(data.types);
+
+            $('#edit-product-input').val(data.product);
+            $('#edit-product-name').val(data.baseproduct);
+            $('#edit-origin-input').val(data.origin);
+            $('#edit-client-input').val(data.client);
+            $('#edit-address-input').val(data.address);
+            $('#edit-contractqnty-input').val(data.tcq);
+            $('#edit-contractunit-input').val(data.contractUnit);
+
+            $('#edit-tolerance-input').val(data.tolerance);
+            $('#edit-packing-input').val(data.packing);
+            $('#edit-tradeupdateqnty-input').val(data.tuq);
+            $('#edit-contractUnit-input').val(data.tuqUnit);
+            $('#edit-contractbalanceqnty-input').val(data.contractBalanceQty);
+
+            $('#edit-contractbalanceunit-input').val(data.contractBalanceUnit);
+            $('#edit-ratepmt-input').val(data.ratePMT);
+            $('#edit-commissionagent-input').val(data.commissionAgent);
+            $('#edit-commissionrate-input').val(data.commissionRate);
+            $('#edit-logisticprovider-input').val(data.logisticProvider);
+
+            $('#edit-bank-input').val(data.bank);
+            $('#edit-acountnum-input').val(data.account);
+            $('#edit-swiftcode-input').val(data.swift);
+
+            $('#edit-estimatedlogisticcost-input').val(data.estimatedLogisticsCost);
+            $('#edit-paymentterm-input').val(data.paymentTerm);
+            $('#edit-incoterm-input').val(data.incoterm);
+            $('#edit-pod-input').val(data.pod);
+            $('#edit-pol-input').val(data.pol);
+            $('#edit-etd-input').val(data.etd);
+            $('#edit-eta-input').val(data.eta);
+            $('#edit-remark-input').val(data.remarks);
+
+             if(data.first_trn != data.trn){
+             
+                                  $('#edit-contractqnty-input').attr('readonly',true);
+                                // $('#contractbalanceqnty-input').attr('readonly',true);
+                            }
+                            else{ $('#edit-contractqnty-input').attr('readonly',false);}
+                  });
+               });
+
+
+           $('#edit-contractqnty-input').keyup(function() {
+                $('#edit-contractbalanceqnty-input').val(this.value);
+                });
+           
+           $(document).on('click','.view',function(){
+
+            var trn=this.value;
+            $.post("{% url 'home:alterTradeApproved' %}",
+                  {
+                     'trn':trn
+                  },
+            function(data,status){
+               // alert(data.sn);
+               $('#sn').text(data.sn);
+               $('#company').text(data.company);
+               $('#trd').text(data.trd);
+               $('#trn').text(data.trn);
+               $('#type').text(data.types);
+               $('#types').text(data.types);
+               $('#product').text(data.product);
+               $('#baseproduct').text(data.baseproduct);
+               $('#origin').text(data.origin);
+               $('#client').text(data.client);
+               $('#address').text(data.address);
+               $('#tcq').text(data.tcq + ' '+data.contractUnit);
+              
+               $('#tolerance').text(data.tolerance);
+               $('#packing').text(data.packing);
+               $('#tuq').text(data.tuq+' '+data.tuqUnit);
+              
+               $('#contractbalanceqnty').text(data.contractBalanceQty+' '+data.contractBalanceUnit);
+
+               $('#trade_status').text(data.trade_status);
+               $('#trade_approved_date').text(data.tad);
+               $('#ratePMT').text(data.ratePMT);
+               $('#commissionAgent').text(data.commissionAgent);
+               $('#commissionRate').text(data.commissionRate);
+               $('#logisticProvider').text(data.logisticProvider);
+
+               $('#bankname').text(data.bank);
+               $('#accountnumber').text(data.account);
+               $('#swiftcode').text(data.swift);
+
+               $('#estimatedLogisticsCost').text(data.estimatedLogisticsCost);
+               $('#paymentTerm').text(data.paymentTerm);
+               $('#incoterm').text(data.incoterm);
+               $('#pod').text(data.pod);
+               $('#pol').text(data.pol);
+               $('#etd').text(data.etd);
+               $('#eta').text(data.eta);
+               $('#remarks').text(data.remarks);
+               $('#manager1').val(data.trn);
+               $('#manager2').val(data.trn);
+             });
+            });
+
+           $('#edit-bank-input').change(function(){
+                    var bank=this.value;
+                    if(bank == 'OVERSEA CHINESE BANKING CORPORATION (OCBC) 65 CHULIA STREET, SINGAPORE 049513'){
+                        $('#edit-acountnum-input').val('503-390-163-301 (USD)');
+                        $('#edit-swiftcode-input').val('OCBCSGSG');
+                    }
+                    if(bank == 'RHB BANK, SINGAPORE 90 CECIL STREET, #12-00 RHB BANK BUILDING , SINGAPORE 069531'){
+                        $('#edit-acountnum-input').val('17510131201 (USD)');
+                        $('#edit-swiftcode-input').val('RHBBSGSGXXX');
+                    }
+                    if(bank == 'NA'){
+                        $('#edit-acountnum-input').val("NA");
+                        $('#edit-swiftcode-input').val("NA");
+                    }
+                    if(bank == 'CIMB BANK MENARA BINJAI, MALAYSIA'){
+                        $('#edit-acountnum-input').val("800-958-748-540 (USD)");
+                        $('#edit-swiftcode-input').val("CIBBMYKL");
+                    }
+                    if(bank == "UNITED OVERSEAS BANK LIMITED 80 RAFFLES PLACE, UOB PLAZA 1, SINGAPORE 048-624"){
+                        $('#edit-acountnum-input').val("391-901-024-8 (USD)");
+                        $('#edit-swiftcode-input').val("UOVBSGSG");
+                    }
+                });
+
+           $('.delete').click(function(){
+                    var trn=this.value;
+                    $.post("{% url 'home:delApproved' %}",
+                        {
+                            'trn':trn
+                        },
+                        function(data,status){
+                            // alert(data.result);
+                        });
+                });
+            $('.excel').click(function(){
+
+           if(filterDate == false){
+
+             if($('#dropdown').val()=='salestrade'){
+                    $(this).attr('href',"{% url 'home:exportApproved' approved='salestrade'%}");
+                    }
+                    else if($('#dropdown').val()=='purchasetrade'){
+                        $(this).attr('href',"{% url 'home:exportApproved' approved='purchasetrade'%}");
+                    }
+                    else if($('#dropdown').val()=='cancelsales'){
+                        $(this).attr('href',"{% url 'home:exportApproved' approved='cancelsales'%}");
+                    }
+                    else if($('#dropdown').val()=='cancelpurchase'){
+                        $(this).attr('href',"{% url 'home:exportApproved' approved='cancelpurchase'%}");
+                    }
+                    else if($('#dropdown').val()=='salesamendment'){
+                        $(this).attr('href',"{% url 'home:exportApproved' approved='salesamendment'%}");
+                    }
+                    else if($('#dropdown').val()=='purchaseamendment'){
+                        $(this).attr('href',"{% url 'home:exportApproved' approved='purchaseamendment'%}");
+                    }
+                    else if($('#dropdown').val()=='pending'){
+                        $(this).attr('href',"{% url 'home:exportApproved' approved='pending'%}");
+                    }
+                    else{
+                        $(this).attr('href',"{% url 'home:exportApproved' approved='all'%}");
+                    }
+           }else{
+            var year=$('#by_year').val();
+            var month=$('#by_month').val();
+           $(this).attr('href',"/home/exportapprovedfilter/"+year+"/"+month+"/");
+          
+           }
+           
+         
+           });
+        });
+
+         function ValidateEdit(){
+
+            if($('#edit-tradetype-input').val()!="Sales" && $('#edit-tradetype-input').val()!="Purchase"){ 
+               // alert($('#tradetype-input').val());
+               $('#edit-tradetype-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; 
+            }
+
+        
+
+            else if($('#edit-number-input').val()==''){
+             $('#edit-number-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+            else if($('#edit-company-input').val()!='KP'&& $('#edit-company-input').val()!='SL'){
+             $('#edit-company-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+            else if($('#edit-traderefdate-input').val()==''){ $('#edit-traderefdate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-traderefno-input').val()==''){ $('#edit-traderefno-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-types-input').val()==''){ $('#edit-types-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-product-input').val()==''){ $('#edit-product-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-product-name').val()==''){ $('#edit-product-name').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-origin-input').val()==''){ $('#edit-origin-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-client-input').val()==''){ $('#edit-client-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-address-input').val()==''){ $('#edit-address-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-contractqnty-input').val()==''){ $('#edit-contractqnty-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-contractunit-input').val()==""){ $('#edit-contractunit-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            // alert($('#contractunit-input').val());
+            return false; }
+
+            else if($('#edit-tolerance-input').val()==''){ $('#edit-tolerance-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-packing-input').val()==''){ $('#edit-packing-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if ($('#edit-tradeupdateqnty-input').val() == '' || parseFloat($('#edit-tradeupdateqnty-input').val()) > parseFloat($('#edit-contractbalanceqnty-input').val())){ $('#edit-tradeupdateqnty-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-contractUnit-input').val()==''){ $('#edit-contractUnit-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+             else if($('#edit-contractbalanceqnty-input').val()==''){ $('#edit-contractbalanceqnty-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+             else if($('#edit-contractbalanceunit-input').val()==''){ $('#edit-contractbalanceunit-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+             else if($('#edit-ratepmt-input').val()==''){ $('#edit-ratepmt-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-commissionagent-input').val()==''){ $('#edit-commissionagent-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-commissionrate-input').val()==''){ $('#edit-commissionrate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-logisticprovider-input').val()==''){ $('#edit-logisticprovider-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-estimatedlogisticcost-input').val()==''){ $('#edit-estimatedlogisticcost-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-paymentterm-input').val()==''){ $('#edit-paymentterm-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-incoterm-input').val()==''){ $('#edit-incoterm-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+            else if($('#edit-pod-input').val()==''){ $('#edit-pod-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+              else if($('#edit-pol-input').val()==''){
+               $('#edit-pol-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+          
+
+            else if($('#edit-eta-input').val()==''){ $('#edit-eta-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+             else if($('#edit-etd-input').val()==''){
+               $('#edit-etd-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+            else if ($('#edit-bank-input').val() == '') {
+                    $('#bank-input').css({
+                        'background': '#ea4b4b',
+                        'color': '#fff'
+                    });
+                    return false;
+                }
+                else if ($('#edit-acountnum-input').val() == '') {
+                    $('#acountnum-input').css({
+                        'background': '#ea4b4b',
+                        'color': '#fff'
+                    });
+                    return false;
+                }
+                else if ($('#edit-swiftcode-input').val() == '') {
+                    $('#swiftcode-input').css({
+                        'background': '#ea4b4b',
+                        'color': '#fff'
+                    });
+                    return false;
+                }
+
+              else if($('#edit-remark-input').val()==''){
+               $('#edit-remark-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; }
+
+           
+          
+            else{
+                return true;
+            }
+           
+         }
+$(document).ready(function(){
+
+
+   $('#print1').click(function(){
+            $('#tobeprintedsales').printThis({
+              debug: false,               // show the iframe for debugging
+              importCSS: true,            // import parent page css
+              importStyle: false,         // import style tags
+              printContainer: true,       // print outer container/$.selector
+              loadCSS: "{% static 'home/css/print.css' %}",                // path to additional css file - use an array [] for multiple
+              pageTitle: "",              // add title to print page
+              removeInline: false,        // remove inline styles from print elements
+              removeInlineSelector: "*",  // custom selectors to filter inline styles. removeInline must be true
+              printDelay:1000 ,            // variable print delay
+              header: null,               // prefix to html
+              footer: null,               // postfix to html
+              base: false,                // preserve the BASE tag or accept a string for the URL
+              formValues: true,           // preserve input/form values
+              canvas: false,              // copy canvas content
+              doctypeString: '',       // enter a different doctype for older markup
+              removeScripts: false,       // remove script tags from print content
+              copyTagClasses: false,      // copy classes from the html & body tag
+              beforePrintEvent: null,     // function for printEvent in iframe
+              beforePrint: null,          // function called before iframe is filled
+              afterPrint: null            // function called before iframe is removed
+            });
+          });
+
+var x= $("#dropdownList option:selected" ).text();
+      // alert(x);
+      searchrow();
+      function searchrow(){
+        if(x=='By TRN'){
+          // alert(x);
+          $(".table-search.approved").on("keyup", function() {
+            var value = $(this).val().toLowerCase(),
+            tableattr = $(this).attr("data-table-search"),
+            tablesearch = $('#' + tableattr).find('tbody tr');
+            // alert(value);
+            tablesearch.hide();                           //start with all rows hidden
+            //initiate our stored rowspan with the default of 1
+
+            tablesearch.each(function() {
+              var $row = $(this);
+              var $firstCell = $row.find("td:nth-child(4)");
+              var id = $firstCell.text().toLowerCase();
+              if (id.indexOf(value) > -1) {               //if the text is found
+                $row.show();         //show this row, and the next (n-1) rows as well
+              }
+            });
+          });
+        }
+      }
+
+      $('#dropdownList').on('change',function(){
+        var x= $("#dropdownList option:selected" ).text();
+        if(x=='By TRN'){
+           // alert(x);
+          $(".table-search.approved").on("keyup", function() {
+
+            var value = $(this).val().toLowerCase(),
+            tableattr = $(this).attr("data-table-search"),
+            tablesearch = $('#' + tableattr).find('tbody tr');
+            // alert(value);
+            tablesearch.hide();                           //start with all rows hidden
+            //initiate our stored rowspan with the default of 1
+
+            tablesearch.each(function() {
+              var $row = $(this);
+              var $firstCell = $row.find("td:nth-child(4)");
+              var id = $firstCell.text().toLowerCase();
+
+              // alert($firstCell.toString());
+              if (id.indexOf(value) > -1) {               //if the text is found
+                $row.show();         //show this row, and the next (n-1) rows as well
+              }
+            });
+          });
+        }
+        else if(x=='By Party'){
+           // alert(x);
+          $(".table-search.approved").on("keyup", function() {
+            var value = $(this).val().toLowerCase(),
+            tableattr = $(this).attr("data-table-search"),
+            tablesearch = $('#' + tableattr).find('tbody tr');
+            // alert(value);
+            tablesearch.hide();                           //start with all rows hidden
+            //initiate our stored rowspan with the default of 1
+
+            tablesearch.each(function() {
+              var $row = $(this);
+              var $firstCell = $row.find("td:nth-child(9)");
+              var id = $firstCell.text().toLowerCase();
+              // alert($firstCell.toString());
+              if (id.indexOf(value) > -1) {               //if the text is found
+                $row.show();         //show this row, and the next (n-1) rows as well
+              }
+            });
+          });
+        }
+   else if(x=='By Product'){
+           // alert(x);
+          $(".table-search.approved").on("keyup", function() {
+            var value = $(this).val().toLowerCase(),
+            tableattr = $(this).attr("data-table-search"),
+            tablesearch = $('#' + tableattr).find('tbody tr');
+            // alert(value);
+            tablesearch.hide();                           //start with all rows hidden
+            //initiate our stored rowspan with the default of 1
+
+            tablesearch.each(function() {
+              var $row = $(this);
+              var $firstCell = $row.find("td:nth-child(8)");
+              var id = $firstCell.text().toLowerCase();
+              // alert($firstCell.toString());
+              if (id.indexOf(value) > -1) {               //if the text is found
+                $row.show();         //show this row, and the next (n-1) rows as well
+              }
+            });
+          });
+        }
+ 
+
+    else if(x=='By Product Code'){
+           // alert(x);
+          $(".table-search.approved").on("keyup", function() {
+            var value = $(this).val().toLowerCase(),
+            tableattr = $(this).attr("data-table-search"),
+            tablesearch = $('#' + tableattr).find('tbody tr');
+            // alert(value);
+            tablesearch.hide();                           //start with all rows hidden
+            //initiate our stored rowspan with the default of 1
+
+            tablesearch.each(function() {
+              var $row = $(this);
+              var $firstCell = $row.find("td:nth-child(7)");
+              var id = $firstCell.text().toLowerCase();
+              // alert($firstCell.toString());
+              if (id.indexOf(value) > -1) {               //if the text is found
+                $row.show();         //show this row, and the next (n-1) rows as well
+              }
+            });
+          });
+        }
+      });
+
+  
+})
+  
+
+      </script>
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+          
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Trade Approved Details</h3>
+               </div>
+               <!-- <input type="text" placeholder="Filter Using TRN" class='table-search approved' id="table-search" data-table-search="myTable"> -->
+
+      <input type="text" placeholder="Filter" class='table-search approved' data-table-search="myTable"></input>
+            <select class="form-control searchid" id="dropdownList">
+                <option value="trn">By TRN</option>
+                <option value="party">By Party</option>
+                <option value="product">By Product</option>
+                <option value="productcode">By Product Code</option>
+                
+            </select>
+            <div class="filter_year">
+                  <select class="form-control" id="by_year">
+                     <option value="2013">2013</option>
+                     <option value="2014">2014</option>
+                     <option value="2015">2015</option>
+                     <option value="2016">2016</option>
+                     <option value="2017">2017</option>
+                     <option value="2018">2018</option>
+                     <option value="2019">2019</option>
+                     <option value="2020">2020</option>
+                     <option value="2021">2021</option>
+                     <option value="2022">2022</option>
+                     <option value="2023">2023</option>
+                     <option value="2024">2024</option>
+                     <option value="2025">2025</option>
+                     <option value="2026">2026</option>
+                     <option value="2027">2027</option>
+                     <option value="2028">2028</option>
+                     <option value="2029">2029</option>
+                     <option value="2030">2030</option>
+                  </select>
+                  <select class="form-control" id="by_month">
+                     <option value="1">January</option>
+                     <option value="2">February</option>
+                     <option value="3">March</option>
+                     <option value="4">April</option>
+                     <option value="5">May</option>
+                     <option value="6">June</option>
+                     <option value="7">July</option>
+                     <option value="8">August</option>
+                     <option value="9">September</option>
+                     <option value="10">October</option>
+                     <option value="11">November</option>
+                     <option value="12">December</option>
+                  </select>
+                  <button class="btn btn-primary" id="filter_btn">Filter</button>
+               </div>
+
+                  <select class="form-control" id="dropdown">
+                    <option value="" selected disabled >By Trade</option>
+                      <option value="salestrade" id="salestrade">By Sales Trade</option>
+                      <option value="purchasetrade" id="purchasetrade">By Purchase Trade</option>
+                      <option value="cancelsales" id="cancelsales">By Cancel Sales </option>
+                      <option value="cancelpurchase" id="cancelpurchase">By Cancel Purchase</option>
+                      <option value="salesamendment" id="salesamendment">By Sales Amendment</option>
+                      <option value="purchaseamendment" id="purchaseamendment">By Purchase Amendment</option>
+                      <option value="pending" id="pending">By Pending</option>
+                  </select>
+                  </input>
+            </div>
+         </div>
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered tablecolumnfixed" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">S.N</th>
+                     <th scope="col">Trade Type</th>
+                     <th scope="col">Company</th>
+                     <th scope="col">TRN</th>
+                     <th scope="col">Trade Ref Date</th>
+                     <th scope="col">Trade Qty</th>
+                     <th scope="col">Product Code</th>
+                     <th scope="col">Product Name</th>
+                     <th scope="col">Buyer/Seller</th>
+                     <th scope="col">Rate</th>
+                     <!-- <th scope="col">Quantity</th> -->
+                     
+                     <th scope="col">Status</th>
+                                    
+                  </tr>
+               </thead>
+               <tbody id="rowid">
+                  {% for record in records %}
+                  <tr>
+                    <th >{{record.sn}}</th>
+                     <td >{{record.types}}</td>
+                     <td >{{record.company}}</td>
+                     <td>{{record.trn}}</td>
+                     <td>{{record.trd}}</td>
+                     <td>{{record.tuq|floatformat:4}} {{record.contractUnit}}</td>
+                     <td >{{record.product}}</td>
+                     <td >{{record.baseproduct}}</td>
+                    <td>{{record.client}}</td>
+                    <td>{{record.ratePMT|floatformat:4}}</td>
+                    <!-- <td>{{record.tuq}} </td> -->
+                   
+                 <td>
+                  <button class="btn btn-primary view" data-toggle="modal" id="{{record.trn}}" value="{{record.trn}}" data-target="#view0">View</button>
+                  {% if user.authority != 'Admin' and user.authority != 'Viewer' and user.authority != 'Accounts'%}
+                  <button class="btn btn-primary editbtn0" data-toggle="modal" id="{{record.trn}}" value="{{record.trn}}" data-target="#edit0">Edit</button>{% endif %}
+                  {% if user.authority == 'Manager 2'%}
+                   <button type="button" class="btn btn-danger delete" value="{{record.trn}}">Delete</button>
+                  {% endif %}
+               </td>
+              
+                   </tr>
+                   {% endfor %}
+               </tbody>
+            </table>
+         </div>
+</div>
+<!-- view -->
+ <div class="modal fade table1" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Trade Details</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                    <div id="tobeprintedsales">
+                     <div class="card-body card-block">
+                        <div class="displaydata">
+                           <div class="description">
+                              
+                              <ul>
+                                 <li>S.N :<span id="sn"></span></li>
+                                 <li>Company :<span id="company"></span></li>
+                                 <li>Trade Ref. Date :<span id="trd"></span></li>
+                                 <li>Trade Ref. No :<span id="trn"></span></li>
+                              </ul>
+                           </div>
+                           <table class="table tableview table-bordered">
+                              <tbody>
+                                 <tr>
+                                    <th scope="col">Terms</th>
+                                    
+                                    <td id="type"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Sale/Cancel Sales/Purchase/Cancel Purchase </th>
+                                    
+                                    <td id="types"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Product Code</th>
+                                    
+                                    <td id="product"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Product Name</th>
+                                    
+                                    <td id="baseproduct"></td>
+                                 </tr>
+                                  <th scope="col">Country of Origin</th>
+                                    
+                                    <td id="origin"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Customer Name/Supplier Name in full detail </th>
+                                    
+                                    <td id="client"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col"><span>Address </th>
+                                    
+                                    <td id="address">
+                                    </td>
+                                 </tr>
+                               <tr>
+                                    <th scope="col"><span>Trade  Approval </th>
+                                    
+                                    <td id="trade_status">Pending</td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col"><span>Trade Approved Date
+                                    </th>
+                                    
+                                    <td id="trade_approved_date"> NA </td>
+                                 </tr> 
+                                 <tr>
+                                    <th scope="col">Total Contract Quantity(MT)   </th>
+                                    
+                                    <td id="tcq"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col"><span>Tolerance
+                                    </th>
+                                    
+                                    <td id="tolerance">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col"><span>Packing
+                                    </th>
+                                    
+                                    <td id="packing">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col"><span>Trade Quantity
+                                    </th>
+                                    
+                                    <td id="tuq">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col"><span>Contract Balance Quantity
+                                    </th>
+                                    
+                                    <td id="contractbalanceqnty">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col"><span>Rate 
+                                    </th>
+                                    
+                                    <td id="ratePMT">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Comission Agent </th>
+                                    
+                                    <td id="commissionAgent"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Comission Rate </th>
+                                    
+                                    <td id="commissionRate"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Logistics Provider</th>
+                                    
+                                    <td id="logisticProvider"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Estimated Logistics Cost</th>
+                                   
+                                    <td id="estimatedLogisticsCost"> </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Payment Term
+                                    </th>
+                                  
+                                    <td id="paymentTerm">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">
+                                       <span>
+                                          Bank Name and Address
+                                    </th>
+
+                                    <td id="bankname">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">
+                                       <span>
+                                          Account Number
+                                    </th>
+
+                                    <td id="accountnumber">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">
+                                       <span>
+                                          Swift Code
+                                    </th>
+
+                                    <td id="swiftcode">
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">
+                                       <span>
+                                          Incoterm
+                                    </th>
+                                   
+                                    <td id="incoterm"> 
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                 <th scope="col">POL
+                                 </th>
+                                 
+                                 <td id="pol"> 
+                                 </td>
+                                 </tr>
+                                  <tr>
+                                 <th scope="col">POD
+                                 </th>
+                                 
+                                 <td id="pod">
+                                 </td>
+                                 </tr>
+
+                                 <tr>
+                                 <th scope="col">ETD
+                                 </th>
+                                 
+                                 <td id="etd">10 Aug 2018
+                                 </td>
+                                 </tr>
+                                 <tr>
+                                 <th scope="col">ETA  </span>
+                                 </th>
+                                 
+                                 <td id="eta">22 Aug 2018
+                                 </td>
+                                 </tr>
+                                 <tr>
+                                 <th scope="col">Remarks</span>
+                                 </th>
+                                 
+                                 <td id="remarks">Good
+                                 </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                     </div>
+                  </div>
+                </div>
+                  <div class="modal-footer">
+                     <button  id="print1"><i class="zmdi zmdi-print" ></i>Print</button>
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>        
+                  </div>
+               </div>
+            </div>
+         </div>
+
+
+
+
+<!-- edit -->
+
+      <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h3 class="modal-title title" id="exampleModalLabel">Trade Request Entry Data</h3>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                  <div class="card-body card-block">
+                     <form action="{% url 'home:editTradeApproved'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                         {% csrf_token %}
+                         <div class="tradeselect">
+                         <div class="col-md-6">
+                           <input type="text" class="form-control" name="tradetype-input" id="edit-tradetype-input">
+                        <!-- <select class="form-control" id="edit-tradetype-input" name="tradetype-input">
+                                       <option value="" selected="true">Select your trade type</option>
+                                       <option value="Sales">Sales</option>
+                                       <option value="Purchase">Purchase</option>
+                                       
+                                    </select> -->
+                   </div>
+                </div>
+                        <div class="content">
+                           <div id="sales">
+                              <div class="row form-group">
+                                 <div class="col-12 col-md-4">
+                                    <label for="number-input"  class="form-control-label">S.N</label>
+                                    <input type="text" value="{{sn}}" id="edit-number-input" name="number-input" class="form-control" readonly="true">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="company-input" class=" form-control-label">Company</label>
+                                    <select class="form-control" id="edit-company-input" name="company-input">
+                                       <option value="company" selected="true">Select Company</option>
+                                       <option value="KP">KP</option>
+                                       <option value="SL">SL</option>
+                                       
+                                    </select>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="traderefdate-input" class=" form-control-label">Trade Reference Date</label>
+                                    <!-- <input type="date" class="form-control" disabled="true" id="edit-traderefdate-input" name="traderefdate-input"/> -->
+                                              <div class="datefield">
+                                    <input type="text" class="form-control" name="traderefdate-input" id="edit-traderefdate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-traderefdate-input-date" ></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 
+                                 <div class="col col-md-6">
+                                    <label for="traderefno-input" class=" form-control-label">Trade Reference Number</label>
+                                    <input type="text" id="edit-traderefno-input" value="" readonly name="traderefno-input" class="form-control">
+                                 
+                              </div>
+                                 <div class="col col-md-6">
+                                    <label for="sales-input" class=" form-control-label">Sales/ Cancel Sales/Sales Amendment</label>
+                                    <select class="form-control" id="edit-types-input" name="types-input">
+                                       <option value="Sales">Sales</option>
+                                       <option value="Cancel Sales">Cancel Sales</option>
+                                       <option value="Sales Amendment">Sales Amendment</option>
+                                        <option value="Purchase">Purchase</option>
+                                       <option value="Cancel Purchase">Cancel Purchase</option>
+                                       <option value="Purchase Amendment">Purchase Amendment</option>
+                                    </select>
+                                 </div>
+                              </div>
+
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="product-input" class=" form-control-label">Product Code</label>
+                                    <input type="text" id="edit-product-input" readonly name="product-input" class="form-control">
+                                 </div>
+                                  <div class="col col-md-4">
+                                                <label for="product-name" class="form-control-label">Product Name</label>
+                                                <!-- <input type="text" name="product-name" id="edit-product-name" class="form-control"> -->
+                                                <div class="input-group dropdown">
+                                                {%if user.authority != 'Manager 1'%}    
+				<input type="text" name="product-name" readonly id="edit-product-name" class="form-control billno dropdown-toggle" autocomplete="on">
+                                                {%else%}
+		    			<input type="text" name="product-name" id="edit-product-name" class="form-control billno dropdown-toggle" autocomplete="on">
+						{%endif%}
+						<ul class="dropdown-menu" id="dropdown-menu1">
+                                                      {%for i in products %}
+                                                        <li>
+                                                            <a href="#" data-value="{{i}}">{{i}}</a>
+                                                        </li>
+                                                        
+                                                          {% endfor %}
+                                                           {%for i in stock_product %}
+                                                        <li>
+                                                            <a href="#" data-value="{{i.product}}">{{i.product}}</a>
+                                                        </li>
+                                                        
+                                                          {% endfor %}
+                                                        
+                                                    </ul>
+                                                  <span role="button" class="input-group-addon dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></span>
+                                                </div>
+                                            </div>
+                           <div class="col col-md-4">
+                                    <label for="address-input" class=" form-control-label">Country of Origin</label>
+                                    <input type="text" id="edit-origin-input" name="origin-input" class="form-control">
+                                 </div>
+                                
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="client-input" class=" form-control-label">Customer Company Name in full details</label>
+                                    <select class="form-control" name="client-input" id="edit-client-input">
+                                       <option value="company"  selected="true">Select Company</option>
+                                       {% for i in companies %}
+                                       <option value="{{i.name}}">{{i.name}}</option>
+                                       {% endfor %}
+                                    </select>
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="address-input" class=" form-control-label">Address</label>
+                                    <input type="text" id="edit-address-input" name="address-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="contractqnty-input" class=" form-control-label">Total Contract Quantity</label>
+                                    <input type="text" id="edit-contractqnty-input" name="contractqnty-input" class="validatenum form-control doubleinput">
+                                     <select class="form-control" name="contractunit-input" id="edit-contractunit-input">
+                                       <option value="" selected="true">Qty</option>
+                                       <option value="MT">MT</option>
+                                       <option value="Drums">Drums</option>
+                                       <option value=KL>KL</option>
+                                       <option value="Pieces">Pieces</option>
+                                       <option value="Cartons">Cartons</option>
+				<option value="Jerricans">Jerricans</option>
+                                                    <option value="Pails">Pails</option>
+                                    </select>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="tolerance-input" class=" form-control-label">Tolerance (in %)</label>
+                                    <input type="text"  id="edit-tolerance-input" name="tolerance-input" class="validatenum form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="packing-input" class=" form-control-label">Packing</label>
+                                    <input type="text" id="edit-packing-input" name="packing-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 
+                                 <div class="col col-md-4">
+                                 <label for="contractbalanceqnty-input" class=" form-control-label">Contract Balance Quantity</label>
+                                     <input type="text" id="edit-contractbalanceqnty-input" readonly name="contractbalanceqnty-input" class="validatenum form-control doubleinput">
+                                    <select class="form-control" name="contractbalanceunit-input" id="edit-contractbalanceunit-input">
+                                       <option value="" selected="true">Qty</option>
+                                       <option value="MT">MT</option>
+                                       <option value="Drums">Drums</option>
+                                       <option value=KL>KL</option>
+                                       <option value="Pieces">Pieces</option>
+                                       <option value="Cartoons">Cartons</option>
+					<option value="Jerricans">Jerricans</option>
+                                                    <option value="Pails">Pails</option>
+                                    </select>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="tradeupdateqnty-input" class=" form-control-label">Trade Quantity</label>
+		{% if user.authority == 'Manager 2' %}
+              <input type="text" id="edit-tradeupdateqnty-input" name="tradeupdateqnty-input" class="validatenum form-control doubleinput">
+		{% else %}
+		<input type="text" readonly id="edit-tradeupdateqnty-input" name="tradeupdateqnty-input" class="validatenum form-control doubleinput">
+		{% endif %}
+                                    <select class="form-control" name="contractUnit-input" id="edit-contractUnit-input">
+                                       <option value="" selected="true">Qty</option>
+                                       <option value="MT">MT</option>
+                                       <option value="Drums">Drums</option>
+                                       <option value=KL>KL</option>
+                                       <option value="Pieces">Pieces</option>
+                                       <option value="Cartons">Cartons</option>
+					<option value="Jerricans">Jerricans</option>
+                                                    <option value="Pails">Pails</option>
+                                    </select>
+
+                                 </div>
+				{% if user.authority != 'Manager 2' %}
+                                 <div class="col col-md-4">
+                                    <label for="salesratepmt-input" class=" form-control-label">Rate<span id="rateUnit"></span></label>
+                                    <input type="text" id="edit-ratepmt-input" readonly name="ratepmt-input" class="validatenum form-control">
+                                   
+                                    
+                                 </div>
+				{%else%}
+				<div class="col col-md-4">
+                                    <label for="salesratepmt-input" class=" form-control-label">Rate<span id="rateUnit"></span></label>
+                                    <input type="text" id="edit-ratepmt-input" name="ratepmt-input" class="validatenum form-control">
+
+
+                                 </div>
+				{% endif %}
+                                 
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="commissionagent-input" class=" form-control-label">Commission Agent</label>
+                                    <input type="text" id="edit-commissionagent-input" name="commissionagent-input" class="form-control">
+                                 </div>
+				{% if user.authority != 'Manager 2'%}
+                                 <div class="col col-md-4">
+                                    <label for="commissionrate-input" class=" form-control-label">Commission Rate</label>
+                                    <input type="text"  id="edit-commissionrate-input" name="commissionrate-input" readonly class="validatenum form-control">
+                                    
+                                 </div>
+				{% else %}
+				 <div class="col col-md-4">
+                                    <label for="commissionrate-input" class=" form-control-label">Commission Rate</label>
+                                    <input type="text"  id="edit-commissionrate-input" name="commissionrate-input" class="validatenum form-control">
+
+                                 </div>
+				{% endif %}		
+
+                                 <div class="col col-md-4">
+                                    <label for="logisticprovider-input" class=" form-control-label">Logistics Provider</label>
+                                    <input type="text"  id="edit-logisticprovider-input" name="logisticprovider-input" class="form-control">
+                                 </div>
+                                 
+                              </div>
+                              <div class="row form-group">
+				{% if user.authority != 'Manager 2' %}
+                                 <div class="col col-md-6">
+                                    <label for="estimatedlogisticcost-input" class=" form-control-label">Estimated Logistics Cost</label>
+                                    <input type="text" id="edit-estimatedlogisticcost-input" name="estimatedlogisticcost-input" readonly class="validatenum form-control">
+                                    
+                                 </div>
+				{% else %}
+				<div class="col col-md-6">
+                                    <label for="estimatedlogisticcost-input" class=" form-control-label">Estimated Logistics Cost</label>
+                                    <input type="text" id="edit-estimatedlogisticcost-input" name="estimatedlogisticcost-input" class="validatenum form-control">
+
+                                 </div>
+				{% endif %}
+
+                                 <div class="col col-md-6">
+                                    <label for="paymentterm-input" class=" form-control-label">Payment Term (Days Against OBL Date)</label>
+                                    <select class="form-control" name="paymentterm-input" id="edit-paymentterm-input">
+                                       <option value="100% against OBL Copy Documents">100% against OBL Copy Documents</option>
+                                       <option value="10% advance & 90% against OBL Copy Documents">10% advance & 90% against OBL Copy Documents</option>
+                                       <option value="20% advance & 80% against OBL Copy Documents">20% advance & 80% against OBL Copy Documents</option>
+                                       <option value="30% advance & 70% against OBL Copy Documents">30% advance & 70% against OBL Copy Documents</option>
+                                       <option value="60% advance & 40% against OBL Copy Documents">60% advance & 40% against OBL Copy Documents</option>
+
+          <option value="10% ADVANCE & 90% AGAINST LOADING DOCUMENT">10% ADVANCE & 90% AGAINST LOADING DOCUMENT</option>
+                    <option value="20% ADVANCE & 80% AGAINST LOADING DOCUMENT">20% ADVANCE & 80% AGAINST LOADING DOCUMENT</option>
+                    <option value="30% ADVANCE & 70% AGAINST LOADING DOCUMENT">30% ADVANCE & 70% AGAINST LOADING DOCUMENT</option>
+                                       <option value="100% advance against PI">100% advance against PI</option>
+                                       <option value="100% against Delivery">100% against Delivery</option>
+                                       <option value="Sight DLC">Sight DLC</option>
+                                       <option value="Usance 30 days DLC">Usance 30 days DLC </option>
+                                       <option value="Usance 45 days DLC">Usance 45 days DLC </option>
+                                       <option value="Usance 60 days DLC">Usance 60 days DLC</option>
+                                       <option value="Usance 90 days DLC">Usance 90 days DLC</option>
+                                        <option value="30 DAYS DAP">30 DAYS DAP</option>
+                    <option value="60 DAYS DAP">60 DAYS DAP</option>
+                    <option value="90 DAYS DAP">90 DAYS DAP</option>
+                                        <option value="LC 30 DAYS FROM BL DATE">LC 30 DAYS FROM BL DATE</option>
+                                        <option value="LC 45 DAYS FROM BL DATE">LC 45 DAYS FROM BL DATE</option>
+                                        <option value="LC 60 DAYS FROM BL DATE">LC 60 DAYS FROM BL DATE</option>
+                                        <option value="LC 90 DAYS FROM BL DATE">LC 90 DAYS FROM BL DATE</option>
+                                       <option value="DAP 100%">DAP 100%</option>
+                                       <option value="20% advance & 80% DAP">20% advance & 80% DAP</option>
+                                       <option value="7 days after OBL date upon clean documents">7 days after OBL date upon clean documents</option>
+                                       <option value="10 days after OBL date upon clean documents">10 days after OBL date upon clean documents</option>
+                                       <option value="15 days after OBL date upon clean documents">15 days after OBL date upon clean documents</option>
+                                       <option value="30 days after OBL date upon clean documents">30 days after OBL date upon clean documents</option>
+                                       <option value="60 days after OBL date upon clean documents">60 days after OBL date upon clean documents</option>
+                                    </select>
+                                 </div>
+                                 
+                                 
+                              </div>
+                                      <div class="row form-group">
+                                            <div class="col col-md-12">
+                                                <label for="edit-bank-input" class="form-control-label">Bank Name and Address</label>
+                                                <select class="form-control" id="edit-bank-input" name="bank-input">
+                                                  <option selected disabled value="">Select Bank</option>
+                                                    <option value="OVERSEA CHINESE BANKING CORPORATION (OCBC) 65 CHULIA STREET, SINGAPORE 049513">OVERSEA CHINESE BANKING CORPORATION (OCBC) 65 CHULIA STREET, SINGAPORE 049513</option>
+                                                    <option value="RHB BANK, SINGAPORE 90 CECIL STREET, #12-00 RHB BANK BUILDING , SINGAPORE 069531">RHB BANK, SINGAPORE 90 CECIL STREET, #12-00 RHB BANK BUILDING , SINGAPORE 069531</option>
+                                                    <option value="CIMB BANK MENARA BINJAI, MALAYSIA">CIMB BANK MENARA BINJAI, MALAYSIA</option>
+                                                    <!-- <option value="UNITED OVERSEAS BANK LIMITED 80 RAFFLES PLACE, UOB PLAZA 1, SINGAPORE 048-624">UNITED OVERSEAS BANK LIMITED <br/> 80 RAFFLES PLACE, UOB PLAZA 1, SINGAPORE 048-624</option> -->
+                                                    <option value="NA">NA</option>
+                                                </select>
+                                          
+
+                                            </div>
+                                        </div>
+                                           <div class="row form-group">
+                                            <div class="col col-md-6">
+                                                <label for="edit-acountnum-input" class="form-control-label">Account Number</label>
+                                                <input type="text" id="edit-acountnum-input" name="acountnum-input" class="form-control" autocomplete="on">
+                                            </div>
+                                            <div class="col col-md-6">
+                                                <label for="edit-swiftcode-input" class="form-control-label">Swift Code</label>
+                                                <input type="text" id="edit-swiftcode-input" name="swiftcode-input" class="form-control" autocomplete="on">
+
+                                            </div>
+                                        </div>
+                                 <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="incoterm-input" class=" form-control-label">Incoterm</label>
+                                    <input type="text" id="edit-incoterm-input" name="incoterm-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="pod-input" class=" form-control-label"><span id="port">POD</span></label>
+                                    <input type="text" id="edit-pod-input" name="pod-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="pol-input" class=" form-control-label"><span id="port">POL</span></label>
+                                    <input type="text" id="edit-pol-input" name="pol-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="eta-input" class=" form-control-label"><span id="time">ETA</span></label>
+                                    <!-- <input type="date" class="form-control" name="eta-input" id="edit-eta-input" /> -->
+                                     <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-eta-input" name="eta-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-eta-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                  <div class="col col-md-6">
+                                    <label for="etd-input" class=" form-control-label"><span id="time">ETD</span></label>
+                                    <!-- <input type="date" class="form-control" name="etd-input" id="edit-etd-input" /> -->
+                                     <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-etd-input" name="etd-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-etd-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="remark-input" class=" form-control-label">Remarks</label>
+                                    <input type="text" id="edit-remark-input" name="remark-input"  class="form-control">
+                                 </div>
+                              </div>
+                              <div class="modal-footer">
+                                 <input type="submit" onclick="return ValidateEdit()" class="btn btn-primary" value="Save Details">
+                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                 
+                              </div>
+                           </div>
+
+                        </div>
+
+                    
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+</div>
+</div>
+   {% include 'footer.html'%}
+   </div>
+   </div>
+   </body>
+   
+  
+</html>
+<!-- end document

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Blending & Consumption View</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'costmanagement/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{$ static 'costmanagement/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'costmanagement/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'costmanagement/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'costmanagement/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'costmanagement/css/style.css' %}" rel="stylesheet" media="all">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript">
+
+         $(document).ready(function(){
+
+	{% if product.approved %}
+	$('.approve').prop('disabled','true');
+	{% else %}
+	$('.approve').removeAttr('disabled');
+	{% endif %}
+	
+	{%if user.authority == 'Manager 1' or user.authority == 'Chemist' %}
+	{% if product.approved %}
+        $('#consumption-edit-save').prop('disabled','true');
+        {% else %}
+        $('#consumption-edit-save').removeAttr('disabled');
+	{%endif%}       
+	{% endif %}
+	
+            $('#oils').empty();
+            $('#additives').empty();
+            
+            {% for i in additives %}
+            $('#additives').append("<tr><td>{{i.name}}</td><td>{{i.QtyInPercent}}</td><td>{{i.QtyInLiters}}</td><td>{{i.value}}</td></tr>");
+            {% endfor %}
+
+            {% for i in oils %}
+            $('#oils').append("<tr><td>{{i.name}}</td><td>{{i.QtyInPercent}}</td><td>{{i.QtyInLiters}}</td><td>{{i.value}}</td></tr>");
+            {% endfor %}
+
+            $(document).on('click','.ok',function(){
+               var perLiter=0.0;
+               $.post("{% url 'costmanagement:getConsumption'%}",
+               {
+                  'product':$('#product').text(),
+                  'netBlendingQty':$('#netBlendingQty').text(),
+               },
+               function(data,status){
+                  // alert(data.oils.length);
+                  $('#additives').empty();
+                  $('#oils').empty();
+                  for (var i = 0; i < data.additives.length; i++) {
+                  
+                  $('#additives').append("<tr><td>"+data.additives[i].name+"</td><td>"+data.additives[i].QtyInPercent.toFixed(4)+"</td><td>"+data.additives[i].QtyInLiters.toFixed(4)+"</td><td>"+data.additives[i].value.toFixed(4)+"</td></tr>");
+                  perLiter=perLiter+data.additives[i].value;
+               }
+                  for (var i = 0; i < data.oils.length; i++) {
+                  
+                  $('#oils').append("<tr><td>"+data.oils[i].name+"</td><td>"+data.oils[i].QtyInPercent.toFixed(4)+"</td><td>"+data.oils[i].QtyInLiters.toFixed(4)+"</td><td>"+data.oils[i].value.toFixed(4)+"</td></tr>");
+                  perLiter=perLiter+data.oils[i].value;
+               }
+               // alert(perLiter);
+               // alert(parseFloat($('#netBlendingQty').text()));
+               $('#perLiterCost').text((perLiter/parseFloat($('#netBlendingQty').text())).toFixed(4));
+               });
+		//alert(data.product.approved);
+            });
+
+            $('.delete').click(function(){
+               $.post("{% url 'costmanagement:deleteconsumption' %}",
+               {
+                  'product':this.id
+               },
+               function(data,status){
+
+               });
+            });
+	
+		$('.approve').click(function(){
+            var i=this.value;
+         $.post("{% url 'costmanagement:approve_consumption'%}",
+         {
+            'product':i,
+           'csrfmiddlewaretoken':'{{csrf_token}}',
+         },
+         function(data,status){
+            // alert(data);
+                window.location.reload();
+
+         });
+
+         });
+	
+
+            $(document).on('click','.edit',function(){
+               var additive=[];
+               var oil=[];
+
+               for (var i =1;i<= {{additives.count}};i++) {
+                var name=$('#name-addive'+i).text();
+                var QtyInPercent=$('#QtyInPercent-addive'+i).text();
+                var QtyInLiters=$('#QtyInLiters-addive'+i).text();
+                var value=$('#value-addive'+i).text();
+                obj={'name':name,'QtyInPercent':QtyInPercent,'QtyInLiters':QtyInLiters,'value':value}
+                additive.push(obj);
+               }
+
+               for (var i =1;i<= {{oils.count}};i++) {
+                var name=$('#name-oil'+i).text();
+                var QtyInPercent=$('#QtyInPercent-oil'+i).text();
+                var QtyInLiters=$('#QtyInLiters-oil'+i).text();
+                var value=$('#value-oil'+i).text();
+                obj={'name':name,'QtyInPercent':QtyInPercent,'QtyInLiters':QtyInLiters,'value':value}
+                oil.push(obj);
+               }
+               console.log($('#edit-perLiterCost').text());
+               console.log($('#edit-crosscheck').text());
+               alert($('#edit-remarks').text());
+               $.post("{% url 'costmanagement:editconsumptions'%}",
+               {
+                  'sn':$('#edit-sn').text(),
+                  'date':$('#edit-date').text(),
+                  'product':$('#edit-product').text(),
+                  'grade':$('#edit-grade').text(),
+                  'sae':$('#edit-sae').text(),
+                  'netBlendingQty':$('#edit-netBlendingQty').text(),
+                  'grossVolCrosscheck':$('#edit-grossVolCrosscheck').text(),
+                  'crosscheck':$('#edit-crosscheck').text(),
+                  'totalvalue':$('#edit-totalvalue').text(),
+                  'perLiterCost':$('#edit-perLiterCost').text(),
+                  'remarks':$('#edit-remarks').text(),
+                  'additives':JSON.stringify(additive),
+                  'oils':JSON.stringify(oil),
+
+               },
+               function(data,status){
+
+               });
+            });
+
+            $(document).on('keyup','.addqty',function(){
+               var $div = this.id;
+               var num = parseInt( $div.match(/\d+/g), 10 );
+               
+               var net=parseFloat($('#edit-netBlendingQty').text());
+               var qty=parseFloat($('#QtyInPercent-addive'+num).text());
+               var inliter=(qty/100)*net;
+               $('#QtyInLiters-addive'+num).text(inliter.toFixed(4));
+               
+
+                $.post("{% url 'costmanagement:fillAdditiveOil'%}",{
+                'name':$('#name-addive'+num).text(),
+                'liters':inliter,
+                'types':'additives',
+              },
+              function(data,status){
+                $('#value-addive'+num).text((parseFloat(data.value)).toFixed(4));
+              });
+
+            });
+
+            $(document).on('keyup','.oilqty',function(){
+               var $div = this.id;
+               var num = parseInt( $div.match(/\d+/g), 10 );
+               
+               var net=parseFloat($('#edit-netBlendingQty').text());
+               var qty=parseFloat($('#QtyInPercent-oil'+num).text());
+               var inliter=(qty/100)*net;
+               $('#QtyInLiters-oil'+num).text(inliter.toFixed(4));
+               
+
+                $.post("{% url 'costmanagement:fillAdditiveOil'%}",{
+                'name':$('#name-oil'+num).text(),
+                'liters':inliter,
+                'types':'oils',
+              },
+              function(data,status){
+                $('#value-oil'+num).text((parseFloat(data.value)).toFixed(4));
+              });
+
+            });
+            $(document).on('click','#edit-perLiterCost',function(){
+               var totalvalue=0;
+               var totalvol=0
+               {% for i in additives %}
+               totalvalue=totalvalue+parseFloat($('#value-addive{{forloop.counter}}').text());
+               totalvol=totalvol+parseFloat($('#QtyInLiters-addive{{forloop.counter}}').text());
+               {% endfor %}
+               {% for i in oils %}
+               totalvalue=totalvalue+parseFloat($('#value-oil{{forloop.counter}}').text());
+               totalvol=totalvol+parseFloat($('#QtyInLiters-oil{{forloop.counter}}').text());
+               {% endfor %}
+
+               // alert(totalvalue);
+               // alert(totalvol);
+               $('#edit-grossVolCrosscheck').text(totalvol.toFixed(4));
+               $('#edit-crosscheck').text(((totalvol/parseFloat($('#edit-netBlendingQty').text()))*100).toFixed(4));
+               $('#edit-totalvalue').text(totalvalue.toFixed(4));
+               $('#edit-perLiterCost').text((totalvalue/parseFloat($('#edit-netBlendingQty').text())).toFixed(4));
+            });
+         });
+      </script>
+   </head>
+   {%include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Blending & Consumption Details</h3>
+               </div>
+               <div class="headingrow">
+                  <button type="button" class="btn btn-primary view" data-toggle="modal" data-target="#view0">
+                  View
+                  </button>
+               </div>
+            </div>
+         </div>
+         <table class="table table0 table-dark table-bordered more tableedit" id="myTable">
+            <thead>
+               <tr>
+                  <!-- <th scope="col">S.N</th> -->
+                  <th scope="col">S.N</th>
+                  <th scope="col">Blending Date</th>
+                  <th scope="col">Product Name</th>
+                  <th scope="col">Grade</th>
+                  <th scope="col">SAE/ISO</th>
+                  <!-- <th scope="col">% Cross Check</th> -->
+                  <th scope="col">Net Blending Quantity</th>
+                  <th scope="col">Gross Vol Cross Check</th>
+                  <th scope="col">% Cross Check</th>
+                  <th scope="col">Total Value</th>
+                  <th scope="col">Per Liter Cost</th>
+                  <th scope="col">Remarks</th>
+                  <!--   <th scope="col">Additives</th>
+                     <th scope="col">Base Oils</th>
+                     <th scope="col">Status</th> -->
+               </tr>
+            </thead>
+            <tbody>
+               <tr>
+                  <!-- <td>1</td> -->
+                  <td id="edit-sn">{{product.sn}}</td>
+                  <td id="edit-date">{{product.date}}</td>
+                  <td id="edit-product">{{product.product}}</td>
+                  <td id="edit-grade">{{product.grade}}</td>
+                  <td id="edit-sae">{{product.sae}}</td>
+                  <td id="edit-netBlendingQty">{{product.netBlendingQty|floatformat:4}}</td>
+                  <td id="edit-grossVolCrosscheck">{{product.grossVolCrosscheck|floatformat:4}}</td>
+                  <td id="edit-crosscheck">{{product.crosscheck|floatformat:4}}</td>
+                  <td id="edit-totalvalue">{{product.totalvalue|floatformat:4}}</td>
+                  <td id="edit-perLiterCost">{{product.perLiterCost|floatformat:4}}</td>
+                  <td id="edit-remarks">{{product.remarks}}</td>
+                  <!--   <td>KS0000001</td> -->
+                  <!--      <td>KS0000001</td>
+                     <td scope="row"><button type="button" class="btn btn-primary primary" data-toggle="modal" data-target="#edit0" >Edit</button> -->
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+         <table class="table table0 table-dark table-bordered tableedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Additives</h4>
+            </div>
+            <thead>
+               <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity in %</th>
+                  <th scope="col">Quantity in Liters</th>
+                  <th scope="col">Value</th>
+               </tr>
+            </thead>
+            <tbody >
+               {% for i in additives %}
+               <tr>
+                  <td id="name-addive{{forloop.counter}}">{{i.name}}</td>
+                  <td class="addqty" id="QtyInPercent-addive{{forloop.counter}}">{{i.QtyInPercent|floatformat:4}}</td>
+                  <!-- <td>KP</td> -->
+                  <td id="QtyInLiters-addive{{forloop.counter}}">{{i.QtyInLiters|floatformat:4}}</td>
+                  <td id="value-addive{{forloop.counter}}">{{i.value|floatformat:4}}</td>
+                  <!--     <td scope="row"><button type="button" class="btn btn-primary primary" data-toggle="modal" data-target="#edit0" >Edit</button> 
+                     </td> --> 
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+         <table class="table table-dark table-bordered tableedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Base Oils</h4>
+            </div>
+            <thead>
+               <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity in %</th>
+                  <th scope="col">Quantity in Liters</th>
+                  <th scope="col">Value</th>
+                  <!--   <th scope="col">Additives</th>
+                     <th scope="col">Base Oils</th>
+                     <th scope="col">Status</th> -->
+               </tr>
+            </thead>
+            <tbody >
+               {% for i in oils %}
+               <tr>
+                  <td id="name-oil{{forloop.counter}}">{{i.name}}</td>
+                  <td class="oilqty" id="QtyInPercent-oil{{forloop.counter}}">{{i.QtyInPercent|floatformat:4}}</td>
+                  <!-- <td>KP</td> -->
+                  <td id="QtyInLiters-oil{{forloop.counter}}">{{i.QtyInLiters|floatformat:4}}</td>
+                  <td id="value-oil{{forloop.counter}}">{{i.value|floatformat:4}}</td>
+                  <!--   <td scope="row"><button type="button" class="btn btn-primary primary" data-toggle="modal" data-target="#edit0" >Edit</button> 
+                     </td> --> 
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+	{%if user.authority == 'Manager 2' or user.authority == 'Chemist' or user.authority == 'Manager 1'%}
+	<button class="btn btn-primary approve" disabled='disabled' id="consumption-approve-btn" value="{{product.product}}">Approve</button>
+	
+	{%endif%}	    
+         <button type="button" class="btn btn-primary edit" id="consumption-edit-save" value="{{product.product}}">Save</button>
+	{%if user.authority == 'Manager 2'%}
+         <button type="button" class="btn btn-danger delete" id="{{product.product}}">Delete</button>
+	{% endif %}
+      </div>
+   </div>
+
+   <!-- view -->
+   <div class="modal fade" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h3 class="modal-title title" id="exampleModalLabel">Consumption Details</h3>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <div class="card-body card-block">
+                  <table class="table table0 table-dark table-bordered tablenoedit1" id="myTable">
+                     <div class="heading">
+                        <h4 class="tradetitle1">Information</h4>
+                     </div>
+                     <thead>
+                        <tr>
+                           <th scope="col">Product</th>
+                           <th scope="col">Net Blending Quantity</th>
+                           <th scope="col">Per Liter Cost</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr>
+                           <td id="product">{{product.product}}</td>
+                           <td contenteditable="true" id="netBlendingQty">{{product.netBlendingQty|floatformat:4}}</td>
+                           <td id="perLiterCost">{{product.perLiterCost|floatformat:4}}</td>
+                        </tr>
+                     </tbody>
+                  </table>
+                    <div class="saveaction">
+            <button class="btn btn-primary ok">
+               OK
+            </button>
+         </div>
+                  <table class="table table0 table-dark table-bordered tablenoedit" id="myTable">
+                     <div class="heading">
+                        <h4 class="tradetitle1">Additives</h4>
+                     </div>
+                     <thead>
+                        <tr>
+                           <th scope="col">Product</th>
+                           <th scope="col">Quantity in %</th>
+                           <th scope="col">Quantity in Liters</th>
+                           <th scope="col">Value</th>
+                        </tr>
+                     </thead>
+                     <tbody id="additives">
+                        <tr>
+                           <td>abc</td>
+                           <td >abc</td>
+                           <td>abc</td>
+                           <td>111</td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <table class="table table0 table-dark table-bordered tablenoedit" id="myTable">
+                     <div class="heading">
+                        <h4 class="tradetitle1">Base Oils</h4>
+                     </div>
+                     <thead>
+                        <tr>
+                           <th scope="col">Product</th>
+                           <th scope="col">Quantity in %</th>
+                           <th scope="col">Quantity in Liters</th>
+                           <th scope="col">Value</th>
+                        </tr>
+                     </thead>
+                     <tbody id="oils">
+                        <tr>
+                           <td>abc</td>
+                           <td >abc</td>
+                           <td>abc</td>
+                           <td>111</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+           </div>
+   </div>
+         <!-- //////////////// -->
+         {%include 'footer.html'%}
+    
+   </body>
+</html>
+<!-- end document

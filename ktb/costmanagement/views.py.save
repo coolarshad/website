@@ -1,0 +1,955 @@
+from django.shortcuts import render
+from django.http import HttpResponse,JsonResponse
+from django.shortcuts import redirect
+from costmanagement.models import *
+from django.views.decorators.csrf import csrf_exempt
+from django.forms.models import model_to_dict
+import xlwt 
+# Create your views here.
+def Raw(request):
+	try:
+		obj=RawMaterials.objects.all().order_by('product')
+	except Exception as e:
+		obj=None
+
+	cxt={'records':obj}
+	return render(request,'rawmaterials.html',context=cxt)
+
+def SaveRaw(request):
+	try:
+		obj=RawMaterials.objects.create(product=request.POST['rawmaterialproduct-input'],
+			costPerLiter=request.POST['rawmaterial_perlitercost-input'],buyPricePmt=request.POST['rawmaterial_buypricepmt-input'],
+			addCost=request.POST['rawmaterial_addcost-input'],total=request.POST['rawmaterial_total-input'],
+			mlToKl=request.POST['rawmaterial_mttokl-input'],density=request.POST['rawmaterial_density-input'],remarks=request.POST['rawmaterial-remarks'])
+		obj.save()
+		Logging(name,'Raw Materials details saved '+obj.product)
+	except Exception as e:
+		print(e)
+
+	return redirect('costmanagement:raw')
+
+def EditRaw(request):
+	try:
+		print('editing')
+		if RawMaterials.objects.filter(product=request.POST['rawmaterialproduct-input']).exists():
+			obj=RawMaterials.objects.get(product=request.POST['rawmaterialproduct-input'])
+			obj.product=request.POST['rawmaterialproduct-input']
+			obj.costPerLiter=request.POST['rawmaterial_perlitercost-input']
+			obj.buyPricePmt=request.POST['rawmaterial_buypricepmt-input']
+			obj.addCost=request.POST['rawmaterial_addcost-input']
+			obj.total=request.POST['rawmaterial_total-input']
+			obj.mlToKl=request.POST['rawmaterial_mttokl-input']
+			obj.density=request.POST['rawmaterial_density-input']
+			obj.remarks=request.POST['rawmaterial-remarks']
+			obj.save()
+			Logging(name,'Raw Materials details edited '+obj.product)
+		# obj=RawMaterials.objects.filter(product=request.POST['rawmaterialproduct-input']).update(
+		# 	costPerLiter=request.POST['rawmaterial_perlitercost-input'],buyPricePmt=request.POST['rawmaterial_buypricepmt-input'],
+		# 	addCost=request.POST['rawmaterial_addcost-input'],total=request.POST['rawmaterial_total-input'],
+		# 	mlToKl=request.POST['rawmaterial_mttokl-input'],density=request.POST['rawmaterial_density-input'])
+		# obj.save()
+		print('edited')
+	except Exception as e:
+		print(e)
+	return redirect('costmanagement:raw')
+
+def Additives(request):
+	try:
+		records=AllAdditives.objects.all()
+	except Exception as e:
+		records=None
+
+	return render(request,'additives.html',context={'records':records})
+
+def SaveAdditives(request):
+	# rawcount=request.POST['count-raw']
+	# polymercount=request.POST['count-polymer']
+	# oilcount=request.POST['count-polymer']
+	# try:
+	# 	print('additive')
+	# 	# obj=Additive.objects.create(date=request.POST['additivesformation_date-input'],
+	# 	obj=Additive.objects.create(date=request.POST['additivesformation_date-input'],
+	# 		product=request.POST['additivesformationproductname-input'],netBlendingQtyLiter=request.POST['additivesformation_netblendingqnty_liter-input'],
+	# 		grossVolCrosscheck=request.POST['additivesformation_grossvol_crosscheck-input'],percentCrosscheck=request.POST['additivesformation_percent_crosscheck-input'])
+	# 	obj.save()
+	# 	print('additive done')
+	# except Exception as e:
+	# 	print(e)
+	# for i in range(1,int(rawcount)+1):
+	# 	print(i)
+	# 	try:
+	# 		print('raw')
+	# 		raw=AdditivesRaw.objects.create(additive=obj,
+	# 			product=request.POST['additivesformationproduct-input'+str(i)],importRate=request.POST['additivesformation_importrate-input'+str(i)],
+	# 			addCost=request.POST['additivesformation_addcost-input'+str(i)],total=request.POST['additivesformation_total-input'+str(i)],
+	# 			mtToKl=request.POST['additivesformation_mttokl-input'+str(i)],usage=request.POST['additivesformation_usage-input'+str(i)],
+	# 			netCost=request.POST['additivesformation_netcost-input'+str(i)])
+	# 		raw.save()
+	# 		print('raw done')
+	# 	except Exception as e:
+	# 		print(e)
+
+	# for j in range(1,int(polymercount)+1):
+	# 	print(j)
+	# 	try:
+	# 		print('polymer')
+	# 		polymer=AdditivesPolymer.objects.create(additive=obj,
+	# 			name=request.POST['additivesformationpolymername-input'+str(j)],qtyInPercent=request.POST['additivesformationpolymer_percent-input'+str(j)],
+	# 			qtyInLiters=request.POST['additivesquantity_liter-input'+str(j)],density=request.POST['additivesformationpolymer_density-input'+str(j)],
+	# 			qtyInKgs=request.POST['additivesformationpolymer_kg-input'+str(j)])
+	# 		polymer.save()
+	# 		print('polymer done')
+	# 	except Exception as e:
+	# 		print(e)
+
+	# for k in range(1,int(oilcount)+1):
+	# 	try:
+	# 		print('all additives')
+	# 		oil=AdditivesBaseOil.objects.create(additive=obj,
+	# 			name=request.POST['additivesformation_baseoilname-input'+str(k)],qtyInPercent=request.POST['additivesformation_baseoil_percent-input'+str(k)],
+	# 			qtyInLiters=request.POST['additivesformation_baseoil_liter-input'+str(k)],density=request.POST['additivesformation_baseoil_density-input'+str(k)],
+	# 			qtyInKgs=request.POST['additivesformation_baseoil_kgs-input'+str(k)])
+	# 		oil.save()
+	# 		print('all additive done')
+	# 	except Exception as e:
+	# 		print(e)
+
+	try:
+		add=AllAdditives.objects.create(
+			product=request.POST['additivesname-input'],
+			crfPrice=request.POST['additivescfrprice-input'],addCost=request.POST['additivesaddcosta-input'],
+			costPriceInLiter=request.POST['additiveslitercost_price-input'],density=request.POST['additives_densityat15deg-input'],
+			totalCost=request.POST['additives_totalcost_exdk-input'],remarks=request.POST['additives-remarks'])
+		add.save()
+	except Exception as e:
+		print(e)
+
+	return redirect('costmanagement:additives')
+def EditAllAdditives(request):
+	try:
+		if AllAdditives.objects.filter(product=request.POST['additivesname-input']).exists():
+			obj=AllAdditives.objects.filter(product=request.POST['additivesname-input']).update(crfPrice=request.POST['additivescfrprice-input'],addCost=request.POST['additivesaddcosta-input'],
+			costPriceInLiter=request.POST['additiveslitercost_price-input'],density=request.POST['additives_densityat15deg-input'],
+			totalCost=request.POST['additives_totalcost_exdk-input'],remarks=request.POST['additives-remarks'])
+			print('edited additives')
+	
+	except Exception as e:
+		print(e)
+
+	return redirect('costmanagement:additives')
+
+def AdditivesView(request,product):
+	additive=Additive.objects.get(product=product)
+	print(additive)
+	net=0
+	usage=0
+	try:
+		raws=additive.additivesraw_set.all()
+		for i in raws:
+			net=net+i.netCost
+			print(net)
+			usage=usage+i.usage
+			print(usage)
+		per_liter=float(net/1000)
+		polymers=additive.additivespolymer_set.all()
+		oils=additive.additivesbaseoil_set.all()
+		alladditive=AllAdditives.objects.get(product=product)
+	except Exception as e:
+		print(e)
+		raws=None
+		polymers=None
+		oils=None
+
+	return render(request,'additivesview.html',{'per_liter':per_liter,'net':net,'usage':usage,'additive':additive,'raws':raws,'polymers':polymers,'oils':oils,'alladditive':alladditive})
+
+def Blendings(request):
+	try:
+		obj=Blending.objects.all()
+	except Exception as e:
+		print(e)
+	return render(request,'blendingcost.html',{'records':obj})
+
+def SaveBlending(request):
+	additivecount=request.POST['count-additive']
+	oilcount=request.POST['count-oil']
+
+	try:
+		print('blending')
+		obj=Blending.objects.create(product=request.POST['blendingcost_productname-input'],
+			grade=request.POST['blendingcost_grade-input'],sae=request.POST['blendingcost_iso-input'],
+			percentCrosscheck=request.POST['blendingcost_crosscheck-input'],perLiterCost=request.POST['blendingcost_perlitercost-input'])
+		obj.save()
+		print('blending done')
+	except Exception as e:
+		print(e)
+
+	for i in range(1,int(additivecount)+1):
+		print(i)
+		try:
+			print('BlendingAdditive')
+			additive=BlendingAdditive.objects.create(product=obj,
+				name=request.POST['blendingcost_additivesname-input'+str(i)],
+				QtyInPercent=request.POST['blendingcost_additivesquantity_percent-input'+str(i)],
+				QtyInLiters=request.POST['blendingcost_additivesvalue-input'+str(i)])
+			additive.save()
+			print('BlendingAdditive done')
+		except Exception as e:
+			print(e)
+
+	for j in range(1,int(oilcount)+1):
+		print(j)
+		try:
+			print('BlendingOil oil')
+			oil=BlendingBaseOil.objects.create(product=obj,
+				name=request.POST['blendingcost_baseoilname-input'+str(j)],
+				QtyInPercent=request.POST['blendingcost_baseoilquantity_percent-input'+str(j)],
+				QtyInLiters=request.POST['blendingcost_baseoilsvalue-input'+str(j)])
+			oil.save()
+			print('BlendingOil done')
+		except Exception as e:
+			print(e)
+	
+	return redirect('costmanagement:blending')
+
+def Consumptions(request):
+	try:
+		obj=Consumption.objects.all()
+		additives=AllAdditives.objects.all()
+		raw=RawMaterials.objects.all()
+	except Exception as e:
+		print(e)
+	try:
+		sn=SnConsumptions.objects.latest('sn')
+		sn=sn.sn+1
+	except Exception as ex:
+		sn=1
+	return render(request,'consumption.html',{'records':obj,'additives':additives,'raw':raw,'sn':sn})
+
+def SaveConsumption(request):
+	additivecount=request.POST['count-additive']
+	oilcount=request.POST['count-oil']
+	print(oilcount)
+
+	try:
+		print('consumption')
+		obj=Consumption.objects.create(sn=request.POST['consumption_sn'],date=request.POST['consumption_date-input'],product=request.POST['consumption_productname-input'],
+			grade=request.POST['consumption_grade-input'],sae=request.POST['consumption_iso-input'],
+			netBlendingQty=request.POST['consumption_netblendingqnty-input'],grossVolCrosscheck=request.POST['consumption_volcrosscheck-input'],
+			crosscheck=request.POST['blendingcost_crosscheck-input'],perLiterCost=request.POST['blendingcost_perlitercost-input'],totalvalue=request.POST['blendingcost_totalvalue-input'])
+		obj.save()
+		print('consumption done')
+	except Exception as e:
+		print(e)
+
+	for i in range(1,int(additivecount)+1):
+		print(i)
+		try:
+			print('ConsumptionAdditive')
+			additive=ConsumptionAdditive.objects.create(product=obj,
+				name=request.POST['cosmumption_additivesname-input'+str(i)],
+				QtyInPercent=request.POST['cosmumption_additivesquantity_percent-input'+str(i)],
+				QtyInLiters=request.POST['cosmumption_additivesquantity_liter-input'+str(i)],
+				value=request.POST['blendingcost_additivesvalue-input'+str(i)])
+			additive.save()
+			print('ConsumptionAdditive done')
+		except Exception as e:
+			print(e)
+
+	for j in range(1,int(oilcount)+1):
+		print(j)
+		try:
+			print('Consumption oil')
+			oil=ConsumptionBaseOil.objects.create(product=obj,
+				name=request.POST['cosmumption_baseoilname-input'+str(j)],
+				QtyInPercent=request.POST['cosmumption_baseoilquantity_percent-input'+str(j)],
+				QtyInLiters=request.POST['cosmumption_baseoilquantity_liter-input'+str(j)],
+				value=request.POST['blendingcost_baseoilsvalue-input'+str(j)])
+			oil.save()
+			print('Consumption done')
+		except Exception as e:
+			print(e)
+
+	try:
+		sn=request.POST['consumption_sn']
+		s=SnConsumptions.objects.create(sn=int(sn))
+		s.save()
+	except Exception as e:
+		pass
+	
+	return redirect('costmanagement:consumption')
+
+def BlendingView(request,product):
+	product=Blending.objects.get(product=product)
+	try:
+		additives=product.blendingadditive_set.all()
+		oils=product.blendingbaseoil_set.all()
+	except:
+		additives=None
+		oils=None
+	return render(request,'blendingcostview.html',{'additives':additives,'oils':oils,'product':product})
+
+def ConsumptionView(request,product):
+	print(product)
+	product=Consumption.objects.get(product=product)
+
+	try:
+		additives=product.consumptionadditive_set.all()
+		oils=product.consumptionbaseoil_set.all()
+		print(oils)
+	except:
+		additives=None
+		oils=None
+	return render(request,'consumptionview.html',{'additives':additives,'oils':oils,'product':product})
+
+def FinalProducts(request):
+	# try:
+	# 	sn=SnFinalProduct.objects.latest('sn')
+	# 	sn=sn.sn+1
+	# except:
+	# 	sn=1
+
+	try:
+		obj=FinalProduct.objects.all()
+		products=Consumption.objects.all()
+		packing=Packing.objects.all()
+	except:
+		obj=None
+
+	try:
+		sn=SnFinalProduct.objects.latest('sn')
+		sn=sn.sn+1
+	except Exception as e:
+		sn=1
+
+	return render(request,'finalproductcost.html',{'records':obj,'products':products,'packing':packing,'sn':sn})
+
+def SaveFinalProduct(request):
+	try:
+		print('saving final product')
+		obj=FinalProduct.objects.create(
+			sn=request.POST['finalproduct_sn'],date=request.POST['finalproduct_date-input'],
+			product=request.POST['finalproductname-input'],packingsize=request.POST['final_packingsize-input'],
+			bottlesperpack=request.POST['final_bottles_perpack-input'],litersperpack=request.POST['final_liters_perpack-input'],
+			totalqty=request.POST['final_totalquantity-text-input'],totalqtyunit=request.POST['final_totalquantity-input'],
+			qtyinliters=request.POST['final_qtylitrs-input'],perlitercost=request.POST['final_perlitercost-input'],
+			costpercase=request.POST['final_costpercasepail-input'],dkcost=request.POST['final_dkcost-input'],
+			bottlepereac=request.POST['final_bottle-eac-input'],bottlepercase=request.POST['final_label-case-input'],
+			lablepereac=request.POST['final_label-eac-input'],labelpercase=request.POST['final_label-case-input'],
+			cartons=request.POST['final_cartons-input'],dkexprice=request.POST['final_dkexPrice-input'],
+			kscost=request.POST['final_kscost-input'],totalsp=request.POST['final_sellingprice-input'],
+			bottlecapprice=request.POST['final_price-bottlecap-input'],bottlecappercase=request.POST['final_bottlecap_per-case-input'])
+		obj.save()
+		print('product saved')
+
+		sn=SnFinalProduct.objects.create(sn=request.POST['finalproduct_sn'])
+		sn.save()
+		print('sn saved')
+	except Exception as e:
+		print(e)
+	
+	return redirect('costmanagement:finalproduct')
+
+def EditFinalProduct(request):
+	try:
+		print('editing final product')
+
+		obj=FinalProduct.objects.filter(product=request.POST['finalproductname-input']).update(
+			sn=int(request.POST['finalproduct_sn']),date=request.POST['finalproduct_date-input'],
+			packingsize=request.POST['final_packingsize-input'],
+			bottlesperpack=request.POST['final_bottles_perpack-input'],litersperpack=request.POST['final_liters_perpack-input'],
+			totalqty=request.POST['final_totalquantity-text-input'],totalqtyunit=request.POST['final_totalquantity-input'],
+			qtyinliters=request.POST['final_qtylitrs-input'],perlitercost=request.POST['final_perlitercost-input'],
+			costpercase=request.POST['final_costpercasepail-input'],dkcost=request.POST['final_dkcost-input'],
+			bottlepereac=request.POST['final_bottle-eac-input'],bottlepercase=request.POST['final_label-case-input'],
+			lablepereac=request.POST['final_label-eac-input'],labelpercase=request.POST['final_label-case-input'],
+			cartons=request.POST['final_cartons-input'],dkexprice=request.POST['final_dkexPrice-input'],
+			kscost=request.POST['final_kscost-input'],totalsp=request.POST['final_sellingprice-input'],
+			bottlecapprice=request.POST['final_price-bottlecap-input'],bottlecappercase=request.POST['final_bottlecap_per-case-input'])
+		# obj.save()
+		print('product edited')
+	
+		# sn=SnFinalProduct.objects.create(sn=request.POST['finalproductnum-input'])
+		# sn.save()
+		# print('sn saved')
+	except Exception as e:
+		print(e)
+	
+	return redirect('costmanagement:finalproduct')
+
+@csrf_exempt
+def EditConsumptions(request):
+	sn=request.POST['sn']
+	date=request.POST['date']
+	product=request.POST['product']
+	grade=request.POST['grade']
+	sae=request.POST['sae']
+
+	netBlendingQty=request.POST['netBlendingQty']
+	netBlendingQty=float(netBlendingQty)
+
+	grossVolCrosscheck=request.POST['grossVolCrosscheck']
+	grossVolCrosscheck=float(grossVolCrosscheck)
+
+	crosscheck=request.POST['crosscheck']
+	crosscheck=float(crosscheck)
+
+	totalvalue=request.POST['totalvalue']
+	totalvalue=float(totalvalue)
+
+	perLiterCost=request.POST['perLiterCost']
+	perLiterCost=float(perLiterCost)
+
+	additives=json.loads(request.POST['additives'])
+	oils=json.loads(request.POST['oils'])
+
+	
+	if Consumption.objects.filter(product=product).exists():
+		obj=Consumption.objects.get(product=product)
+		o=Consumption.objects.filter(product=product).update(sn=sn,date=date,grade=grade,sae=sae,
+			netBlendingQty=netBlendingQty,grossVolCrosscheck=grossVolCrosscheck,
+			crosscheck=crosscheck,perLiterCost=perLiterCost,
+			totalvalue=totalvalue)
+		# addset=obj.consumptionadditive_set.all()
+		# for i,j in enumerate(addset):
+		# 	add=ConsumptionAdditive.objects.filter(product=obj,name=j.name).update(
+		# 		QtyInPercent=float(additives[i]['QtyInPercent']),
+		# 		QtyInLiters=float(additives[i]['QtyInLiters']),
+		# 		value=float(additives[i]['value']))
+		if SnConsumptions.objects.filter(sn=int(sn)).exists():
+			# sn=SnConsumptions.objects.get(sn=int(sn))
+			pass
+		else:
+			SnConsumptions.objects.create(sn=int(sn))
+
+		if ConsumptionAdditive.objects.filter(product=obj).exists():
+			cset=ConsumptionAdditive.objects.filter(product=obj)
+			for i,j in enumerate(cset):
+				add=ConsumptionAdditive.objects.filter(product=obj,name=j.name).update(
+				# name=additives[i]['name'],
+				QtyInPercent=float(additives[i]['QtyInPercent']),
+				QtyInLiters=float(additives[i]['QtyInLiters']),
+				value=float(additives[i]['value']))
+				
+
+		if ConsumptionBaseOil.objects.filter(product=obj).exists():
+			oset=ConsumptionBaseOil.objects.filter(product=obj)
+			for i,j in enumerate(oset):
+				add=ConsumptionBaseOil.objects.filter(product=obj,name=j.name).update(
+				# name=oils[i]['name'],
+				QtyInPercent=float(oils[i]['QtyInPercent']),
+				QtyInLiters=float(oils[i]['QtyInLiters']),
+				value=float(oils[i]['value']))
+				
+
+	return JsonResponse({'data':'ok'})
+
+def InventoryList(request):
+	try:
+		obj=Inventory.objects.all()
+	except Exception as e:
+		obj=None
+	try:
+		sn=SnInventory.objects.latest('sn')
+		sn=sn.sn+1
+	except:
+		sn=1
+	
+
+	return render(request,'costmanagement-inventory.html',{'records':obj,'sn':sn})
+
+def SaveInventory(request):
+	try:
+		print('saving inventory')
+		obj=Inventory.objects.create(sn=request.POST['costinventory-input'],
+			product=request.POST['costinventoryproductname-input'],dkSupply=request.POST['costinventorydksupply-input'],
+			ksSupply=request.POST['costinventorykssupply-input'],perLiterPrice=request.POST['costinventory_perliterprice-input'],
+			valueDk=request.POST['costinventory_dkvalue-input'],valueKs=request.POST['costinventory_ksvalue-input'])
+		obj.save()
+		print('inventory saved')
+
+		sn=SnInventory.objects.create(sn=request.POST['costinventory-input'])
+		sn.save()
+	except Exception as e:
+		print(e)
+	return redirect('costmanagement:inventory')
+
+def Packings(request):
+	try:
+		obj=Packing.objects.all().order_by('product')
+
+	except Exception as e:
+		obj=None
+
+	try:
+		sn=SnPacking.objects.latest('sn')
+		sn=sn.sn+1
+	except Exception as e:
+		sn=1
+	
+	return render(request,'packing.html',{'records':obj,'sn':sn})
+
+def SavePacking(request):
+	try:
+		obj=Packing.objects.create(sn=request.POST['packing_sn'],date=request.POST['packing_date-input'],product=request.POST['packingproduct-input'],
+			pereach=request.POST['packingpereach_price-input'],remarks=request.POST['packing-remarks'],category=request.POST['packingcategory'])
+		obj.save()
+
+		sn=SnPacking.objects.create(sn=request.POST['packing_sn'])
+		sn.save()
+
+		Logging(name,'Packing details saved '+obj.product)
+	except Exception as e:
+		print(e)
+	return redirect('costmanagement:packing')
+
+def EditPacking(request):
+	try:
+		obj=Packing.objects.filter(product=request.POST['packingproduct-input']).update(
+			sn=request.POST['packing_sn'],date=request.POST['packing_date-input'],
+			pereach=request.POST['packingpereach_price-input'],remarks=request.POST['packing-remarks'],category=request.POST['packingcategory'])
+		Logging(name,'Packing details edited '+obj.product)
+		# obj.save()
+	except Exception as e:
+		print(e)
+	return redirect('costmanagement:packing')
+
+#---------------------------------------------------------------------
+from . import engine1
+from . import engine2
+import json
+from django.forms.models import model_to_dict
+
+@csrf_exempt
+def AlterRaw(request):
+	try:
+		# print("response")
+		obj=RawMaterials.objects.get(product=request.POST['product'])
+		print(obj)
+		print("ok")
+	except Exception as e:
+		print(e)
+		obj=None
+
+	cxt={'product':obj.product,'costPerLiter':obj.costPerLiter,'buyPricePmt':obj.buyPricePmt,'addCost':obj.addCost,'total':obj.total,'mlToKl':obj.mlToKl,'density':obj.density,'remarks':obj.remarks}
+	return JsonResponse(cxt)
+@csrf_exempt
+def AlterPacking(request):
+	try:
+		print("response")
+		obj=Packing.objects.get(product=request.POST['product'])
+		
+		print("ok")
+	except Exception as e:
+		print(e)
+		obj=None
+
+	cxt={'sn':obj.sn,'date':obj.date,'product':obj.product,'pereach':obj.pereach,'category':obj.category,'remarks':obj.remarks}
+	return JsonResponse(cxt)
+
+@csrf_exempt
+def DeletePacking(request):
+	try:
+		product=request.POST['product']
+		obj=Packing.objects.filter(product=product).delete()
+		Logging(name,'Packing details deleted '+product)
+	except Exception as e:
+		pass
+	return redirect('costmanagement:packing')
+
+@csrf_exempt
+def DeleteRawMaterials(request):
+	try:
+		product=request.POST['product']
+		obj=RawMaterials.objects.filter(product=product).delete()
+		Logging(name,'Raw Materials details deleted '+product)
+	except Exception as e:
+		pass
+	return redirect('costmanagement:raw')
+	
+@csrf_exempt
+def GetAdditives(request):
+	try:
+		product=request.POST['product']
+		netBlendingQtyLiter=request.POST['netBlendingQtyLiter']
+		polymers,oils,costs=engine1.GetAllAdditive(product,netBlendingQtyLiter)
+		# polymers=json.dumps(polymers)
+		print(polymers)
+		# oils=json.dumps(oils)
+		print(oils)
+		print(costs)
+		# getadditive=engine1.GetAdditive(product)
+		# getalladditive=AllAdditives.objects.get(product=product)
+		# getadditive=Additive.objects.get(product=product)
+		data={'polymers':polymers,'oils':oils,'costs':costs}
+	except Exception as e:
+		print(e)
+		data={'polymers':None,'oils':None,'costs':None}
+	return JsonResponse(data)
+
+
+@csrf_exempt
+def GetConsumption(request):
+	try:
+		product=request.POST['product']
+		print(product)
+		netBlendingQty=request.POST['netBlendingQty']
+		# print()
+		additives,oils=engine2.GetConsumption(product,netBlendingQty)
+		
+		print(additives)
+		
+		print(oils)
+		
+	
+		data={'additives':additives,'oils':oils}
+	except Exception as e:
+		print(e)
+		data={'additive':None,'oils':None}
+	return JsonResponse(data)
+
+@csrf_exempt
+def GetFinalAll(request):
+	try:
+		product=request.POST['product']
+		print(product)
+		obj=Consumption.objects.get(product=product)
+		obj=model_to_dict(obj)
+		data={'product':obj}
+	except Exception as e:
+		print(e)
+		data={'product':None}
+	return JsonResponse(data)
+
+@csrf_exempt
+def GetFinal(request):
+	try:
+		product=request.POST['product']
+		print(product)
+		obj=FinalProduct.objects.get(product=product)
+		obj=model_to_dict(obj)
+		data={'product':obj}
+	except Exception as e:
+		print(e)
+		data={'product':None}
+	return JsonResponse(data)
+
+@csrf_exempt
+def GetFinalProduct(request):
+	try:
+		product=request.POST['product']
+		netQty=request.POST['totalQty']
+		print(product+" "+netQty)
+		obj=Consumption.objects.get(product=product)
+		print(obj)
+		additives,oils=engine2.GetConsumption(product,netQty)
+		per_liter=0
+		
+		for i in additives:
+			print()
+			per_liter=per_liter+i['value']
+	
+		for i in oils:
+			# print(i+'in views')
+			per_liter=per_liter+i['value']
+	
+		# obj=model_to_dict(obj)
+		data={'product':product,'totalQty':netQty,'perLiterCost':per_liter}
+	except Exception as e:
+		print(e)
+		data={'product':None,'totalQty':None,'per_liter':None}
+	return JsonResponse(data)
+
+@csrf_exempt
+def AlterAllAdditives(request):
+	product=request.POST['product']
+	additives=[]
+	if AllAdditives.objects.filter(product=product).exists():
+		obj=AllAdditives.objects.get(product=product)
+		data={'product':obj.product,'crfPrice':obj.crfPrice,'addCost':obj.addCost,
+		'costPriceInLiter':obj.costPriceInLiter,'density':obj.density,'totalCost':obj.totalCost,
+		'remarks':obj.remarks}
+	else:
+		data=None
+	return JsonResponse(data)
+
+@csrf_exempt
+def DeleteAdditives(request):
+	product=request.POST['product']
+	if AllAdditives.objects.filter(product=product).exists():
+		obj=AllAdditives.objects.get(product=product).delete()
+	return redirect('costmanagement:additives')
+
+@csrf_exempt
+def DeleteConsumption(request):
+ 	product=request.POST['product']
+ 	print(product+" deleting")
+ 	if Consumption.objects.filter(product=product).exists():
+ 		obj=Consumption.objects.filter(product=product).delete()
+ 		obj.save()
+ 		print('deleted')
+ 	return redirect('costmanagement:consumption')
+
+@csrf_exempt
+def DeleteFinal(request):
+	product=request.POST['product']
+	if FinalProduct.objects.filter(product=product).exists():
+		obj=FinalProduct.objects.get(product=product).delete()
+	return redirect('costmanagement:finalproduct')	
+@csrf_exempt
+def FillAdditiveOil(request):
+	name=request.POST['name']
+	liters=request.POST['liters']
+	types=request.POST['types']
+
+	if types == 'additives':
+		obj=AllAdditives.objects.get(product=name)
+		price=(obj.costPriceInLiter*float(liters))
+		data={'value':price}
+
+	if types == 'oils':
+		if RawMaterials.objects.filter(product=name).exists():
+			obj=RawMaterials.objects.get(product=name)
+			price=(obj.costPerLiter*float(liters))
+			data={'value':price}
+		else:
+			data={'value':0}
+	return JsonResponse(data)
+
+@csrf_exempt
+def ExportRaw(request):
+	response = HttpResponse(content_type='application/ms-excel')
+	response['Content-Disposition'] = 'attachment; filename="RawMaterials.xls"'
+
+	wb = xlwt.Workbook(encoding='utf-8')
+	ws = wb.add_sheet('Kyc')
+
+    # Sheet header, first row
+	row_num = 0
+
+	font_style = xlwt.XFStyle()
+	font_style.font.bold = True
+
+	columns = ['Product Name','Cost Per Liter','Buy Price PMT','Add Cost','Total','Density','MT to KL','Remarks']
+
+	for col_num in range(len(columns)):
+		ws.write(row_num, col_num, columns[col_num], font_style)
+
+		font_style = xlwt.XFStyle()
+	
+		trns = RawMaterials.objects.all()
+
+	for row in trns:
+		
+		record=[row.product,row.costPerLiter,row.buyPricePmt,row.addCost,row.total,row.mlToKl,row.density,row.remarks]
+
+		row_num += 1
+		for col_num in range(len(record)):
+			ws.write(row_num, col_num, record[col_num], font_style)
+	wb.save(response)
+	return response
+
+@csrf_exempt
+def ExportAdditives(request):
+	response = HttpResponse(content_type='application/ms-excel')
+	response['Content-Disposition'] = 'attachment; filename="Additives.xls"'
+
+	wb = xlwt.Workbook(encoding='utf-8')
+	ws = wb.add_sheet('Kyc')
+
+    # Sheet header, first row
+	row_num = 0
+
+	font_style = xlwt.XFStyle()
+	font_style.font.bold = True
+
+	columns = ['Name of additives','CFR Price/KG in USD','Add Cost','Total cost EX DK in Kgs','Density @ 15 Degree Celsius','Cost Price in Liters','Remarks']
+
+	for col_num in range(len(columns)):
+		ws.write(row_num, col_num, columns[col_num], font_style)
+
+		font_style = xlwt.XFStyle()
+	
+		trns = AllAdditives.objects.all()
+
+	for row in trns:
+		
+		record=[row.product,row.crfPrice,row.addCost,row.totalCost,row.density,row.costPriceInLiter,row.remarks]
+
+		row_num += 1
+		for col_num in range(len(record)):
+			ws.write(row_num, col_num, record[col_num], font_style)
+	wb.save(response)
+	return response
+
+@csrf_exempt
+def ExportFinalProduct(request):
+	response = HttpResponse(content_type='application/ms-excel')
+	response['Content-Disposition'] = 'attachment; filename="FinalProducts.xls"'
+
+	wb = xlwt.Workbook(encoding='utf-8')
+	ws = wb.add_sheet('Kyc')
+
+    # Sheet header, first row
+	row_num = 0
+
+	font_style = xlwt.XFStyle()
+	font_style.font.bold = True
+
+	columns = ['S.N','Date','Product Name','Packing Size','Bottles Per Pack','Liters Per Pack','Total Quantity','Unit','Quantity in Liters','Per Liter Cost',
+	'Cost Per Case Pail','DK Cost','Price Per Bottle','Price Per Label','Price Per Bottle Cap','Bottle Per Case','Label Per Case','Bottle Cap Per Case',
+	'Price Per Cartoon','DK Ex Price','KS Cost','Total Selling Price']
+
+	for col_num in range(len(columns)):
+		ws.write(row_num, col_num, columns[col_num], font_style)
+
+		font_style = xlwt.XFStyle()
+	
+		trns = FinalProduct.objects.all()
+
+	for row in trns:
+		
+		record=[row.sn,row.date,row.product,row.packingsize,row.bottlesperpack,row.litersperpack,row.totalqty,row.totalqtyunit,row.qtyinliters,row.perlitercost,row.costpercase,
+		row.dkcost,row.bottlepereac,row.bottlepercase,row.bottlecapprice,row.bottlecappercase,row.lablepereac,row.labelpercase,
+		row.cartons,row.dkexprice,row.kscost,row.totalsp]
+
+		row_num += 1
+		for col_num in range(len(record)):
+			ws.write(row_num, col_num, record[col_num], font_style)
+	wb.save(response)
+	return response
+
+@csrf_exempt
+def ExportPacking(request):
+	response = HttpResponse(content_type='application/ms-excel')
+	response['Content-Disposition'] = 'attachment; filename="Packings.xls"'
+
+	wb = xlwt.Workbook(encoding='utf-8')
+	ws = wb.add_sheet('Kyc')
+
+    # Sheet header, first row
+	row_num = 0
+
+	font_style = xlwt.XFStyle()
+	font_style.font.bold = True
+
+	columns = ['Product','Per each Price','Packing Category','Remarks']
+
+	for col_num in range(len(columns)):
+		ws.write(row_num, col_num, columns[col_num], font_style)
+
+		font_style = xlwt.XFStyle()
+	
+		trns = Packing.objects.all()
+
+	for row in trns:
+		
+		record=[row.product,row.pereach,row.category,row.remarks]
+
+		row_num += 1
+		for col_num in range(len(record)):
+			ws.write(row_num, col_num, record[col_num], font_style)
+	wb.save(response)
+	return response
+
+
+def RawConsumption(request):
+	raws=[]
+	consumptions=Consumption.objects.all()
+	for i in consumptions:
+		raw=i.consumptionbaseoil_set.all()
+		raws.append(raw)
+	return render(request,"rawmaterialconsumption.html",{'products':consumptions,'raws':raws})
+
+def AdditivesConsumption(request):
+	additives=[]
+	consumptions=Consumption.objects.all()
+	for i in consumptions:
+		additive=i.consumptionadditive_set.all()
+		additives.append(additive)
+	return render(request,"additiveconsumption.html",{'additives':additives})
+
+
+@csrf_exempt
+def ExportRawConsumption(request):
+	print('in here')
+	response = HttpResponse(content_type='application/ms-excel')
+	response['Content-Disposition'] = 'attachment; filename="rawmaterialconsumption.xls"'
+
+	wb = xlwt.Workbook(encoding='utf-8')
+	ws = wb.add_sheet('Raw Material Consumption')
+
+    # Sheet header, first row
+	row_num = 0
+
+	font_style = xlwt.XFStyle()
+	font_style.font.bold = True
+
+	columns = ['Final Product Name','Raw Material Name','Date','S.N','Quantity','Rate','Value']
+
+	for col_num in range(len(columns)):
+		ws.write(row_num, col_num, columns[col_num], font_style)
+
+	font_style = xlwt.XFStyle()
+	raws=[]
+	consumptions=Consumption.objects.all()
+	for i in consumptions:
+		raw=i.consumptionbaseoil_set.all()
+		raws.append(raw)
+
+	# for row in raws:
+	# print(raws)
+	for i in raws:
+		for j in i:
+
+			record=[j.product.product,j.name,j.product.date,j.product.sn,j.QtyInLiters,float(j.value/j.QtyInLiters),j.value]
+
+			row_num += 1
+			for col_num in range(len(record)):
+				ws.write(row_num, col_num, record[col_num], font_styfloat(j.value/j.QtyInLiters)le)
+	wb.save(response)
+	return response
+	# return HttpResponse('Hi')
+
+
+@csrf_exempt
+def ExportAdditiveConsumption(request):
+	print('in here')
+	response = HttpResponse(content_type='application/ms-excel')
+	response['Content-Disposition'] = 'attachment; filename="additiveconsumption.xls"'
+
+	wb = xlwt.Workbook(encoding='utf-8')
+	ws = wb.add_sheet('Additive Consumption')
+
+    # Sheet header, first row
+	row_num = 0
+
+	font_style = xlwt.XFStyle()
+	font_style.font.bold = True
+
+	columns = ['Final Product Name','Additive Name','Date','S.N','Quantity','Rate','Value']
+
+	for col_num in range(len(columns)):
+		ws.write(row_num, col_num, columns[col_num], font_style)
+
+	font_style = xlwt.XFStyle()
+	
+	additives=[]
+	consumptions=Consumption.objects.all()
+	for i in consumptions:
+		additive=i.consumptionadditive_set.all()
+		additives.append(additive)
+	for row in additives:
+		
+			# print(row.balanceDue)
+			# pre.append(i)
+		# for i in rows:
+		for j in i:
+
+			record=[j.product.product,j.name,j.product.date,j.product.sn,j.QtyInLiters,0,j.value]
+
+			row_num += 1
+			for col_num in range(len(record)):
+				ws.write(row_num, col_num, record[col_num], font_style)
+	wb.save(response)
+	return response
+	# return HttpResponse('Hi')

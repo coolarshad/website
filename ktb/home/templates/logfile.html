@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Log file</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+   </head>
+   <script src="{% static 'home/vendor/jquery-3.2.1.min.js' %}"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+   <script type="text/javascript">
+      $(document).ready(function(){
+       $(".table-search-log").on("keyup", function() {
+       		var value=$(this).val().toLowerCase();
+		$("tbody tr").filter(function(){
+		$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+	});
+      
+      });
+      });
+      
+      
+           
+         
+   </script>
+   {% include 'header.html' %}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>User Log Details</h3>
+               </div>
+               <input type="text" placeholder="Filter Using Any Key" class='table-search-log' data-table-search="myTable"></input>
+            </div>
+         </div>
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table1 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">Date</th>
+                     <th scope="col">User Name</th>
+                     <th scope="col">Authority</th>
+                     <th scope="col">Action</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for i in logs %}
+                  <tr>
+                     <td >{{i.logdate}}</td>
+                     <td >{{i.user}}</td>
+                     <td>{{i.authority}}</td>
+                     <td>{{i.action}}</td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+       </div>
+               </div>
+   </div>
+         {% include 'footer.html' %}
+
+   </body>
+</html>
+<!-- end document

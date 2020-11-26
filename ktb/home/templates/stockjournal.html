@@ -1,0 +1,2511 @@
+<!DOCTYPE html>
+{%load staticfiles %}
+{% load mathfilters %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Stock Journal</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+      <style type="text/css">
+        .tableview th {
+            width: auto!important; 
+      }
+      </style>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript">
+        var editrawqtyflag=0;
+            var rawqtyflag=0;
+            var additiveqtyflag=0;
+            var editadditiveqtyflag=0;
+            var packingqtyflag=0;
+            var editpackingqtyflag=0;
+            var consumptionqtyflag=0;
+            var editconsumptionqtyflag=0;
+
+         $(document).ready(function(){
+
+
+            function resetall(){
+                $('.resetbtn').on('click',function(){
+                $(this).parent().parent().prevAll('div').find('select').find('option:eq(0)').removeAttr('selected');
+                $(this).parent().parent().prevAll('div').find('input').val(" ");
+                $(this).parent().parent().prevAll('div').find('select').find('option:eq(0)').attr('selected','true');
+              })
+            }  
+              var countraw=1;
+              var countadditive=1;
+              var countpacking=1;
+              var countblending=1;
+              var edit_countraw=1;
+              var edit_countadditive=1;
+              var edit_countpacking=1;
+              var edit_countblending=1;
+
+              function selectblock(block){
+                var data=document.querySelectorAll(block);
+                  data.forEach(function(datarow){
+                    console.log(datarow);
+                   
+                 
+                      // console.log($(datarow).siblings(block).length);
+                        var length=$(datarow).siblings(block).length;
+                         // console.log(length);
+                     $(datarow).on('click','.remove',function(e){
+                          if(length>=1){
+                            e.stopImmediatePropagation();
+                          // alert('more sibling');
+                          
+                      $(this).parent().parent().parent().remove();
+                      if(this.id=='raw'){countraw-=1;}
+                      if(this.id=='edit-raw'){edit_countraw-=1;}
+                      if(this.id=='additive'){countadditive-=1;}
+                      if(this.id=='edit-additive'){edit_countadditive-=1;}
+                      if(this.id=='packing'){countpacking-=1;}
+                      if(this.id=='edit-packing'){edit_countpacking-=1;}
+                      if(this.id=='consumption'){countblending-=1;}
+                      if(this.id=='edit-consumption'){edit_countblending-=1;}
+                      
+                    }
+                  
+                  else if(length!=1){
+                  
+                      e.stopImmediatePropagation();
+                        alert('This block cannot be deleted!');
+                    }
+                  })
+                
+
+                  })
+              }
+              
+
+                $('.addraw').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="rawdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'rawdata'+num );
+
+                  $clone.find('#consumptionproductraw-input'+(num-1)).prop('name','consumptionproductraw-input'+num);
+                  $clone.find('#consumptionproductraw-input'+(num-1)).prop('id','consumptionproductraw-input'+num);
+                  $clone.find('#consumptionproductraw-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityraw-input'+(num-1)).prop('name','consumptionquantityraw-input'+num);
+                  $clone.find('#consumptionquantityraw-input'+(num-1)).prop('id','consumptionquantityraw-input'+num).addClass('validatenum raw_qty');
+                  $clone.find('#consumptionquantityraw-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityliterraw-input'+(num-1)).prop('name','consumptionquantityliterraw-input'+num);
+                  $clone.find('#consumptionquantityliterraw-input'+(num-1)).prop('id','consumptionquantityliterraw-input'+num).addClass('validatenum raw_liters');
+                  $clone.find('#consumptionquantityliterraw-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantitydensityraw-input'+(num-1)).prop('name','consumptionquantitydensityraw-input'+num);
+                  $clone.find('#consumptionquantitydensityraw-input'+(num-1)).prop('id','consumptionquantitydensityraw-input'+num).addClass('validatenum');
+                  $clone.find('#consumptionquantitydensityraw-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityratekgraw-input'+(num-1)).prop('name','consumptionquantityratekgraw-input'+num);
+                  $clone.find('#consumptionquantityratekgraw-input'+(num-1)).prop('id','consumptionquantityratekgraw-input'+num).addClass('validatenum raw_rate');
+                  $clone.find('#consumptionquantityratekgraw-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityvaluekgraw-input'+(num-1)).prop('name','consumptionquantityvaluekgraw-input'+num);
+                  $clone.find('#consumptionquantityvaluekgraw-input'+(num-1)).prop('id','consumptionquantityvaluekgraw-input'+num).addClass('validatenum raw_kgvalue');
+                  $clone.find('#consumptionquantityvaluekgraw-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityrateliter-input'+(num-1)).prop('name','consumptionquantityrateliter-input'+num);
+                  $clone.find('#consumptionquantityrateliter-input'+(num-1)).prop('id','consumptionquantityrateliter-input'+num).addClass('validatenum');
+                  $clone.find('#consumptionquantityrateliter-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityvalueliterraw-input'+(num-1)).prop('name','consumptionquantityvalueliterraw-input'+num);
+                  $clone.find('#consumptionquantityvalueliterraw-input'+(num-1)).prop('id','consumptionquantityvalueliterraw-input'+num).addClass('validatenum raw_litervalue');
+                  $clone.find('#consumptionquantityvalueliterraw-input'+num).val("").end();
+
+
+                  $div.after($clone);
+
+                  countraw=countraw+1;
+                  $('#count-raw').val(countraw);
+                  selectblock('.rawdata');
+                  // if($($clone).children('input,select').hasClass('.validatenum')){
+                  //   alert('hi');
+                  // }
+                  if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+               })
+              selectblock('.rawdata');
+   
+              $(document).on('focus','.raw_rateliter',function(){
+                 var $div = $('div[id^="rawdata"]:last');
+                var num = parseInt( $div.prop("id").match(/\d+/g), 10 );
+                var total=parseFloat($('#consumptionquantityratekgraw-input'+num).val())*parseFloat($('#consumptionquantitydensityraw-input'+num).val());
+                $('#consumptionquantityrateliter-input'+num).val(total.toFixed(4));
+              });
+
+              $(document).on('focus','.raw_rateliter',function(){
+                 var $div = $('div[id^="edit-rawdata"]:last');
+                var num = parseInt( $div.prop("id").match(/\d+/g), 10 );
+                var total=parseFloat($('#edit-consumptionquantityratekgraw-input'+num).val())*parseFloat($('#edit-consumptionquantitydensityraw-input'+num).val());
+                $('#edit-consumptionquantityrateliter-input'+num).val(total.toFixed(4));
+              });
+
+              $(document).on('focus','.additive_rateliter',function(){
+                var $div = $('div[id^="additivedata"]:last');
+                var num = parseInt( $div.prop("id").match(/\d+/g), 10 );
+                var total=parseFloat($('#consumptionquantityratekgadditive-input'+num).val())*parseFloat($('#consumptionquantitydensityadditive-input'+num).val());
+                $('#consumptionquantityrateliteradditive-input'+num).val(total.toFixed(4));
+              });
+
+              $(document).on('focus','.additive_rateliter',function(){
+                var $div = $('div[id^="edit-additivedata"]:last');
+                var num = parseInt( $div.prop("id").match(/\d+/g), 10 );
+                var total=parseFloat($('#edit-consumptionquantityratekgadditive-input'+num).val())*parseFloat($('#edit-consumptionquantitydensityadditive-input'+num).val());
+                $('#edit-consumptionquantityrateliteradditive-input'+num).val(total.toFixed(4));
+              });
+
+                $('.addadditive').click(function(e){
+                  // alert('add entry');
+                  var $div = $('div[id^="additivedata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'additivedata'+num );
+
+                  $clone.find('#consumptionproductadditive-input'+(num-1)).prop('name','consumptionproductadditive-input'+num);
+                  $clone.find('#consumptionproductadditive-input'+(num-1)).prop('id','consumptionproductadditive-input'+num);
+                  $clone.find('#consumptionproductadditive-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityadditive-input'+(num-1)).prop('name','consumptionquantityadditive-input'+num);
+                  $clone.find('#consumptionquantityadditive-input'+(num-1)).prop('id','consumptionquantityadditive-input'+num).addClass('validatenum');
+                  $clone.find('#consumptionquantityadditive-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityliteradditive-input'+(num-1)).prop('name','consumptionquantityliteradditive-input'+num);
+                  $clone.find('#consumptionquantityliteradditive-input'+(num-1)).prop('id','consumptionquantityliteradditive-input'+num).addClass('validatenum');
+                  $clone.find('#consumptionquantityliteradditive-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantitydensityadditive-input'+(num-1)).prop('name','consumptionquantitydensityadditive-input'+num);
+                  $clone.find('#consumptionquantitydensityadditive-input'+(num-1)).prop('id','consumptionquantitydensityadditive-input'+num).addClass('validatenum');
+                  $clone.find('#consumptionquantitydensityadditive-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityratekgadditive-input'+(num-1)).prop('name','consumptionquantityratekgadditive-input'+num);
+                  $clone.find('#consumptionquantityratekgadditive-input'+(num-1)).prop('id','consumptionquantityratekgadditive-input'+num).addClass('validatenum additive_rate');
+                  $clone.find('#consumptionquantityratekgadditive-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityvaluekgadditive-input'+(num-1)).prop('name','consumptionquantityvaluekgadditive-input'+num);
+                  $clone.find('#consumptionquantityvaluekgadditive-input'+(num-1)).prop('id','consumptionquantityvaluekgadditive-input'+num).addClass('validatenum additive_value');
+                  $clone.find('#consumptionquantityvaluekgadditive-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityrateliteradditive-input'+(num-1)).prop('name','consumptionquantityrateliteradditive-input'+num);
+                  $clone.find('#consumptionquantityrateliteradditive-input'+(num-1)).prop('id','consumptionquantityrateliteradditive-input'+num).addClass('validatenum additive_rate');
+                  $clone.find('#consumptionquantityrateliteradditive-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityvalueliteradditive-input'+(num-1)).prop('name','consumptionquantityvalueliteradditive-input'+num);
+                  $clone.find('#consumptionquantityvalueliteradditive-input'+(num-1)).prop('id','consumptionquantityvalueliteradditive-input'+num).addClass('validatenum additive_value');
+                  $clone.find('#consumptionquantityvalueliteradditive-input'+num).val("").end();
+
+
+                  $div.after($clone);
+
+                  countadditive=countadditive+1;
+                  $('#count-additive').val(countadditive);
+                  selectblock('.additivedata');
+                     if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+
+                 
+               });
+                selectblock('.additivedata');
+                $('.addpacking').click(function(){
+                  alert('add entry');
+                  var $div = $('div[id^="packingdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'packingdata'+num );
+
+                  $clone.find('#consumptionproductpacking-input'+(num-1)).prop('name','consumptionproductpacking-input'+num);
+                  $clone.find('#consumptionproductpacking-input'+(num-1)).prop('id','consumptionproductpacking-input'+num);
+                  $clone.find('#consumptionproductpacking-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantitypacking-input'+(num-1)).prop('name','consumptionquantitypacking-input'+num);
+                  $clone.find('#consumptionquantitypacking-input'+(num-1)).prop('id','consumptionquantitypacking-input'+num).addClass('validatenum');
+                  $clone.find('#consumptionquantitypacking-input'+num).val("").end();
+
+                  $clone.find('#consumptionunitpacking-input'+(num-1)).prop('name','consumptionunitpacking-input'+num);
+                  $clone.find('#consumptionunitpacking-input'+(num-1)).prop('id','consumptionunitpacking-input'+num);
+                  $clone.find('#consumptionunitpacking-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityratepacking-input'+(num-1)).prop('name','consumptionquantityratepacking-input'+num);
+                  $clone.find('#consumptionquantityratepacking-input'+(num-1)).prop('id','consumptionquantityratepacking-input'+num).addClass('validatenum packing_rate');
+                  $clone.find('#consumptionquantityratepacking-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityvaluepacking-input'+(num-1)).prop('name','        consumptionquantityvaluepacking-input'+num);
+                  $clone.find('#consumptionquantityvaluepacking-input'+(num-1)).prop('id','consumptionquantityvaluepacking-input'+num).addClass('validatenum packing_value');
+                  $clone.find('#consumptionquantityvaluepacking-input'+num).val("").end();
+
+
+                  $div.after($clone);
+
+                  countpacking=countpacking+1;
+                  $('#count-packing').val(countpacking);
+                   selectblock('.packingdata');
+                    if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+                  // removedata();
+               });
+                  selectblock('.packingdata');
+               $('.addblending').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="blendingdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'blendingdata'+num );
+
+                  $clone.find('#consumptionproductblending-input'+(num-1)).prop('name','consumptionproductblending-input'+num);
+                  $clone.find('#consumptionproductblending-input'+(num-1)).prop('id','consumptionproductblending-input'+num);
+                  $clone.find('#consumptionproductblending-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityblending-input'+(num-1)).prop('name','consumptionquantityblending-input'+num);
+                  $clone.find('#consumptionquantityblending-input'+(num-1)).prop('id','consumptionquantityblending-input'+num).addClass('validatenum');
+                  $clone.find('#consumptionquantityblending-input'+num).val("").end();
+
+                  $clone.find('#consumptionunitblending-input'+(num-1)).prop('name','consumptionunitblending-input'+num);
+                  $clone.find('#consumptionunitblending-input'+(num-1)).prop('id','consumptionunitblending-input'+num);
+                  $clone.find('#consumptionunitblending-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityrateblending-input'+(num-1)).prop('name','consumptionquantityrateblending-input'+num);
+                  $clone.find('#consumptionquantityrateblending-input'+(num-1)).prop('id','consumptionquantityrateblending-input'+num).addClass('validatenum consumption_rate');
+                  $clone.find('#consumptionquantityrateblending-input'+num).val("").end();
+
+                  $clone.find('#consumptionquantityvalueblending-input'+(num-1)).prop('name','        consumptionquantityvalueblending-input'+num);
+                  $clone.find('#consumptionquantityvalueblending-input'+(num-1)).prop('id','consumptionquantityvalueblending-input'+num).addClass('validatenum consumption_value');
+                  $clone.find('#consumptionquantityvalueblending-input'+num).val("").end();
+
+
+                  $div.after($clone);
+
+                  countblending=countblending+1;
+                  $('#count-blending').val(countblending);
+                   selectblock('.blendingdata');
+                      if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+                   // return false;
+                  // removedata();
+               });
+               selectblock('.blendingdata');
+          // 
+
+
+// edit
+                $('.edit-addraw').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="edit-rawdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'edit-rawdata'+num );
+
+                  $clone.find('#edit-consumptionproductraw-input'+(num-1)).prop('name','consumptionproductraw-input'+num);
+                  $clone.find('#edit-consumptionproductraw-input'+(num-1)).prop('id','edit-consumptionproductraw-input'+num);
+                  $clone.find('#edit-consumptionproductraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityraw-input'+(num-1)).prop('name','consumptionquantityraw-input'+num);
+                  $clone.find('#edit-consumptionquantityraw-input'+(num-1)).prop('id','edit-consumptionquantityraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityliterraw-input'+(num-1)).prop('name','consumptionquantityliterraw-input'+num);
+                  $clone.find('#edit-consumptionquantityliterraw-input'+(num-1)).prop('id','edit-consumptionquantityliterraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityliterraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantitydensityraw-input'+(num-1)).prop('name','consumptionquantitydensityraw-input'+num);
+                  $clone.find('#edit-consumptionquantitydensityraw-input'+(num-1)).prop('id','edit-consumptionquantitydensityraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantitydensityraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityratekgraw-input'+(num-1)).prop('name','        consumptionquantityratekgraw-input'+num);
+                  $clone.find('#edit-consumptionquantityratekgraw-input'+(num-1)).prop('id','edit-consumptionquantityratekgraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityratekgraw-input'+num).val("").end();
+
+
+
+                  $clone.find('#edit-consumptionquantityvaluekgraw-input'+(num-1)).prop('name','consumptionquantityvaluekgraw-input'+num);
+                  $clone.find('#edit-consumptionquantityvaluekgraw-input'+(num-1)).prop('id','edit-consumptionquantityvaluekgraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvaluekgraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityrateliter-input'+(num-1)).prop('name','consumptionquantityrateliter-input'+num);
+                  $clone.find('#edit-consumptionquantityrateliter-input'+(num-1)).prop('id','edit-consumptionquantityrateliter-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityrateliter-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityvalueliterraw-input'+(num-1)).prop('name','consumptionquantityvalueliterraw-input'+num);
+                  $clone.find('#edit-consumptionquantityvalueliterraw-input'+(num-1)).prop('id','edit-consumptionquantityvalueliterraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvalueliterraw-input'+num).val("").end();
+                  $div.after($clone);
+
+                  edit_countraw=edit_countraw+1;
+                  // alert(edit_countraw);
+                  $('#edit_count-raw').val(edit_countraw);
+                  selectblock('.edit-rawdata');
+                     if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+
+                  // var data=document.querySelectorAll('.rawdata');
+                  // data.forEach(function(datarow){
+                  //   console.log(datarow);
+                  //   $(datarow).find('.remove').click(function(){
+                  //     $(this).parent().parent().parent().remove();
+                  //   })
+
+                  // })
+                  // $(this).parent().parent().css('background','yellow').prevAll().find('.remove').remove();
+
+               });
+              selectblock('.edit-rawdata');
+   
+             
+
+                $('.edit-addadditive').click(function(e){
+                  // alert('add entry');
+                  var $div = $('div[id^="edit-additivedata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'edit-additivedata'+num );
+
+                  $clone.find('#edit-consumptionproductadditive-input'+(num-1)).prop('name','consumptionproductadditive-input'+num);
+                  $clone.find('#edit-consumptionproductadditive-input'+(num-1)).prop('id','edit-consumptionproductadditive-input'+num);
+                  $clone.find('#edit-consumptionproductadditive-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityadditive-input'+(num-1)).prop('name','consumptionquantityadditive-input'+num);
+                  $clone.find('#edit-consumptionquantityadditive-input'+(num-1)).prop('id','edit-consumptionquantityadditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityadditive-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityliteradditive-input'+(num-1)).prop('name','consumptionquantityliteradditive-input'+num);
+                  $clone.find('#edit-consumptionquantityliteradditive-input'+(num-1)).prop('id','edit-consumptionquantityliteradditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityliteradditive-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantitydensityadditive-input'+(num-1)).prop('name','consumptionquantitydensityadditive-input'+num);
+                  $clone.find('#edit-consumptionquantitydensityadditive-input'+(num-1)).prop('id','edit-consumptionquantitydensityadditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantitydensityadditive-input'+num).val("").end();
+
+
+                  $clone.find('#edit-consumptionquantityratekgadditive-input'+(num-1)).prop('name','consumptionquantityratekgadditive-input'+num);
+                  $clone.find('#edit-consumptionquantityratekgadditive-input'+(num-1)).prop('id','edit-consumptionquantityratekgadditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityratekgadditive-input'+num).val("").end();
+
+
+                  $clone.find('#edit-consumptionquantityvaluekgadditive-input'+(num-1)).prop('name','consumptionquantityvaluekgadditive-input'+num);
+                  $clone.find('#edit-consumptionquantityvaluekgadditive-input'+(num-1)).prop('id','edit-consumptionquantityvaluekgadditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvaluekgadditive-input'+num).val("").end();
+
+
+                  $clone.find('#edit-consumptionquantityrateliteradditive-input'+(num-1)).prop('name','consumptionquantityrateliteradditive-input'+num);
+                  $clone.find('#edit-consumptionquantityrateliteradditive-input'+(num-1)).prop('id','edit-consumptionquantityrateliteradditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityrateliteradditive-input'+num).val("").end();
+
+
+                  $clone.find('#edit-consumptionquantityvalueliteradditive-input'+(num-1)).prop('name','consumptionquantityvalueliteradditive-input'+num);
+                  $clone.find('#edit-consumptionquantityvalueliteradditive-input'+(num-1)).prop('id','edit-consumptionquantityvalueliteradditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvalueliteradditive-input'+num).val("").end();
+
+                  $div.after($clone);
+
+                  edit_countadditive=edit_countadditive+1;
+                  $('#edit_count-additive').val(edit_countadditive);
+                  selectblock('.edit-additivedata');
+                     if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();  
+               });
+                selectblock('.edit-additivedata');
+
+                $('.edit-addpacking').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="edit-packingdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'edit-packingdata'+num );
+
+                  $clone.find('#edit-consumptionproductpacking-input'+(num-1)).prop('name','consumptionproductpacking-input'+num);
+                  $clone.find('#edit-consumptionproductpacking-input'+(num-1)).prop('id','edit-consumptionproductpacking-input'+num);
+                  $clone.find('#edit-consumptionproductpacking-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantitypacking-input'+(num-1)).prop('name','consumptionquantitypacking-input'+num);
+                  $clone.find('#edit-consumptionquantitypacking-input'+(num-1)).prop('id','edit-consumptionquantitypacking-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantitypacking-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionunitpacking-input'+(num-1)).prop('name','consumptionunitpacking-input'+num);
+                  $clone.find('#edit-consumptionunitpacking-input'+(num-1)).prop('id','edit-consumptionunitpacking-input'+num);
+                  $clone.find('#edit-consumptionunitpacking-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityratepacking-input'+(num-1)).prop('name','consumptionquantityratepacking-input'+num);
+                  $clone.find('#edit-consumptionquantityratepacking-input'+(num-1)).prop('id','edit-consumptionquantityratepacking-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityratepacking-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityvaluepacking-input'+(num-1)).prop('name','consumptionquantityvaluepacking-input'+num);
+                  $clone.find('#edit-consumptionquantityvaluepacking-input'+(num-1)).prop('id','edit-consumptionquantityvaluepacking-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvaluepacking-input'+num).val("").end();
+
+
+                  $div.after($clone);
+
+                  edit_countpacking=edit_countpacking+1;
+                  // alert(edit_countpacking);
+                  $('#edit_count-packing').val(edit_countpacking);
+                 
+                  alert($('#edit_count-packing').val());
+                   selectblock('.edit-packingdata');
+                      if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+                  // removedata();
+               });
+                  selectblock('.edit-packingdata');
+
+               $('.edit-addblending').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="edit-blendingdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'edit-blendingdata'+num );
+
+                  $clone.find('#edit-consumptionproductblending-input'+(num-1)).prop('name','consumptionproductblending-input'+num);
+                  $clone.find('#edit-consumptionproductblending-input'+(num-1)).prop('id','edit-consumptionproductblending-input'+num);
+                  $clone.find('#edit-consumptionproductblending-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityblending-input'+(num-1)).prop('name','consumptionquantityblending-input'+num);
+                  $clone.find('#edit-consumptionquantityblending-input'+(num-1)).prop('id','edit-consumptionquantityblending-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityblending-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionunitblending-input'+(num-1)).prop('name','consumptionunitblending-input'+num);
+                  $clone.find('#edit-consumptionunitblending-input'+(num-1)).prop('id','edit-consumptionunitblending-input'+num);
+                  $clone.find('#edit-consumptionunitblending-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityrateblending-input'+(num-1)).prop('name','consumptionquantityrateblending-input'+num);
+                  $clone.find('#edit-consumptionquantityrateblending-input'+(num-1)).prop('id','edit-consumptionquantityrateblending-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityrateblending-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityvalueblending-input'+(num-1)).prop('name','consumptionquantityvalueblending-input'+num);
+                  $clone.find('#edit-consumptionquantityvalueblending-input'+(num-1)).prop('id','edit-consumptionquantityvalueblending-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvalueblending-input'+num).val("").end();
+
+
+                  $div.after($clone);
+
+                  edit_countblending=edit_countblending+1;
+                  $('#edit_count-blending').val(edit_countblending);
+                   selectblock('.edit-blendingdata');
+                      if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+                   // return false;
+                  // removedata();
+               });
+               selectblock('.edit-blendingdata');
+          // 
+
+
+
+
+
+            // remove appended element
+
+
+
+
+            // 
+           $("#stockjournal_date-input-date").datepicker({
+          dateFormat: 'dd/mm/yy'
+         }).on("changeDate", function (e) {
+            var dateFormat= 'dd/mm/yy';
+            var d=new Date();
+            d=e.date;
+         
+            $('#stockjournal_date-input').val(d.toLocaleDateString());
+             // console.log(e.date);
+          // alert('hi');
+         });
+         
+         // });
+         $("#edit-stockjournal_date-input-date").datepicker({
+          dateFormat: 'dd/mm/yy'
+         }).on("changeDate", function (e) {
+            var dateFormat= 'dd/mm/yy';
+            var d=new Date();
+            d=e.date;
+         
+            $('#edit-stockjournal_date-input').val(d.toLocaleDateString());
+             // console.log(e.date);
+          // alert('hi');
+         });
+         
+         $(document).on('keyup','.raw_qty',function(){
+          rawqtyflag=0;
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#consumptionproductraw-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Raw Material'
+          },
+          function(data,status){
+            // $('#consumptionquantityraw-input'+i).val(data.qty);
+            if(parseFloat($('#consumptionquantityraw-input'+i).val()) > data.qty ){
+              rawqtyflag=1;
+              // alert(rawqtyflag);
+              alert('Max allowed quantity exceeded');
+            }
+          });
+         });
+         
+         $(document).on('keyup','.edit_raw_qty',function(){
+          editrawqtyflag=0;
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#edit-consumptionproductraw-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Raw Material'
+          },
+          function(data,status){
+            // $('#consumptionquantityraw-input'+i).val(data.qty);
+            if(parseFloat($('#edit-consumptionquantityraw-input'+i).val()) > data.qty ){
+              editrawqtyflag=1;
+             alert('Max allowed quantity exceeded');
+            }
+          });
+         });
+
+         $(document).on('focusin','.raw_liters',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#consumptionquantityraw-input'+i).val())/parseFloat($('#consumptionquantitydensityraw-input'+i).val())).toFixed(4);
+        });
+         $(document).on('focusin','.edit_raw_liters',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          // alert($('#edit-consumptionquantityraw-input'+i).val());
+          var total=(parseFloat($('#edit-consumptionquantityraw-input'+i).val())/parseFloat($('#edit-consumptionquantitydensityraw-input'+i).val())).toFixed(4);
+
+          $('#edit-consumptionquantityliterraw-input'+i).val(total);
+        });
+
+         $(document).on('focusin','.raw_kgvalue',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#consumptionquantityraw-input'+i).val())*parseFloat($('#consumptionquantityratekgraw-input'+i).val())).toFixed(4);
+        });
+         $(document).on('focusin','.edit_raw_kgvalue',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#edit-consumptionquantityraw-input'+i).val())*parseFloat($('#edit-consumptionquantityratekgraw-input'+i).val())).toFixed(4);
+        });
+
+         $(document).on('focusin','.raw_valueliter',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#consumptionquantityliterraw-input'+i).val())*parseFloat($('#consumptionquantityrateliter-input'+i).val())).toFixed(4);
+        });
+         $(document).on('focusin','.edit_raw_valueliter',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#edit-consumptionquantityliterraw-input'+i).val())*parseFloat($('#edit-consumptionquantityrateliter-input'+i).val())).toFixed(4);
+        });
+
+         
+         $(document).on('keyup','.additive_qty',function(){
+          additiveqtyflag=0;
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#consumptionproductadditive-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Additives'
+          },
+          function(data,status){
+            // $('#consumptionquantityraw-input'+i).val(data.qty);
+            if(parseFloat($('#consumptionquantityadditive-input'+i).val()) > data.qty ){
+              additiveqtyflag=1;
+              alert('Max allowed quantity exceeded');
+            }
+          });
+         });
+         // var editadditiveqtyflag=0;
+         $(document).on('keyup','.edit_additive_qty',function(){
+          editadditiveqtyflag=0;
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#edit-consumptionproductadditive-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Additives'
+          },
+          function(data,status){
+            // $('#consumptionquantityraw-input'+i).val(data.qty);
+            if(parseFloat($('#edit-consumptionquantityadditive-input'+i).val()) > data.qty ){
+              editadditiveqtyflag=1;
+              alert('Max allowed quantity exceeded');
+            }
+          });
+         });
+
+         $(document).on('focusin','.additives_liter',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#consumptionquantityadditive-input'+i).val())/parseFloat($('#consumptionquantitydensityadditive-input'+i).val())).toFixed(4);
+        });
+         $(document).on('focusin','.edit_additives_liter',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#edit-consumptionquantityadditive-input'+i).val())/parseFloat($('#edit-consumptionquantitydensityadditive-input'+i).val())).toFixed(4);
+        });
+
+          $(document).on('focusin','.additive_valuekg',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#consumptionquantityadditive-input'+i).val())*parseFloat($('#consumptionquantityratekgadditive-input'+i).val())).toFixed(4);
+        });
+          $(document).on('focusin','.edit_additive_valuekg',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#edit-consumptionquantityadditive-input'+i).val())*parseFloat($('#edit-consumptionquantityratekgadditive-input'+i).val())).toFixed(4);
+        });
+
+          $(document).on('focusin','.additive_valueliter',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#consumptionquantityliteradditive-input'+i).val())*parseFloat($('#consumptionquantityrateliteradditive-input'+i).val())).toFixed(4);
+        });
+          $(document).on('focusin','.edit_additive_valueliter',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          this.value=(parseFloat($('#edit-consumptionquantityliteradditive-input'+i).val())*parseFloat($('#edit-consumptionquantityrateliteradditive-input'+i).val())).toFixed(4);
+        });
+
+          $('.excel').click(function(){
+                        $(this).attr('href',"{% url 'home:exportStockJournal'%}");
+                     });
+
+          
+          $(document).on('keyup','.packing_qty',function(){
+            packingqtyflag=0;
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#consumptionproductpacking-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Packing Material'
+          },
+          function(data,status){
+            // $('#consumptionquantityraw-input'+i).val(data.qty);
+            if(parseFloat($('#consumptionquantitypacking-input'+i).val()) > data.qty ){
+              packingqtyflag=1;
+              alert('Max allowed quantity exceeded');
+            }
+          });
+         });
+          // var editpackingqtyflag=0;
+          $(document).on('keyup','.edit_packing_qty',function(){
+            editpackingqtyflag=0;
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#edit-consumptionproductpacking-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Packing Material'
+          },
+          function(data,status){
+            // $('#consumptionquantityraw-input'+i).val(data.qty);
+            if(parseFloat($('#edit-consumptionquantitypacking-input'+i).val()) > data.qty ){
+              editpackingqtyflag=1;
+              alert('Max allowed quantity exceeded');
+            }
+          });
+         });
+
+          
+          $(document).on('keyup','.consumption_qty',function(){
+            consumptionqtyflag=0;
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#consumptionproductblending-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Consumption'
+          },
+          function(data,status){
+            // $('#consumptionquantityraw-input'+i).val(data.qty);
+            if(parseFloat($('#consumptionquantityblending-input'+i).val()) > data.qty ){
+              consumptionqtyflag=1;
+              alert('Max allowed quantity exceeded');
+            }
+          });
+         });
+          // var editconsumptionqtyflag=0;
+          $(document).on('keyup','.edit_consumption_qty',function(){
+            editconsumptionqtyflag=0;
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#edit-consumptionproductblending-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Consumption'
+          },
+          function(data,status){
+            // $('#consumptionquantityraw-input'+i).val(data.qty);
+            if(parseFloat($('#edit-consumptionquantityblending-input'+i).val()) > data.qty ){
+              editconsumptionqtyflag=1;
+             alert('Max allowed quantity exceeded');
+            }
+          });
+         });
+
+          $('#edit0').on('hidden.bs.modal', function () {
+           location.reload();
+          })
+
+          $('.view').click(function(){
+            var product=this.value;
+
+            $.post("{% url 'home:getStockProduct' %}",
+            {
+              'product':product
+            },
+            function(data,status){
+              // alert(data.product.product);
+              $('#production_view').empty();
+              $('#production_view').append('<tr style="font-weight: lighter;"><td>'+data.product.product+'</td><td>'+data.product.qty+'</td><td>'+data.product.unit+'</td><td>'+data.product.rate+'</td><td>'+data.product.value+'</td></tr>');
+
+              $('#consumption_view_raws').empty();
+              for( var i=0;i<data.raws.length;i++){
+              $('#consumption_view_raws').append('<tr><td>'+data.raws[i].name+'</td><td>'+data.raws[i].qtykg+'</td><td>'+data.raws[i].qtyliter+'</td><td>'+data.raws[i].density+'</td><td>'+data.raws[i].ratekg+'</td><td>'+data.raws[i].valuekg+'</td><td>'+data.raws[i].rateliter+'</td><td>'+data.raws[i].valueliter+'</td></tr>');
+            }
+
+             $('#consumption_view_additives').empty();
+              for( var i=0;i<data.additives.length;i++){
+              $('#consumption_view_additives').append('<tr><td>'+data.additives[i].name+'</td><td>'+data.additives[i].qtykg+'</td><td>'+data.additives[i].qtyliter+'</td><td>'+data.additives[i].density+'</td><td>'+data.additives[i].ratekg+'</td><td>'+data.additives[i].valuekg+'</td><td>'+data.additives[i].rateliter+'</td><td>'+data.additives[i].valueliter+'</td></tr>');
+            }
+
+             $('#consumption_view_packings').empty();
+              for( var i=0;i<data.packings.length;i++){
+              $('#consumption_view_packings').append('<tr><td>'+data.packings[i].name+'</td><td>'+data.packings[i].qty+'</td><td>'+data.packings[i].unit+'</td><td>'+data.packings[i].rate+'</td><td>'+data.packings[i].value+'</td></tr>');
+            }
+
+            $('#consumption_view_consumptions').empty();
+              for( var i=0;i<data.consumptions.length;i++){
+              $('#consumption_view_consumptions').append('<tr><td>'+data.consumptions[i].name+'</td><td>'+data.consumptions[i].qty+'</td><td>'+data.consumptions[i].unit+'</td><td>'+data.consumptions[i].rate+'</td><td>'+data.consumptions[i].value+'</td></tr>');
+            }
+            $('#production_sn').text(data.product.stockno);
+            $('#production_date').text(data.product.stockdate);
+            $('#production_view_remarks').text(data.product.production_remarks);
+            $('#consumption_view_remarks').text(data.product.consumption_remarks);
+            });
+          });
+
+          $('.editbtn0').click(function(){
+
+            var product=this.value;
+
+            $.post("{% url 'home:getStockProduct' %}",
+            {
+              'product':product
+            },
+            function(data,status){
+            if (data.raws.length>1){
+              // alert(data.raws.length);
+              for(var i=2;i<=data.raws.length;i++){
+                  var $div = $('div[id^="edit-rawdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                   
+                  var $clone = $div.clone().prop('id', 'edit-rawdata'+num );
+
+                  $clone.find('#edit-consumptionproductraw-input'+(num-1)).prop('name','consumptionproductraw-input'+num);
+                  $clone.find('#edit-consumptionproductraw-input'+(num-1)).prop('id','edit-consumptionproductraw-input'+num);
+                  $clone.find('#edit-consumptionproductraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityraw-input'+(num-1)).prop('name','consumptionquantityraw-input'+num);
+                  $clone.find('#edit-consumptionquantityraw-input'+(num-1)).prop('id','edit-consumptionquantityraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityliterraw-input'+(num-1)).prop('name','consumptionquantityliterraw-input'+num);
+                  $clone.find('#edit-consumptionquantityliterraw-input'+(num-1)).prop('id','edit-consumptionquantityliterraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityliterraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantitydensityraw-input'+(num-1)).prop('name','consumptionquantitydensityraw-input'+num);
+                  $clone.find('#edit-consumptionquantitydensityraw-input'+(num-1)).prop('id','edit-consumptionquantitydensityraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantitydensityraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityratekgraw-input'+(num-1)).prop('name','        consumptionquantityratekgraw-input'+num);
+                  $clone.find('#edit-consumptionquantityratekgraw-input'+(num-1)).prop('id','edit-consumptionquantityratekgraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityratekgraw-input'+num).val("").end();
+
+
+
+                  $clone.find('#edit-consumptionquantityvaluekgraw-input'+(num-1)).prop('name','consumptionquantityvaluekgraw-input'+num);
+                  $clone.find('#edit-consumptionquantityvaluekgraw-input'+(num-1)).prop('id','edit-consumptionquantityvaluekgraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvaluekgraw-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityrateliter-input'+(num-1)).prop('name','consumptionquantityrateliter-input'+num);
+                  $clone.find('#edit-consumptionquantityrateliter-input'+(num-1)).prop('id','edit-consumptionquantityrateliter-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityrateliter-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityvalueliterraw-input'+(num-1)).prop('name','consumptionquantityvalueliterraw-input'+num);
+                  $clone.find('#edit-consumptionquantityvalueliterraw-input'+(num-1)).prop('id','edit-consumptionquantityvalueliterraw-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvalueliterraw-input'+num).val("").end();
+                  $div.after($clone);
+
+                  edit_countraw=edit_countraw+1;
+
+                  $('#edit_count-raw').val(edit_countraw);
+                 
+                  selectblock('.edit-rawdata');
+                     if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+                  selectblock('.edit-rawdata');
+                }
+              }
+              // alert(edit_countraw);
+            if (data.additives.length>1){
+              for(var i=2;i<=data.additives.length;i++){
+                  var $div = $('div[id^="edit-additivedata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'edit-additivedata'+num );
+
+                  $clone.find('#edit-consumptionproductadditive-input'+(num-1)).prop('name','consumptionproductadditive-input'+num);
+                  $clone.find('#edit-consumptionproductadditive-input'+(num-1)).prop('id','edit-consumptionproductadditive-input'+num);
+                  $clone.find('#edit-consumptionproductadditive-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityadditive-input'+(num-1)).prop('name','consumptionquantityadditive-input'+num);
+                  $clone.find('#edit-consumptionquantityadditive-input'+(num-1)).prop('id','edit-consumptionquantityadditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityadditive-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityliteradditive-input'+(num-1)).prop('name','consumptionquantityliteradditive-input'+num);
+                  $clone.find('#edit-consumptionquantityliteradditive-input'+(num-1)).prop('id','edit-consumptionquantityliteradditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityliteradditive-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantitydensityadditive-input'+(num-1)).prop('name','consumptionquantitydensityadditive-input'+num);
+                  $clone.find('#edit-consumptionquantitydensityadditive-input'+(num-1)).prop('id','edit-consumptionquantitydensityadditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantitydensityadditive-input'+num).val("").end();
+
+
+                  $clone.find('#edit-consumptionquantityratekgadditive-input'+(num-1)).prop('name','consumptionquantityratekgadditive-input'+num);
+                  $clone.find('#edit-consumptionquantityratekgadditive-input'+(num-1)).prop('id','edit-consumptionquantityratekgadditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityratekgadditive-input'+num).val("").end();
+
+
+                  $clone.find('#edit-consumptionquantityvaluekgadditive-input'+(num-1)).prop('name','consumptionquantityvaluekgadditive-input'+num);
+                  $clone.find('#edit-consumptionquantityvaluekgadditive-input'+(num-1)).prop('id','edit-consumptionquantityvaluekgadditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvaluekgadditive-input'+num).val("").end();
+
+
+                  $clone.find('#edit-consumptionquantityrateliteradditive-input'+(num-1)).prop('name','consumptionquantityrateliteradditive-input'+num);
+                  $clone.find('#edit-consumptionquantityrateliteradditive-input'+(num-1)).prop('id','edit-consumptionquantityrateliteradditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityrateliteradditive-input'+num).val("").end();
+
+
+                  $clone.find('#edit-consumptionquantityvalueliteradditive-input'+(num-1)).prop('name','consumptionquantityvalueliteradditive-input'+num);
+                  $clone.find('#edit-consumptionquantityvalueliteradditive-input'+(num-1)).prop('id','edit-consumptionquantityvalueliteradditive-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvalueliteradditive-input'+num).val("").end();
+
+                  $div.after($clone);
+
+                  edit_countadditive=edit_countadditive+1;
+                  $('#edit_count-additive').val(edit_countadditive);
+                  selectblock('.edit-additivedata');
+                     if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+                  selectblock('.edit-additivedata');
+                }
+              }
+
+            if (data.packings.length>1){
+              for(var i=2;i<=data.packings.length;i++){
+                  var $div = $('div[id^="edit-packingdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'edit-packingdata'+num );
+
+                  $clone.find('#edit-consumptionproductpacking-input'+(num-1)).prop('name','consumptionproductpacking-input'+num);
+                  $clone.find('#edit-consumptionproductpacking-input'+(num-1)).prop('id','edit-consumptionproductpacking-input'+num);
+                  $clone.find('#edit-consumptionproductpacking-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantitypacking-input'+(num-1)).prop('name','consumptionquantitypacking-input'+num);
+                  $clone.find('#edit-consumptionquantitypacking-input'+(num-1)).prop('id','edit-consumptionquantitypacking-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantitypacking-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionunitpacking-input'+(num-1)).prop('name','consumptionunitpacking-input'+num);
+                  $clone.find('#edit-consumptionunitpacking-input'+(num-1)).prop('id','edit-consumptionunitpacking-input'+num);
+                  $clone.find('#edit-consumptionunitpacking-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityratepacking-input'+(num-1)).prop('name','consumptionquantityratepacking-input'+num);
+                  $clone.find('#edit-consumptionquantityratepacking-input'+(num-1)).prop('id','edit-consumptionquantityratepacking-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityratepacking-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityvaluepacking-input'+(num-1)).prop('name','consumptionquantityvaluepacking-input'+num);
+                  $clone.find('#edit-consumptionquantityvaluepacking-input'+(num-1)).prop('id','edit-consumptionquantityvaluepacking-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvaluepacking-input'+num).val("").end();
+
+
+                  $div.after($clone);
+
+                  edit_countpacking=edit_countpacking+1;
+                  $('#edit_count-packing').val(edit_countpacking);
+                   selectblock('.edit-packingdata');
+                      if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+                  selectblock('.edit-packingdata');
+              }
+            }
+
+            if(data.consumptions.length>1){
+              for(var i=2;i<=data.consumptions.length;i++){
+                  var $div = $('div[id^="edit-blendingdata"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'edit-blendingdata'+num );
+
+                  $clone.find('#edit-consumptionproductblending-input'+(num-1)).prop('name','consumptionproductblending-input'+num);
+                  $clone.find('#edit-consumptionproductblending-input'+(num-1)).prop('id','edit-consumptionproductblending-input'+num);
+                  $clone.find('#edit-consumptionproductblending-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityblending-input'+(num-1)).prop('name','consumptionquantityblending-input'+num);
+                  $clone.find('#edit-consumptionquantityblending-input'+(num-1)).prop('id','edit-consumptionquantityblending-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityblending-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionunitblending-input'+(num-1)).prop('name','consumptionunitblending-input'+num);
+                  $clone.find('#edit-consumptionunitblending-input'+(num-1)).prop('id','edit-consumptionunitblending-input'+num);
+                  $clone.find('#edit-consumptionunitblending-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityrateblending-input'+(num-1)).prop('name','consumptionquantityrateblending-input'+num);
+                  $clone.find('#edit-consumptionquantityrateblending-input'+(num-1)).prop('id','edit-consumptionquantityrateblending-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityrateblending-input'+num).val("").end();
+
+                  $clone.find('#edit-consumptionquantityvalueblending-input'+(num-1)).prop('name','consumptionquantityvalueblending-input'+num);
+                  $clone.find('#edit-consumptionquantityvalueblending-input'+(num-1)).prop('id','edit-consumptionquantityvalueblending-input'+num).addClass('validatenum');
+                  $clone.find('#edit-consumptionquantityvalueblending-input'+num).val("").end();
+
+
+                  $div.after($clone);
+
+                  edit_countblending=edit_countblending+1;
+                  $('#edit_count-blending').val(edit_countblending);
+                   selectblock('.edit-blendingdata');
+                      if($($clone).find('input').hasClass('validatenum')){
+                   checkInp();
+                  }
+                  resetall();
+                  selectblock('.edit-blendingdata');
+              }
+            }
+             // alert(edit_countraw+" "+edit_countadditive+" "+edit_countpacking+' '+edit_countblending);
+            for(var i=1;i<=data.raws.length;i++){
+
+              $('#edit-consumptionproductraw-input'+i).val(data.raws[i-1].name);
+              $('#edit-consumptionquantityraw-input'+i).val(data.raws[i-1].qtykg);
+              $('#edit-consumptionquantitydensityraw-input'+i).val(data.raws[i-1].density);
+              $('#edit-consumptionquantityliterraw-input'+i).val(data.raws[i-1].qtyliter);
+              $('#edit-consumptionquantityratekgraw-input'+i).val(data.raws[i-1].ratekg);
+              $('#edit-consumptionquantityvaluekgraw-input'+i).val(data.raws[i-1].valuekg);
+              $('#edit-consumptionquantityrateliter-input'+i).val(data.raws[i-1].rateliter);
+              $('#edit-consumptionquantityvalueliterraw-input'+i).val(data.raws[i-1].valueliter);
+            }
+
+            for(var i=1;i<=data.additives.length;i++){
+              $('#edit-consumptionproductadditive-input'+i).val(data.additives[i-1].name);
+              $('#edit-consumptionquantityadditive-input'+i).val(data.additives[i-1].qtykg);
+              $('#edit-consumptionquantitydensityadditive-input'+i).val(data.additives[i-1].density);
+              $('#edit-consumptionquantityliteradditive-input'+i).val(data.additives[i-1].qtyliter);
+              $('#edit-consumptionquantityratekgadditive-input'+i).val(data.additives[i-1].ratekg);
+              $('#edit-consumptionquantityvaluekgadditive-input'+i).val(data.additives[i-1].valuekg);
+              $('#edit-consumptionquantityrateliteradditive-input'+i).val(data.additives[i-1].rateliter);
+              $('#edit-consumptionquantityvalueliteradditive-input'+i).val(data.additives[i-1].valueliter);
+            }
+
+
+            for(var i=1;i<=data.packings.length;i++){
+              $('#edit-consumptionproductpacking-input'+i).val(data.packings[i-1].name);
+              $('#edit-consumptionquantitypacking-input'+i).val(data.packings[i-1].qty);
+              $('#edit-consumptionunitpacking-input'+i).val(data.packings[i-1].unit);
+              $('#edit-consumptionquantityratepacking-input'+i).val(data.packings[i-1].rate);
+              $('#edit-consumptionquantityvaluepacking-input'+i).val(data.packings[i-1].value);
+             
+            }
+
+            for(var i=1;i<=data.consumptions.length;i++){
+              $('#edit-consumptionproductblending-input'+i).val(data.consumptions[i-1].name);
+              $('#edit-consumptionquantityblending-input'+i).val(data.consumptions[i-1].qty);
+              $('#edit-consumptionunitblending-input'+i).val(data.consumptions[i-1].unit);
+              $('#edit-consumptionquantityrateblending-input'+i).val(data.consumptions[i-1].rate);
+              $('#edit-consumptionquantityvalueblending-input'+i).val(data.consumptions[i-1].value);
+             
+            }
+
+            $('#edit-stockjournal_num-input').val(data.product.stockno);
+            $('#edit-stockjournal_date-input').val(data.product.stockdate);
+            $('#edit-consumptionblockremarks').val(data.product.production_remarks);
+            $('#edit-production_product-input').val(data.product.product);
+            $('#edit-production_quantity-input').val(data.product.qty);
+            $('#edit-production_unit-input').val(data.product.unit);
+            $('#edit-production_value-input').val(data.product.value);
+            $('#edit-production_rateperunit').val(data.product.rate);
+            $('#edit-production_remarks-input').val(data.product.consumption_remarks);
+
+      });
+});
+         // $(document).on('focusout','.raw_qty',function(){
+         //  var i=parseInt(this.id.match(/\d+/g), 10 );
+         //  var product=$('#consumptionproductraw-input'+i).val();
+         //  // alert(product);
+         //  $.post("{% url 'home:get_rate'%}",
+         //  {
+         //    'product':product,
+         //    'type':'Raw Material'
+         //  },
+         //  function(data,status){
+         //    // $('#consumptionquantityraw-input'+i).val(data.qty);
+         //    if(parseFloat($('#consumptionquantityraw-input'+i).val()) > data.qty ){
+         //      alert('over');
+         //    }
+         //  });
+         // });
+
+         // $(document).on('focusin','.raw_value',function(){
+         //  var i=parseInt(this.id.match(/\d+/g), 10 );
+
+         //  var qty=parseFloat($('#consumptionquantityraw-input'+i).val());
+         //  var rate=parseFloat($('#consumptionquantityrateraw-input'+i).val());
+         //  var val=qty*rate;
+         //  this.value=val.toFixed(4);
+         // });
+
+         // $(document).on('focusin','.additive_rate',function(){
+         //  var i=parseInt(this.id.match(/\d+/g), 10 );
+         //  var product=$('#consumptionproductadditive-input'+i).val();
+         //  // alert(product);
+         //  $.post("{% url 'home:get_rate'%}",
+         //  {
+         //    'product':product,
+         //    'type':'Additives'
+         //  },
+         //  function(data,status){
+         //    $('#consumptionquantityrateadditive-input'+i).val(data.rate);
+         //  });
+         // });
+
+         // $(document).on('focusin','.additive_value',function(){
+         //  var i=parseInt(this.id.match(/\d+/g), 10 );
+
+         //  var qty=parseFloat($('#consumptionquantityadditive-input'+i).val());
+         //  var rate=parseFloat($('#consumptionquantityrateadditive-input'+i).val());
+         //  var val=qty*rate;
+         //  this.value=val.toFixed(4);
+         // });
+
+         $(document).on("change",'.raw_product',function(){
+          if(this.value == 'NA'){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          $('#consumptionquantityraw-input'+i).val(0);
+          $('#consumptionquantitydensityraw-input'+i).val(0);
+          $('#consumptionquantityliterraw-input'+i).val(0);
+          $('#consumptionquantityratekgraw-input'+i).val(0);
+          $('#consumptionquantityvaluekgraw-input'+i).val(0);
+          $('#consumptionquantityrateliter-input'+i).val(0);
+          $('#consumptionquantityvalueliterraw-input'+i).val(0);
+        }
+         });
+         $(document).on("change",'.edit_raw_product',function(){
+          if(this.value == 'NA'){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          $('#edit-consumptionquantityraw-input'+i).val(0);
+          $('#edit-consumptionquantitydensityraw-input'+i).val(0);
+          $('#edit-consumptionquantityliterraw-input'+i).val(0);
+          $('#edit-consumptionquantityratekgraw-input'+i).val(0);
+          $('#edit-consumptionquantityvaluekgraw-input'+i).val(0);
+          $('#edit-consumptionquantityrateliter-input'+i).val(0);
+          $('#edit-consumptionquantityvalueliterraw-input'+i).val(0);
+        }
+         });
+          $(document).on("change",'.additive_product',function(){
+          if(this.value == 'NA'){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          $('#consumptionquantityadditive-input'+i).val(0);
+          $('#consumptionquantitydensityadditive-input'+i).val(0);
+          $('#consumptionquantityliteradditive-input'+i).val(0);
+          $('#consumptionquantityratekgadditive-input'+i).val(0);
+          $('#consumptionquantityvaluekgadditive-input'+i).val(0);
+          $('#consumptionquantityrateliteradditive-input'+i).val(0);
+          $('#consumptionquantityvalueliteradditive-input'+i).val(0);
+        }
+         });
+          $(document).on("change",'.edit_additive_product',function(){
+          if(this.value == 'NA'){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          $('#edit-consumptionquantityadditive-input'+i).val(0);
+          $('#edit-consumptionquantitydensityadditive-input'+i).val(0);
+          $('#edit-consumptionquantityliteradditive-input'+i).val(0);
+          $('#edit-consumptionquantityratekgadditive-input'+i).val(0);
+          $('#edit-consumptionquantityvaluekgadditive-input'+i).val(0);
+          $('#edit-consumptionquantityrateliteradditive-input'+i).val(0);
+          $('#edit-consumptionquantityvalueliteradditive-input'+i).val(0);
+          }
+         });
+
+          $(document).on("change",'.packing_product',function(){
+            var i=parseInt(this.id.match(/\d+/g), 10 );
+          if(this.value == 'NA'){
+          
+          // $('#consumptionproductpacking-input'+i).val(0);
+          $('#consumptionquantitypacking-input'+i).val(0);
+          $('#consumptionunitpacking-input'+i).val('each');
+          $('#consumptionquantityratepacking-input'+i).val(0);
+          $('#consumptionquantityvaluepacking-input'+i).val(0);
+          }
+         });
+
+          $(document).on("change",'.edit_packing_product',function(){
+            var i=parseInt(this.id.match(/\d+/g), 10 );
+          if(this.value == 'NA'){
+          
+          // $('#edit-consumptionproductpacking-input'+i).val(0);
+          $('#edit-consumptionquantitypacking-input'+i).val(0);
+          $('#edit-consumptionunitpacking-input'+i).val('each');
+          $('#edit-consumptionquantityratepacking-input'+i).val(0);
+          $('#edit-consumptionquantityvaluepacking-input'+i).val(0);
+          }
+         });
+
+          $(document).on("change",'.consumption_product',function(){
+            var i=parseInt(this.id.match(/\d+/g), 10 );
+          if(this.value == 'NA'){
+          
+          $('#consumptionquantityblending-input'+i).val(0);
+          $('#consumptionunitblending-input'+i).val('liter');
+          $('#consumptionquantityrateblending-input'+i).val(0);
+          $('#consumptionquantityvalueblending-input'+i).val(0);
+          // $('#edit-consumptionquantityvaluepacking-input'+i).val(0);
+          }
+         });
+          $(document).on("change",'.edit_consumption_product',function(){
+            var i=parseInt(this.id.match(/\d+/g), 10 );
+          if(this.value == 'NA'){
+          
+          $('#edit-consumptionquantityblending-input'+i).val(0);
+          $('#edit-consumptionunitblending-input'+i).val('liter');
+          $('#edit-consumptionquantityrateblending-input'+i).val(0);
+          $('#edit-consumptionquantityvalueblending-input'+i).val(0);
+          // $('#edit-consumptionquantityvaluepacking-input'+i).val(0);
+          }
+         });
+
+
+          $(document).on('focusin','.packing_rate',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#consumptionproductpacking-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Packing Material'
+          },
+          function(data,status){
+            $('#consumptionquantityratepacking-input'+i).val(data.rate);
+          });
+         });
+         
+         $(document).on('focusin','.packing_value',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+
+          var qty=parseFloat($('#consumptionquantitypacking-input'+i).val());
+          var rate=parseFloat($('#consumptionquantityratepacking-input'+i).val());
+          var val=qty*rate;
+          this.value=val.toFixed(4);
+         });
+         $(document).on('focusin','.edit_packing_value',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+
+          var qty=parseFloat($('#edit-consumptionquantitypacking-input'+i).val());
+          var rate=parseFloat($('#edit-consumptionquantityratepacking-input'+i).val());
+          var val=qty*rate;
+          this.value=val.toFixed(4);
+         });
+
+
+         $(document).on('focusin','.consumption_rate',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+          var product=$('#consumptionproductblending-input'+i).val();
+          // alert(product);
+          $.post("{% url 'home:get_rate'%}",
+          {
+            'product':product,
+            'type':'Consumption'
+          },
+          function(data,status){
+            $('#consumptionquantityrateblending-input'+i).val(data.rate);
+          });
+         });
+
+         $(document).on('focusin','.consumption_value',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+
+          var qty=parseFloat($('#consumptionquantityblending-input'+i).val());
+          var rate=parseFloat($('#consumptionquantityrateblending-input'+i).val());
+          var val=qty*rate;
+          this.value=val.toFixed(4);
+         });
+         $(document).on('focusin','.edit_consumption_value',function(){
+          var i=parseInt(this.id.match(/\d+/g), 10 );
+
+          var qty=parseFloat($('#edit-consumptionquantityblending-input'+i).val());
+          var rate=parseFloat($('#edit-consumptionquantityrateblending-input'+i).val());
+          var val=qty*rate;
+          this.value=val.toFixed(4);
+         });
+
+         $(".delete").click(function(){
+          var product=this.id;
+          $.post("{% url 'home:deleteStockJournal'%}",
+            {'product':product},
+            function(data,status){});
+         });
+
+
+        $(document).on('focusin','#production_val-input',function(){
+          // alert(countraw+" "+countadditive+" "+countpacking+" "+countblending);
+          var sum_value=0;
+          for(var i=1; i<=countraw;i++){
+            if($('#consumptionquantityvalueliterraw-input'+i).val() != ''){
+            sum_value=sum_value+parseFloat($('#consumptionquantityvalueliterraw-input'+i).val());
+            }
+            
+            }
+
+          for(var i=1; i<=countadditive;i++){
+            if($('#consumptionquantityvalueliteradditive-input'+i).val() != ''){
+            sum_value=sum_value+parseFloat($('#consumptionquantityvalueliteradditive-input'+i).val());
+            }
+           
+            }
+
+          for(var i=1; i<=countpacking;i++){
+            if($('#consumptionquantityvaluepacking-input'+i).val() != ''){
+            sum_value=sum_value+parseFloat($('#consumptionquantityvaluepacking-input'+i).val());
+            }
+          
+            }
+
+          for(var i=1; i<=countblending;i++){
+            if($('#consumptionquantityvalueblending-input'+i).val() != ''){
+            sum_value=sum_value+parseFloat($('#consumptionquantityvalueblending-input'+i).val());
+            }
+          
+            }
+
+            this.value=sum_value.toFixed(4);
+
+           });
+            
+       $(document).on('focusin','#edit-production_value-input',function(){
+          // alert(countraw+" "+countadditive+" "+countpacking+" "+countblending);
+          var sum_value=0;
+          for(var i=1; i<=edit_countraw;i++){
+            if($('#edit-consumptionquantityvalueliterraw-input'+i).val() != ''){
+            sum_value=sum_value+parseFloat($('#edit-consumptionquantityvalueliterraw-input'+i).val());
+            }
+            
+            }
+
+          for(var i=1; i<=edit_countadditive;i++){
+            if($('#edit-consumptionquantityvalueliteradditive-input'+i).val() != ''){
+            sum_value=sum_value+parseFloat($('#edit-consumptionquantityvalueliteradditive-input'+i).val());
+            }
+           
+            }
+
+          for(var i=1; i<=edit_countpacking;i++){
+            if($('#edit-consumptionquantityvaluepacking-input'+i).val() != ''){
+            sum_value=sum_value+parseFloat($('#edit-consumptionquantityvaluepacking-input'+i).val());
+            }
+          
+            }
+
+          for(var i=1; i<=edit_countblending;i++){
+            if($('#edit-consumptionquantityvalueblending-input'+i).val() != ''){
+            sum_value=sum_value+parseFloat($('#edit-consumptionquantityvalueblending-input'+i).val());
+            }
+          
+            }
+
+            this.value=sum_value.toFixed(4);
+
+           });
+
+        $('#production_rate_per__unit-input').focusin(function(){
+         this.value=(parseFloat($('#production_val-input').val())/parseFloat($('#production_quantity-input').val())).toFixed(4);
+
+          $('#countraw').val(countraw);
+          $('#countadditive').val(countadditive);
+          $('#countpacking').val(countpacking);
+          $('#countblending').val(countblending);
+         
+
+        });
+
+        $('#edit-production_rateperunit').focusin(function(){
+         this.value=(parseFloat($('#edit-production_value-input').val())/parseFloat($('#edit-production_quantity-input').val())).toFixed(4);
+
+          $('#countraw').val(edit_countraw);
+          $('#countadditive').val(edit_countadditive);
+          $('#countpacking').val(edit_countpacking);
+          $('#countblending').val(edit_countblending);
+         
+
+        });
+
+       
+  }); 
+    // $('.editbtn0').click(function(){
+         //    var stockno=this.value;
+         //    $.post("{% url 'home:alterStock' %}",
+         //    {
+         //        'stockno':stockno
+         //    },
+         //    function(data,status){
+         
+         //      $('#edit-stockjournal_num-input').val(data.sn);
+         //      $('#edit-stockjournal_date-input').val(data.stockdate);
+         //      $('#edit-consumptionproduct-input1').val(data.c_product1);
+         //      $('#edit-consumptionproduct-input2').val(data.c_product2);
+         //      $('#edit-consumptionproduct-input3').val(data.c_product3);
+             
+         //      $('#edit-consumptionquantity-input1').val(data.c_qty1);
+         //      $('#edit-consumptionquantity-input2').val(data.c_qty2);
+         //      $('#edit-consumptionquantity-input3').val(data.c_qty3);
+         //       $('#edit-consumptionunit-input1').val(data.c_unit1);
+         //      $('#edit-consumptionunit-input2').val(data.c_unit2);
+         //      $('#edit-consumptionunit-input3').val(data.c_unit3);
+         //      $('#edit-consumptionquantityalt_unit-input1').val(data.c_altqty1);
+         //      $('#edit-consumptionquantityalt_unit-input2').val(data.c_altqty2);
+         //      $('#edit-consumptionquantityalt_unit-input3').val(data.c_altqty3);
+         //      $('#edit-consumptionquantityalt_unit-unit-input1').val(data.c_altunit1);
+         //      $('#edit-consumptionquantityalt_unit-unit-input2').val(data.c_altunit2);
+         //      $('#edit-consumptionquantityalt_unit-unit-input3').val(data.c_altunit3);
+              
+         //      $('#edit-production_product-input1').val(data.p_product);
+         //      $('#edit-production_quantity-input1').val(data.p_qty);
+         //      $('#edit-production_unit-input1').val(data.p_unit);
+         //      $('#edit-production_quantity_altunit-input1').val(data.p_altqty);
+         //      $('#edit-production_quantity_altunit_unit-input1').val(data.p_altunit);
+         
+         //      $('#edit-warehouse-input').val(data.warehouse);
+         //      $('#edit-purpose-input').val(data.purpose);
+         //     });
+         //    });
+         // });
+         </script>
+         <script type="text/javascript">
+        function Validate(){
+          // alert('validating');
+          if(rawqtyflag==1){
+             $('.raw_qty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if(additiveqtyflag==1){
+             $('.additive_qty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if(packingqtyflag==1){
+             $('.packing_qty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+            else if(consumptionqtyflag==1){
+             $('.consumption_qty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else{
+              return true;
+             }
+        }
+
+        function EditValidate(){
+          // alert('validating');
+          if(editrawqtyflag == 1){
+             $('.edit_raw_qty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if(editadditiveqtyflag == 1){
+             $('.edit_additive_qty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if(editpackingqtyflag == 1){
+             $('.edit_packing_qty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+            else if(editconsumptionqtyflag == 1){
+             $('.edit_consumption_qty').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else{
+              return true;
+             }
+        }
+         
+      
+</script>
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingrow">
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry">
+               New Entry
+               </button>
+            </div>
+         </div>
+         <!-- Modal -->
+         <div class="modal fade" id="entry" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Stock Journal Data Entry</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <form action="{% url 'home:savestocks'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                           {% csrf_token %}
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="stockjournal_num-input" class=" form-control-label">Stock Journal No.</label>
+                                 <input type="text" id="stockjournal_num-input" value={{sn}} name="stockjournal_num-input" class="form-control" readonly="true">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="stockjournal_date-input" class=" form-control-label">Stock Journal Date</label>
+                                 <div class="datefield">
+                                    <input type="text" class="form-control" id="stockjournal_date-input" name="stockjournal_date-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="stockjournal_date-input-date" ></i>
+                                    </span>
+                                 </div>
+                              </div>
+                           </div>
+                           <ul class="nav nav-tabs nav-justified" role="tablist">
+                              <li class="nav-item">
+                                 <a class="nav-link active" href="#consumption" role="tab" data-toggle="tab">Consumption</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link" href="#production" role="tab" data-toggle="tab">Production</a>
+                              </li>
+                           </ul>
+                           <!-- Tab panes -->
+                           <div class="tab-content">
+                              <div role="tabpanel" class="tab-pane fade in active" id="consumption">
+                                 <div class="consumptionblock" id="consumptionblock">
+                                     <h3 class="title">Raw Material</h3>
+
+                                    <div id="rawdata1" class="rawdata">
+                                   
+                                       <div class="row form-group">
+                                          <div class="col col-md-4">
+                                             <label for="consumptionproductraw-input1" class=" form-control-label">Product</label>
+                                             <select class="form-control raw_product" id="consumptionproductraw-input1" name="consumptionproductraw-input1">
+                                              <option value=""></option>
+                                              <option value="NA">NA</option>
+                                              {% for i in inventory %}
+                                              {%if i.category == 'Raw Material' %}
+                                               <option value="{{i.product}}">{{i.product}}</option>
+                                              {% endif %}
+                                               {% endfor %}
+                                              
+                                             </select>
+                                             <!-- <input type="text" id="consumptionproduct-input1" name="consumptionproduct-input1" class="form-control"> -->
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityraw-input" class=" form-control-label">Quantity in Kg</label>
+                                             <input type="text" id="consumptionquantityraw-input1" name="consumptionquantityraw-input1" class="form-control validatenum raw_qty">
+                                          </div>
+                                         <!--  <div class="col col-md-4">
+                                             <label for="consumptionquantityliterraw-input" class=" form-control-label">Quantity in liter</label>
+                                             <input type="text" id="consumptionquantityliterraw-input1" name="consumptionquantityliterraw-input1" class="form-control validatenum">
+                                       </div> -->
+                                         <div class="col col-md-4">
+                                             <label for="consumptionquantitydensityraw-input" class=" form-control-label">Density</label>
+                                             <input type="text" id="consumptionquantitydensityraw-input1" name="consumptionquantitydensityraw-input1" class="form-control validatenum raw_density">
+                                          </div>
+                                     </div>
+                                       <div class="row form-group">
+                                       <!--  <div class="col col-md-4">
+                                             <label for="consumptionquantitydensityraw-input" class=" form-control-label">Density</label>
+                                             <input type="text" id="consumptionquantitydensityraw-input1" name="consumptionquantitydensityraw-input1" class="form-control validatenum raw_density">
+                                          </div> -->
+                                           <div class="col col-md-4">
+                                             <label for="consumptionquantityliterraw-input" class=" form-control-label">Quantity in liter</label>
+                                             <input type="text" id="consumptionquantityliterraw-input1" name="consumptionquantityliterraw-input1" class="form-control validatenum raw_liters">
+                                       </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityratekgraw-input" class=" form-control-label">Rate per kg</label>
+                                             <input type="text" id="consumptionquantityratekgraw-input1" name="consumptionquantityratekgraw-input1" class="form-control validatenum raw_rate">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityvaluekgraw-input" class=" form-control-label">Value in kg</label>
+                                             <input type="text" id="consumptionquantityvaluekgraw-input1" name="consumptionquantityvaluekgraw-input1" class="form-control validatenum raw_value raw_kgvalue">
+                                          </div>
+                                       </div>
+                                        <div class="row form-group">
+                                        <div class="col col-md-6">
+                                             <label for="consumptionquantityrateliterraw-input" class=" form-control-label">Rate per liter</label>
+                                             <input type="text" id="consumptionquantityrateliter-input1" name="consumptionquantityrateliter-input1" class="form-control validatenum raw_rateliter">
+                                          </div>
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityvalueliterraw-input" class=" form-control-label">Value in liter</label>
+                                             <input type="text" id="consumptionquantityvalueliterraw-input1" name="consumptionquantityvalueliterraw-input1" class="form-control validatenum raw_valueliter">
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                         <div class="col-md-12">
+                                            <input type="button" class="resetbtn" value="Reset">
+                                           <input type="button" id="raw" class="btn remove" value="Remove">
+                                         </div>
+                                       </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                            <input type="hidden" value="1" id="count-raw" name="count-raw"/>
+                                          <input type="button" class="btn btn-primary addraw" value="Add More">
+                                          
+                                        </div>
+                                      </div>
+                                    <h3 class="title">Additives</h3>
+                                    <div id="additivedata1" class="additivedata">
+                                      
+                                       <div class="row form-group">
+                                          <div class="col col-md-4">
+                                             <label for="consumptionproductadditive-input1" class=" form-control-label">Product</label>
+                                             <select class="form-control additive_product" id="consumptionproductadditive-input1" name="consumptionproductadditive-input1">
+                                              <option value=""></option>
+                                               <option value="NA">NA</option>
+                                               {% for i in inventory %}
+                                              {%if i.category == 'Additives' %}
+                                               <option value="{{i.product}}">{{i.product}}</option>
+                                              {% endif %}
+                                               {% endfor %}
+                                             </select>
+                                             <!-- <input type="text" id="consumptionproduct-input1" name="consumptionproduct-input1" class="form-control"> -->
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityadditive-input" class=" form-control-label">Quantity in kg</label>
+                                             <input type="text" id="consumptionquantityadditive-input1" name="consumptionquantityadditive-input1" class="form-control validatenum additive_qty">
+                                          </div>
+                                           <div class="col col-md-4">
+                                             <label for="consumptionquantitydensityadditive-input" class=" form-control-label">Density</label>
+                                             <input type="text" id="consumptionquantitydensityadditive-input1" name="consumptionquantitydensityadditive-input1" class="form-control validatenum"> 
+                                          </div>
+                                          
+                                       </div>
+                                       <div class="row form-group">
+                                        <div class="col col-md-4">
+                                             <label for="consumptionquantityliteradditive-input" class=" form-control-label">Quantity in liter</label>
+                                             <input type="text" id="consumptionquantityliteradditive-input1" name="consumptionquantityliteradditive-input1" class="form-control validatenum additives_liter"> 
+                                          </div>
+                                              <!--  <div class="col col-md-4">
+                                             <label for="consumptionquantitydensityadditive-input" class=" form-control-label">Density</label>
+                                             <input type="text" id="consumptionquantitydensityadditive-input1" name="consumptionquantitydensityadditive-input1" class="form-control validatenum"> 
+                                          </div> -->
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityratekgadditive-input" class=" form-control-label">Rate per kg</label>
+                                             <input type="text" id="consumptionquantityratekgadditive-input1" name="consumptionquantityratekgadditive-input1" class="form-control validatenum additive_ratekg">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityvaluekgadditive-input" class=" form-control-label">Value in kg</label>
+                                             <input type="text" id="consumptionquantityvaluekgadditive-input1" name="consumptionquantityvaluekgadditive-input1" class="form-control validatenum additive_valuekg">
+                                          </div>
+                                       </div>
+                                           <div class="row form-group">
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityrateliteradditive-input" class=" form-control-label">Rate per liter</label>
+                                             <input type="text" id="consumptionquantityrateliteradditive-input1" name="consumptionquantityrateliteradditive-input1" class="form-control validatenum additive_rateliter">
+                                          </div>
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityvalueliteradditive-input" class=" form-control-label">Value in liter</label>
+                                             <input type="text" id="consumptionquantityvalueliteradditive-input1" name="consumptionquantityvalueliteradditive-input1" class="form-control validatenum additive_valueliter">
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                         <div class="col-md-12">
+                                           <input type="button" class="resetbtn" value="Reset">
+                                           <input type="button" id="additive" class="btn  remove" value="Remove">
+                                         </div>
+                                       </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                          <input type="hidden" value="1" id="count-additive" name="count-additive"/>
+                                          <input type="button" class="btn btn-primary addadditive" value="Add More">
+                        
+                                        </div>
+                                      </div>
+                                    <h3 class="title">Packing Material</h3>
+                                    <div id="packingdata1" class="packingdata">
+                                     
+                                       <div class="row form-group">
+                                          <div class="col col-md-4">
+                                             <label for="consumptionproductpacking-input1" class=" form-control-label">Product</label>
+                                             <select class="form-control packing_product" id="consumptionproductpacking-input1" name="consumptionproductpacking-input1">
+                                              <option value=""></option>
+                                               <option value="NA">NA</option>
+                                               {% for i in inventory %}
+                                              {%if i.category == 'Packing Material' %}
+                                               <option value="{{i.product}}">{{i.product}}</option>
+                                              {% endif %}
+                                               {% endfor %}
+                                             </select>
+                                             <!-- <input type="text" id="consumptionproduct-input1" name="consumptionproduct-input1" class="form-control"> -->
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantitypacking-input" class=" form-control-label">Quantity</label>
+                                             <input type="text" id="consumptionquantitypacking-input1" name="consumptionquantitypacking-input1" class="form-control validatenum packing_qty">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionunitpacking-input" class=" form-control-label">Unit</label>
+                                             <!-- <input type="text" id="consumptionunit-input1" name="consumptionunit-input1" class="form-control"> -->
+                                            <select class="form-control" id="consumptionunitpacking-input1" name="consumptionunitpacking-input1">
+                                                <!-- <option value="liter">Liter</option> -->
+                                                <!-- <option value="mt">MT</option> -->
+                                                <!-- <option value="piece">Piece</option> -->
+                                                <option value="each">Each</option>
+                                            </select>
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityratepacking-input" class=" form-control-label">Rate per unit</label>
+                                             <input type="text" id="consumptionquantityratepacking-input1" name="consumptionquantityratepacking-input1" class="form-control validatenum packing_rate">
+                                          </div>
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityvaluepacking-input" class=" form-control-label">Value</label>
+                                             <input type="text" id="consumptionquantityvaluepacking-input1" name="consumptionquantityvaluepacking-input1" class="form-control validatenum packing_value">
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                         <div class="col-md-12">
+                                           <input type="button" class="resetbtn" value="Reset">
+                                           <input type="button" id="packing" class="btn  remove" value="Remove">
+                                         </div>
+                                       </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                          <input type="hidden" value="1" id="count-packing" name="count-packing"/>
+                                          <input type="button" class="btn btn-primary addpacking" value="Add More">
+                                          
+                                        </div>
+                                      </div>
+                                    <h3 class="title">Blending and Consumption</h3>
+                                    <div id="blendingdata1" class="blendingdata">
+                                     
+                                       <div class="row form-group">
+                                          <div class="col col-md-4">
+                                             <label for="consumptionproductblending-input1" class=" form-control-label">Product</label>
+                                             <select class="form-control consumption_product" id="consumptionproductblending-input1" name="consumptionproductblending-input1">
+                                              <option value=""></option>
+                                               <option value="NA">NA</option>
+                                               {% for i in inventory %}
+                                               {% if i.category == 'Consumption'%}
+                                               <option value="{{i.product}}">{{i.product}}</option>
+                                               {% endif %}
+                                               {% endfor %}
+                                             </select>
+                                             <!-- <input type="text" id="consumptionproduct-input1" name="consumptionproduct-input1" class="form-control"> -->
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityblending-input" class=" form-control-label">Quantity</label>
+                                             <input type="text" id="consumptionquantityblending-input1" name="consumptionquantityblending-input1" class="form-control validatenum consumption_qty">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionunitblending-input" class=" form-control-label">Unit</label>
+                                             <!-- <input type="text" id="consumptionunit-input1" name="consumptionunit-input1" class="form-control"> -->
+                                            <select class="form-control" id="consumptionunitblending-input1" name="consumptionunitblending-input1">
+                                              <option value="liter">Liter</option>
+                                           <!--    <option value="mt">MT</option>
+                                              <option value="piece">Piece</option>
+                                              <option value="each">Each</option> -->
+                                            </select>
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityrateblending-input" class=" form-control-label">Rate per unit</label>
+                                             <input type="text" id="consumptionquantityrateblending-input1" name="consumptionquantityrateblending-input1" class="form-control validatenum consumption_rate">
+                                          </div>
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityvalueblending-input" class=" form-control-label">Value</label>
+                                             <input type="text" id="consumptionquantityvalueblending-input1" name="consumptionquantityvalueblending-input1" class="form-control validatenum consumption_value">
+                                          </div>
+                                       </div>
+                                               <div class="row form-group">
+                                         <div class="col-md-12">
+                                           <input type="button" class="resetbtn" value="Reset">
+                                           <input type="button" id="consumption" class="btn  remove" value="Remove">
+                                         </div>
+                                       </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                          <input type="hidden" value="1" id="count-blending" name="count-blending"/>
+                                          <input type="button" class="btn btn-primary addblending" value="Add More">
+                                          <!-- <button class="btn btn-primary addblending">Add More</button> -->
+            
+                                        </div>
+                                      </div>
+                                 </div>
+                                 <div class="col-md-12">
+                                  <label for="consumptionblockremarks" class="form-control-label">Remarks</label>
+                                  <input type="text" name="consumptionblockremarks" class="form-control" id="consumptionblockremarks">
+                                 </div>
+                                 <div class="modal-footer">
+                                       <!-- <input type="submit" class="btn btn-primary"  value="Save Details"> -->
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                 </div>
+                                 <!--      <input type="button" class="btn btn-primary add"  value="Add More"> -->
+                              </div>
+                              <div role="tabpanel" class="tab-pane fade" id="production">
+                                 <div class="row form-group">
+                                    <div class="col col-md-4">
+                                       <label for="production_product-input" class=" form-control-label">Product</label>
+                                       <input type="text" id="production_product-input" name="production_product-input" class="form-control">
+                                    </div>
+                                    <div class="col col-md-4">
+                                       <label for="production_quantity-input" class=" form-control-label">Quantity</label>
+                                       <input type="text" id="production_quantity-input" name="production_quantity-input" class="form-control validatenum">
+                                    </div>
+                                    <div class="col col-md-4">
+                                       <label for="production_unit-input" class=" form-control-label">Unit</label>
+                                       <select class="form-control" name="production_unit-input" id="production_unit-input">
+                                          <option value="liter">Liter</option>
+                                          <option value="mt">MT</option>
+                                          <option value="piece">Piece</option>
+                                          <option value="each">Each</option>
+                                       </select>
+                                       <!-- <input type="text"  id="production_unit-input" name="production_unit-input" class="form-control"> -->
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                  
+                                    <div class="col col-md-6">
+                                       <label for="production_quantity_altunit-input1" class=" form-control-label">Value</label>
+                                       <input type="text" id="production_val-input" name="production_val-input" class="form-control validatenum">
+                                    </div>
+
+                                     <div class="col col-md-6">
+                                       <label for="production_quantity_altunit_unit-input1" class=" form-control-label">Rate per unit</label>
+                                       <input type="text" id="production_rate_per__unit-input" name="production_rate_per__unit-input" class="form-control validatenum">
+                                    </div>
+                                   
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-12">
+                                       <label for="production_remarks-input" class=" form-control-label">Remarks</label>
+                                       <input type="text" id="production_remarks-input" name="production_remarks-input" class="form-control">
+                                    </div>
+                                 </div>
+                                 <input type="hidden" name="countraw" id="countraw" value="">
+                                 <input type="hidden" name="countadditive" id="countadditive" value="">
+                                 <input type="hidden" name="countpacking" id="countpacking" value="">
+                                 <input type="hidden" name="countblending" id="countblending" value="">
+                                 <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <input type="submit" onclick="return Validate()" class="btn btn-primary"  value="Save Details">
+                                 </div>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="headingtitle">
+            <div class="title">
+               <h3>Stock Journal Details</h3>
+            </div>
+            <input type="text" placeholder="Filter Using Date" class='table-searchstock' data-table-search="myTable"></input>
+         </div>
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table0 table2 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col" rowspan="2">S.N</th>
+                     <th scope="col" rowspan="2">Stock Journal Date</th>
+                     <!-- <th scope="col" colspan="8">Consumption</th> -->
+                     <th scope="col" colspan="5">Production</th>
+            
+                     <th scope="col" rowspan="2">Status</th>
+                  </tr>
+                  <tr>
+                      <!-- <th scope="col">Product</th> -->
+                      <!-- <th scope="col">Quantity(Kg)</th> -->
+                      <!-- <th scope="col">Density</th> -->
+                      <!-- <th scope="col">Rate(Kg)</th> -->
+                      <!-- <th scope="col">Value(Kg)</th> -->
+                      <!-- <th scope="col">Quantity(Lts)</th> -->
+                       <!-- <th scope="col">Rate(Lts)</th> -->
+                       <!-- <th scope="col">Value(Lts)</th> -->
+                      <th scope="col">Product</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Unit</th>
+                      <th scope="col">Rate</th>
+                      <th scope="col">Value</th>
+                      
+
+                  </tr>
+               </thead>
+               <tbody>
+                {% for i in stocks %}
+
+            
+                  <tr>
+
+                      <td>{{i.stockno}}</td>
+                      <td>{{i.stockdate}}</td>
+                      
+                      <td rowspan="1">{{i.product}}</td>
+                      <td rowspan="1">{{i.qty}}</td>
+                      <td rowspan="1">{{i.unit}}</td>
+                      <td rowspan="1">{{i.value}}</td>
+                      <td rowspan="1">{{i.rate}}</td>
+      
+                      <td rowspan="1">  
+                        <button type="button" class="btn btn-info view" value="{{i.product}}" data-toggle="modal" data-target="#view0">View</button>
+                        <button type="button" data-set="{{forloop.counter}}" class="btn btn-primary editbtn0" data-toggle="modal" value="{{i.product}}" id="{{i.product}}" data-target="#edit0">
+                        Edit
+                        </button>
+                        <button type="button" class="btn btn-danger delete" id="{{i.product}}">Delete</button>
+                     </td>
+                  </tr>
+              
+                
+                 
+                  
+                  {% endfor %}
+         
+               </tbody>
+            </table>
+          </div>
+         </div>
+         <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Stock Journal Data Edit</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <form action="{% url 'home:editStock'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                           {% csrf_token %}
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="stockjournal_num-input" class=" form-control-label">Stock Journal No.</label>
+                                 <input type="text" id="edit-stockjournal_num-input" value='' name="stockjournal_num-input" class="form-control" readonly="true">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="stockjournal_date-input" class=" form-control-label">Stock Journal Date</label>
+                                 <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-stockjournal_date-input" name="stockjournal_date-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-stockjournal_date-input-date" ></i>
+                                    </span>
+                                 </div>
+                              </div>
+                           </div>
+                           <ul class="nav nav-tabs nav-justified" role="tablist">
+                              <li class="nav-item">
+                                 <a class="nav-link active" class="tab-pane fade in active" href="#edit-consumption" role="tab" data-toggle="tab">Consumption</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link" class="tab-pane fade" href="#edit-production" role="tab" data-toggle="tab">Production</a>
+                              </li>
+                           </ul>
+                           <!-- Tab panes -->
+                                 <div class="tab-content">
+                              <div role="tabpanel" class="tab-pane fade in active" id="edit-consumption">
+                                 <div class="consumptionblock" id="edit-consumptionblock">
+                                    <h3 class="title">Raw Material</h3>
+                                      <div id="edit-rawdata1" class="edit-rawdata">
+                                        
+                                       <div class="row form-group">
+                                          <div class="col col-md-4">
+                                             <label for="consumptionproductraw-input1" class=" form-control-label">Product</label>
+                                             <select class="form-control edit_raw_product" id="edit-consumptionproductraw-input1" name="consumptionproductraw-input1">
+                                              <option value=""></option>
+                                             <option value="NA">NA</option>
+                                              {% for i in inventory %}
+                                              {%if i.category == 'Raw Material' %}
+                                               <option value="{{i.product}}">{{i.product}}</option>
+                                              {% endif %}
+                                               {% endfor %}
+                                             </select>
+                                             <!-- <input type="text" id="consumptionproduct-input1" name="consumptionproduct-input1" class="form-control"> -->
+                                          </div>
+                                         <div class="col col-md-4">
+                                             <label for="consumptionquantityraw-input" class=" form-control-label">Quantity in Kg</label>
+                                             <input type="text" id="edit-consumptionquantityraw-input1" name="consumptionquantityraw-input1" class="form-control validatenum edit_raw_qty">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantitydensityraw-input" class=" form-control-label">Density</label>
+                                             <input type="text" id="edit-consumptionquantitydensityraw-input1" name="consumptionquantitydensityraw-input1" class="form-control validatenum raw_density">
+                                          </div>
+                                          
+                                     </div>
+                                       <div class="row form-group">
+                                        <div class="col col-md-4">
+                                             <label for="consumptionquantityliterraw-input" class=" form-control-label">Quantity in liter</label>
+                                             <input type="text" id="edit-consumptionquantityliterraw-input1" name="consumptionquantityliterraw-input1" class="form-control validatenum edit_raw_liters">
+                                       </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityratekgraw-input" class=" form-control-label">Rate per kg</label>
+                                             <input type="text" id="edit-consumptionquantityratekgraw-input1" name="consumptionquantityratekgraw-input1" class="form-control validatenum raw_rate">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityvaluekgraw-input" class=" form-control-label">Value in kg</label>
+                                             <input type="text" id="edit-consumptionquantityvaluekgraw-input1" name="consumptionquantityvaluekgraw-input1" class="form-control validatenum edit_raw_kgvalue">
+                                          </div>
+                                       </div>
+                                        <div class="row form-group">
+                                        <div class="col col-md-6">
+                                             <label for="consumptionquantityrateliterraw-input" class=" form-control-label">Rate per liter</label>
+                                             <input type="text" id="edit-consumptionquantityrateliter-input1" name="consumptionquantityrateliter-input1" class="form-control validatenum raw_rateliter">
+                                          </div>
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityvalueliterraw-input" class=" form-control-label">Value in liter</label>
+                                             <input type="text" id="edit-consumptionquantityvalueliterraw-input1" name="consumptionquantityvalueliterraw-input1" class="form-control validatenum raw_valueliter edit_raw_valueliter">
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                         <div class="col-md-12">
+                                           <input type="button" class="resetbtn" value="Reset">
+                                           <input type="button" id="edit-raw" class="btn remove" value="Remove">
+                                         </div>
+                                       </div>
+                                      </div>
+                                    
+                                     <div class="row form-group">
+                                        <div class="col-md-12">
+                                            <input type="hidden" value="1" id="edit_count-raw" name="edit_count-raw"/>
+                                          <input type="button" class="btn btn-primary edit-addraw" value="Add More">
+                                          
+                                        </div>
+                                    </div>
+                                    <h3 class="title">Additives</h3>
+                                    <div id="edit-additivedata1" class="edit-additivedata">
+                                      
+                                       <div class="row form-group">
+                                          <div class="col col-md-4">
+                                             <label for="consumptionproductadditive-input1" class=" form-control-label">Product</label>
+                                             <select class="form-control edit_additive_product" id="edit-consumptionproductadditive-input1" name="consumptionproductadditive-input1">
+                                              <option value=""></option>
+                                              <option value="NA">NA</option>
+                                               {% for i in inventory %}
+                                              {%if i.category == 'Additives' %}
+                                               <option value="{{i.product}}">{{i.product}}</option>
+                                              {% endif %}
+                                               {% endfor %}
+                                             </select>
+                                             <!-- <input type="text" id="consumptionproduct-input1" name="consumptionproduct-input1" class="form-control"> -->
+                                          </div>
+                                         <div class="col col-md-4">
+                                             <label for="consumptionquantityadditive-input" class=" form-control-label">Quantity in kg</label>
+                                             <input type="text" id="edit-consumptionquantityadditive-input1" name="consumptionquantityadditive-input1" class="form-control validatenum edit_additive_qty">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantitydensityadditive-input" class=" form-control-label">Density</label>
+                                             <input type="text" id="edit-consumptionquantitydensityadditive-input1" name="consumptionquantitydensityadditive-input1" class="form-control validatenum"> 
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                              
+                                           <div class="col col-md-4">
+                                             <label for="consumptionquantityliteradditive-input" class=" form-control-label">Quantity in liter</label>
+                                             <input type="text" id="edit-consumptionquantityliteradditive-input1" name="consumptionquantityliteradditive-input1" class="form-control validatenum edit_additives_liter"> 
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityratekgadditive-input" class=" form-control-label">Rate per kg</label>
+                                             <input type="text" id="edit-consumptionquantityratekgadditive-input1" name="consumptionquantityratekgadditive-input1" class="form-control validatenum additive_ratekg">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityvaluekgadditive-input" class=" form-control-label">Value in kg</label>
+                                             <input type="text" id="edit-consumptionquantityvaluekgadditive-input1" name="consumptionquantityvaluekgadditive-input1" class="form-control validatenum edit_additive_valuekg">
+                                          </div>
+                                       </div>
+                                           <div class="row form-group">
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityrateliteradditive-input" class=" form-control-label">Rate per liter</label>
+                                             <input type="text" id="edit-consumptionquantityrateliteradditive-input1" name="consumptionquantityrateliteradditive-input1" class="form-control validatenum additive_rateliter">
+                                          </div>
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityvalueliteradditive-input" class=" form-control-label">Value in liter</label>
+                                             <input type="text" id="edit-consumptionquantityvalueliteradditive-input1" name="consumptionquantityvalueliteradditive-input1" class="form-control validatenum edit_additive_valueliter">
+                                          </div>
+                                        </div>
+                                          <div class="row form-group">
+                                           <div class="col-md-12">
+                                             <input type="button" class="resetbtn" value="Reset">
+                                             <input type="button" id="edit-additive" class="btn remove" value="Remove">
+                                           </div>
+                                       </div>
+                                     </div>
+
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                          <input type="hidden" value="1" id="edit_count-additive" name="edit_count-additive"/>
+                                          <input type="button" class="btn btn-primary edit-addadditive" value="Add More">
+                        
+                                        </div>
+                                    </div>
+
+                                    <h3 class="title">Packing Material</h3>
+                                    <div id="edit-packingdata1" class="edit-packingdata">
+                                     
+                                       <div class="row form-group">
+                                          <div class="col col-md-4">
+                                             <label for="consumptionproductpacking-input1" class=" form-control-label">Product</label>
+                                             <select class="form-control edit_packing_product" id="edit-consumptionproductpacking-input1" name="consumptionproductpacking-input1">
+                                              <option value=""></option>
+                                               <option value="NA">NA</option>
+                                               {% for i in inventory %}
+                                              {%if i.category == 'Packing Material' %}
+                                               <option value="{{i.product}}">{{i.product}}</option>
+                                              {% endif %}
+                                               {% endfor %}
+                                             </select>
+                                             <!-- <input type="text" id="consumptionproduct-input1" name="consumptionproduct-input1" class="form-control"> -->
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantitypacking-input" class=" form-control-label">Quantity</label>
+                                             <input type="text" id="edit-consumptionquantitypacking-input1" name="consumptionquantitypacking-input1" class="form-control validatenum">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionunitpacking-input" class=" form-control-label">Unit</label>
+                                             <!-- <input type="text" id="consumptionunit-input1" name="consumptionunit-input1" class="form-control"> -->
+                                            <select class="form-control" id="edit-consumptionunitpacking-input1" name="consumptionunitpacking-input1">
+                                               <!--  <option value="liter">Liter</option>
+                                                <option value="mt">MT</option>
+                                                <option value="piece">Piece</option> -->
+                                                <option value="each" selected>Each</option>
+                                            </select>
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityratepacking-input" class=" form-control-label">Rate per unit</label>
+                                             <input type="text" id="edit-consumptionquantityratepacking-input1" name="consumptionquantityratepacking-input1" class="form-control validatenum">
+                                          </div>
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityvaluepacking-input" class=" form-control-label">Value</label>
+                                             <input type="text" id="edit-consumptionquantityvaluepacking-input1" name="consumptionquantityvaluepacking-input1" class="form-control validatenum edit_packing_value">
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                         <div class="col-md-12">
+                                           <input type="button" class="resetbtn" value="Reset">
+                                           <input type="button" id="edit-packing" class="btn remove" value="Remove">
+                                         </div>
+                                       </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                          <input type="hidden" value="1" id="edit_count-packing" name="edit_countpacking"/>
+                                          <input type="button" class="btn btn-primary edit-addpacking" value="Add More">
+                                          
+                                        </div>
+                                    </div>
+                                    <h3 class="title">Blending and Consumption</h3>
+                                    <div id="edit-blendingdata1" class="edit-blendingdata">
+                                     
+                                       <div class="row form-group">
+                                          <div class="col col-md-4">
+                                             <label for="consumptionproductblending-input1" class=" form-control-label">Product</label>
+                                             <select class="form-control edit_consumption_product" id="edit-consumptionproductblending-input1" name="consumptionproductblending-input1">
+                                              <option value=""></option>
+                                              <option value="NA">NA</option>
+                                               {% for i in inventory %}
+                                               {% if i.category == 'Consumption'%}
+                                               <option value="{{i.product}}">{{i.product}}</option>
+                                               {% endif %}
+                                               {% endfor %}
+                                             </select>
+                                             <!-- <input type="text" id="consumptionproduct-input1" name="consumptionproduct-input1" class="form-control"> -->
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionquantityblending-input" class=" form-control-label">Quantity</label>
+                                             <input type="text" id="edit-consumptionquantityblending-input1" name="consumptionquantityblending-input1" class="form-control validatenum consumption_qty">
+                                          </div>
+                                          <div class="col col-md-4">
+                                             <label for="consumptionunitblending-input" class=" form-control-label">Unit</label>
+                                             <!-- <input type="text" id="consumptionunit-input1" name="consumptionunit-input1" class="form-control"> -->
+                                            <select class="form-control" id="edit-consumptionunitblending-input1" name="consumptionunitblending-input1">
+                                              <option value="liter">Liter</option>
+                                             <!--  <option value="mt">MT</option>
+                                              <option value="piece">Piece</option>
+                                              <option value="each">Each</option> -->
+                                            </select>
+                                          </div>
+                                       </div>
+
+                                       <div class="row form-group">
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityrateblending-input" class=" form-control-label">Rate per unit</label>
+                                             <input type="text" id="edit-consumptionquantityrateblending-input1" name="consumptionquantityrateblending-input1" class="form-control validatenum">
+                                          </div>
+                                          <div class="col col-md-6">
+                                             <label for="consumptionquantityvalueblending-input" class=" form-control-label">Value</label>
+                                             <input type="text" id="edit-consumptionquantityvalueblending-input1" name="consumptionquantityvalueblending-input1" class="form-control validatenum edit_consumption_value">
+                                          </div>
+                                       </div>
+                                       <div class="row form-group">
+                                         <div class="col-md-12">
+                                           <input type="button" class="resetbtn" value="Reset">
+                                           <input type="button" id="edit-consumption" class="btn remove" value="Remove">
+                                         </div>
+                                       </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                          <input type="hidden" value="1" id="edit_count-blending" name="edit_count-blending"/>
+                                          <input type="button" class="btn btn-primary edit-addblending" value="Add More">
+                                          <!-- <button class="btn btn-primary addblending">Add More</button> -->
+            
+                                        </div>
+                                    </div>
+                                    </div>
+                               
+                                 <div class="col-md-12">
+                                  <label for="consumptionblockremarks" class="form-control-label">Remarks</label>
+                                  <input type="text" name="consumptionblockremarks" class="form-control" id="edit-consumptionblockremarks">
+                                 </div>
+                                 <div class="modal-footer">
+                                       <input type="submit" class="btn btn-primary"  value="Save Details">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                 </div>
+                                 <!--      <input type="button" class="btn btn-primary add"  value="Add More"> -->
+                              </div>
+
+                              <div role="tabpanel" class="tab-pane fade" id="edit-production">
+                                 <div class="row form-group">
+                                    <div class="col col-md-4">
+                                       <label for="production_product-input" class=" form-control-label">Product</label>
+                                       <input type="text" id="edit-production_product-input" name="production_product-input" class="form-control">
+                                    </div>
+                                    <div class="col col-md-4">
+                                       <label for="production_quantity-input" class=" form-control-label">Quantity</label>
+                                       <input type="text" id="edit-production_quantity-input" name="production_quantity-input" class="form-control validatenum">
+                                    </div>
+                                    <div class="col col-md-4">
+                                       <label for="production_unit-input" class=" form-control-label">Unit</label>
+                                       <select class="form-control" id="edit-production_unit-input" name="production_unit-input">
+                                          <option value="liter">Liter</option>
+                                        <!--   <option value="mt">MT</option>
+                                          <option value="piece">Piece</option>
+                                          <option value="each">Each</option> -->
+                                       </select>
+                                       <!-- <input type="text"  id="production_unit-input" name="production_unit-input" class="form-control"> -->
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-6">
+                                       <label for="production_value-input1" class=" form-control-label">Value</label>
+                                       <input type="text" id="edit-production_value-input" name="production_value-input" class="form-control validatenum">
+                                    </div>
+                                    <div class="col col-md-6">
+                                       <label for="production_rateperunit-input1" class=" form-control-label">Rate per unit</label>
+                                       <input type="text" id="edit-production_rateperunit" name="production_rateperunit" class="form-control validatenum">
+                                    </div>
+                                 </div>
+                                 <div class="row form-group">
+                                    <div class="col col-md-12">
+                                       <label for="production_remarks-input" class=" form-control-label">Remarks</label>
+                                       <input type="text" id="edit-production_remarks-input" name="production_remarks-input" class="form-control">
+                                    </div>
+                                 </div>
+                                 <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <input type="submit" onclick="return EditValidate()" class="btn btn-primary"  value="Save Details">
+                                 </div>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- view data -->
+               <div class="modal fade" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Stock Journal Data View</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                      <div class="description">
+                              
+                              <ul>
+                                 <li>S.N : <span id="production_sn"> 1</span></li>
+                                 <li>Stock Journal Date : <span id="production_date"> 2019-08-01</span></li>
+                              </ul>
+                       </div>
+                      <table class="table tableview table-bordered">
+                              <tbody>
+                                <tr>
+                                  <th scope="col">PRODUCTION
+                                      <hr>
+                                    <table>
+                                        <thead>
+                                          <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                            <th>Rate</th>
+                                            <th>Value</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody id="production_view">
+                                          <tr style="font-weight: lighter;">
+                                            <td>Base Oil SN150</td>
+                                            <td>100.000</td>
+                                            <td>1.0987</td>
+                                            <td>12.0901</td>
+                                            <td>22.0987</td>
+                                          </tr>
+                                        </tbody>
+                                      </table></th>
+
+                                    </tr>
+                                      <tr>
+                                    
+                                    <th scope="col" >Remarks  <p style="font-weight: lighter;" id="production_view_remarks">Base Oil SN150 from 40 tonnes</p></th>
+                                 </tr>
+                            </tbody>
+                          </table>
+                             <table class="table tableview table-bordered">
+                              <tbody>
+                                 <tr>
+
+                                    <th scope="col">CONSUMPTION
+                                      <hr>
+                                      <br>Raw Material</br>
+                                      <table>
+                                        <thead>
+                                          <tr>
+                                            <th>Product</th>
+                                            <th>Quantity in kg</th>
+                                            <th>Quantity in liter</th>
+                                            <th>Density</th>
+                                            <th>Rate per kg</th>
+                                            <th>Value in kg</th>
+                                            <th>Rate per liter</th>
+                                            <th>Value in liter</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody style="font-weight: lighter;" id="consumption_view_raws" >
+                                          <tr>
+                                            <td>Base Oil SN150</td>
+                                            <td>100.000</td>
+                                            <td>1.0987</td>
+                                            <td>12.0901</td>
+                                            <td>22.0987</td>
+                                            <td>1.0987</td>
+                                            <td>12.0901</td>
+                                            <td>22.0987</td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                       <br>Additives</br>
+                                      <table>
+                                        <thead>
+                                          <tr>
+                                            <th>Product</th>
+                                            <th>Quantity in kg</th>
+                                            <th>Quantity in liter</th>
+                                            <th>Density</th>
+                                            <th>Rate per kg</th>
+                                            <th>Value in kg</th>
+                                            <th>Rate per liter</th>
+                                            <th>Value in liter</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody style="font-weight: lighter;" id="consumption_view_additives">
+                                          <tr>
+                                            <td>Base Oil SN150</td>
+                                            <td>100.000</td>
+                                            <td>1.0987</td>
+                                            <td>12.0901</td>
+                                            <td>22.0987</td>
+                                            <td>100.000</td>
+                                            <td>1.0987</td>
+                                            <td>12.0901</td>
+                                            <td>22.0987</td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                       <br>Packing Material</br>
+                                      <table>
+                                        <thead>
+                                          <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                            <th>Rate</th>
+                                            <th>Value</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody style="font-weight: lighter;" id="consumption_view_packings" >
+                                          <tr  >
+                                            <td>Base Oil SN150</td>
+                                            <td>100.000</td>
+                                            <td>1.0987</td>
+                                            <td>12.0901</td>
+                                            <td>22.0987</td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                       <br>Blending and Consumption</br>
+                                      <table>
+                                        <thead>
+                                          <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                            <th>Rate</th>
+                                            <th>Value</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody style="font-weight: lighter;" id="consumption_view_consumptions">
+                                          <tr >
+                                            <td>Base Oil SN150</td>
+                                            <td>100.000</td>
+                                            <td>1.0987</td>
+                                            <td>12.0901</td>
+                                            <td>22.0987</td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                      
+
+                                    </th>
+                                    
+                                    <!-- <th scope="col">PRODUCTION
+                                      <hr>
+                                    <table>
+                                        <thead>
+                                          <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                            <th>Rate</th>
+                                            <th>Value</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr style="font-weight: lighter;">
+                                            <td>Base Oil SN150</td>
+                                            <td>100.000</td>
+                                            <td>1.0987</td>
+                                            <td>12.0901</td>
+                                            <td>22.0987</td>
+                                          </tr>
+                                        </tbody>
+                                      </table></th> -->
+                                </tr>
+                                <tr>
+                                  <th scope="col">Remarks
+                                    <p style="font-weight: lighter;" id="consumption_view_remarks">All items blended with 50% ISO grade</p></th>
+                                </tr>
+                         <!--         <tr>
+                                    <th scope="col">Remarks
+                                      <p style="font-weight: lighter;">All items blended with 50% ISO grade</p></th>
+                                    
+                                    <th scope="col">Remarks  <p style="font-weight: lighter;">Base Oil SN150 from 40 tonnes</p></th>
+                                 </tr> -->
+                                <!--  </tr> -->
+                                 
+                              </tbody>
+                      </table>
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!--  -->
+      </div>
+   </div>
+
+   {% include 'footer.html'%}
+ <!--         <script type="text/javascript">
+       
+  
+
+   </script> -->
+
+   </body>
+</html>
+<!-- end document-->

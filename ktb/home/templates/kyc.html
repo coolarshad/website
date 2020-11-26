@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Kismat Singapore KYC Form</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+          <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0-RC1/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript">
+         $(document).ready(function(){
+            
+         
+            $(".table-search-company").on("keyup", function() {
+         // alert('in lookup');
+         var value = $(this).val().toLowerCase(),
+         tableattr = $(this).attr("data-table-search"),
+         tablesearch = $('#' + tableattr).find('tbody tr');
+         
+         tablesearch.hide();                           //start with all rows hidden
+                     //initiate our stored rowspan with the default of 1
+         
+         tablesearch.each(function() {
+         var $row = $(this);
+         var $firstCell = $row.find("td:nth-child(2)");
+         var id = $firstCell.text().toLowerCase();
+         
+         // alert($firstCell.toString());
+         if (id.indexOf(value) > -1) {               //if the text is found
+         $row.show();         //show this row, and the next (n-1) rows as well
+         }
+         
+         });
+         
+         });
+         
+          $('.excel').click(function(){
+                        $(this).attr('href',"{% url 'home:exportKyc'%}");
+                     });
+            
+            $("#kyc_company_date-input-date").datepicker({
+          
+            }).on("changeDate", function (e) {
+           var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+            
+            $('#kyc_company_date-input').val(d);
+            // console.log(e.date);
+            // alert('hi');
+            });
+            
+            $("#regcopdate-date").datepicker({
+           
+            }).on("changeDate", function (e) {
+            var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+            
+            $('#regcopdate-input').val(d.toLocaleDateString());
+            // console.log(e.date);
+            // alert('hi');
+            });
+            
+            $("#edit-kyc_company_date-input-date").datepicker({
+            dateFormat: 'dd/mm/yy'
+            }).on("changeDate", function (e) {
+            var dateFormat= 'dd/mm/yy';
+            var d=new Date();
+            d=e.date;
+            
+            $('#edit-kyc_company_date-input').val(d.toLocaleDateString());
+            // console.log(e.date);
+            // alert('hi');
+            });
+            
+            $("#edit-regcopdate-input-date").datepicker({
+          
+            }).on("changeDate", function (e) {
+            var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+            
+            $('#edit-regcopdate-input').val(d);
+            // console.log(e.date);
+            // alert('hi');
+            });
+            
+         
+         
+         $('.kycmanager1').click(function(){
+         
+          var name=this.value;alert(name);
+          $.post("{% url 'home:approveKyc1' %}",
+            {
+              'name':name,
+            },
+            function(data,status){
+              window.location.reload(true);
+            });
+         });
+
+         $('.kycmanager2').click(function(){
+          var name=this.value;
+          $.post("{% url 'home:approveKyc2' %}",
+            {
+              'name':name,
+            },
+            function(data,status){
+              window.location.reload(true);
+            });
+         });
+            
+             $('.editbtn0').click(function(){
+                     var name=this.value;
+                     $.post("{% url 'home:alterKyc' %}",
+                     {
+                        'name':name
+                     },
+                     function(data,status){
+                     $('#edit-kyc_company_date-input').val(data.date);
+                     $('#edit-kyc_company_name-input').val(data.comp);
+                     $('#edit-kyc_company_registrationnum_date-input').val(data.companyRegNo);
+                     $('#edit-kyc_company_registered_address-input').val(data.regAddress);
+                     $('#edit-kyc_company_other_address-input').val(data.mailingAddress);
+                     $('#edit-kyc_company_telephone-input').val(data.telephone);
+                     $('#edit-kyc_company_fax-input').val(data.fax);
+                     $('#edit-kyc_company_concernedperson_one-input').val(data.person1);
+                     $('#edit-kyc_company_concernedperson_one_designation-input').val(data.designation1);
+                     $('#edit-kyc_company_concernedperson_one_mobile-input').val(data.mobile1);
+                     $('#edit-kyc_company_concernedperson_one_email-input').val(data.email1);
+                     $('#edit-kyc_company_concernedperson_two-input').val(data.person2);
+                     $('#edit-kyc_company_concernedperson_two_designation-input').val(data.designation2);
+                     $('#edit-kyc_company_concernedperson_two_mobile-input').val(data.mobile2);
+                     $('#edit-kyc_company_concernedperson_two_email-input').val(data.email2);
+                     $('#edit-kyc_company_bankername-input').val(data.banker);
+                     $('#edit-kyc_company_bankeraddress-input').val(data.address);
+                     $('#edit-kyc_company_bankerswiftcode-input').val(data.swiftCode);
+                     $('#edit-kyc_company_bankersaccountnumber-input').val(data.accountNumber);
+                     
+                      $('#kycmanager1').val(name);
+                       
+                   
+                      $('#kycmanager2').val(name);
+                     
+                     
+                     
+            
+              
+               });  });
+            });
+            function Del(name1){
+               var name=name1;
+               alert(name);
+                     $.post("{% url 'home:delKyc' %}",
+                     {
+                        'name':name
+                     },
+               function(data,status){
+                    
+            
+                });
+            }
+            
+            function Validate(){
+               if($('#kyc_company_date-input').val()==''){ 
+                $('#kyc_company_date-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                 });
+               return false; 
+                 }
+                 else if($('#kyc_company_name-input').val()==''){
+                 $('#kyc_company_name-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_registrationnum_date-input').val()==''){
+                 $('#kyc_company_registrationnum_date-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                 else if($('#regcopdate').val()==''){
+                 $('#regcopdate').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                 else if($('#kyc_company_registered_address-input').val()==''){
+                 $('#kyc_company_registered_address-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                 else if($('#kyc_company_other_address-input').val()==''){
+                 $('#kyc_company_other_address-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                 else if($('#kyc_company_telephone-input').val()==''){
+                 $('#kyc_company_telephone-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_fax-input').val()==''){
+                 $('#kyc_company_fax-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_concernedperson_one-input').val()==''){
+                 $('#kyc_company_concernedperson_one-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_concernedperson_one_designation-input').val()==''){
+                 $('#kyc_company_concernedperson_one_designation-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_concernedperson_one_mobile-input').val()==''){
+                 $('#kyc_company_concernedperson_one_mobile-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_concernedperson_one_email-input').val()==''){
+                 $('#kyc_company_concernedperson_one_email-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_concernedperson_two-input').val()==''){
+                 $('#kyc_company_concernedperson_two-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_concernedperson_two_designation-input').val()==''){
+                 $('#kyc_company_concernedperson_two_designation-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_concernedperson_two_mobile-input').val()==''){
+                 $('#kyc_company_concernedperson_two_mobile-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_concernedperson_two_email-input').val()==''){
+                 $('#kyc_company_concernedperson_two_email-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+
+                else if($('#kyc_company_bankername-input').val()==''){
+                 $('#kyc_company_bankername-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_bankeraddress-input').val()==''){
+                 $('#kyc_company_bankeraddress-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_bankerswiftcode-input').val()==''){
+                 $('#kyc_company_bankerswiftcode-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#kyc_company_bankersaccountnumber-input').val()==''){
+                 $('#kyc_company_bankersaccountnumber-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else{
+            
+               return true;
+               }
+            }
+             function EditValidate(){
+               if($('#edit-kyc_company_date-input').val()==''){ 
+                $('#edit-kyc_company_date-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                 });
+               return false; 
+                 }
+                 else if($('#edit-kyc_company_name-input').val()==''){
+                 $('#edit-kyc_company_name-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_registrationnum_date-input').val()==''){
+                 $('#edit-kyc_company_registrationnum_date-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                 else if($('#edit-regcopdate').val()==''){
+                 $('#edit-regcopdate').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                 else if($('#edit-kyc_company_registered_address-input').val()==''){
+                 $('#edit-kyc_company_registered_address-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                 else if($('#edit-kyc_company_other_address-input').val()==''){
+                 $('#edit-kyc_company_other_address-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                 else if($('#edit-kyc_company_telephone-input').val()==''){
+                 $('#edit-kyc_company_telephone-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_fax-input').val()==''){
+                 $('#edit-kyc_company_fax-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_concernedperson_one-input').val()==''){
+                 $('#edit-kyc_company_concernedperson_one-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_concernedperson_one_designation-input').val()==''){
+                 $('#edit-kyc_company_concernedperson_one_designation-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_concernedperson_one_mobile-input').val()==''){
+                 $('#edit-kyc_company_concernedperson_one_mobile-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_concernedperson_one_email-input').val()==''){
+                 $('#edit-kyc_company_concernedperson_one_email-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_concernedperson_two-input').val()==''){
+                 $('#edit-kyc_company_concernedperson_two-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_concernedperson_two_designation-input').val()==''){
+                 $('#edit-kyc_company_concernedperson_two_designation-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_concernedperson_two_mobile-input').val()==''){
+                 $('#edit-kyc_company_concernedperson_two_mobile-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_concernedperson_two_email-input').val()==''){
+                 $('#edit-kyc_company_concernedperson_two_email-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_bankername-input').val()==''){
+                 $('#edit-kyc_company_bankername-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_bankeraddress-input').val()==''){
+                 $('#edit-kyc_company_bankeraddress-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_bankerswiftcode-input').val()==''){
+                 $('#edit-kyc_company_bankerswiftcode-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else if($('#edit-kyc_company_bankersaccountnumber-input').val()==''){
+                 $('#edit-kyc_company_bankersaccountnumber-input').css({
+                     'background':'#ea4b4b',
+                     'color':'#fff'
+                  });
+               return false;
+                }
+                else{
+            
+               return true;
+               }
+            }
+      </script>
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+          {% if user.authority != 'Viewer' %}
+            <div class="headingrow">
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#basicExampleModal">
+               New Entry
+               </button>
+            </div>
+            {% endif %}
+            <!-- Modal -->
+            <div class="modal fade" id="basicExampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">Kismat KYC Document Entry</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <div class="modal-body">
+                        <div class="card-body card-block">
+                           <form action="{% url 'home:savekyc' %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                              {% csrf_token %}
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_date-input" class=" form-control-label">Date</label>
+                                    <!-- <input type="text" class="form-control date" name="kyc_company_date-input" id="kyc_company_date-input" placeholder="Choose the date"> -->
+                                    <div class="datefield">
+                                       <input type="text" class="form-control" id="kyc_company_date-input" name="kyc_company_date-input">
+                                       <span>
+                                       <i class="fa fa-calendar date" id="kyc_company_date-input-date"></i>
+                                       </span>
+                                    </div>
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_name-input" class=" form-control-label">Name of the company</label>
+                                    <input type="text" id="kyc_company_name-input" name="kyc_company_name-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_registrationnum_date-input" class=" form-control-label">Company registration number</label>
+                                    <input type="text" id="kyc_company_registrationnum_date-input" name="kyc_company_registrationnum_date-input" class="form-control">
+                                    <!-- <input type="text" class="form-control date" id="regcopdate" name="regcopdate" placeholder="Choose the date"> -->
+                                    <!--            <div class="datefield">
+                                       <input type="text" class="form-control" id="regcopdate-input" name="regcopdate-input">
+                                       <span>
+                                       <i class="fa fa-calendar date" id="regcopdate-date"></i>
+                                       </span>
+                                       </div> -->
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_registered_address-input" class=" form-control-label">Registered Address</label>
+                                    <input type="text" id="kyc_company_registered_address-input" name="kyc_company_registered_address-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_other_address-input" class=" form-control-label">Mailing address if other than the
+                                    registered address</label>
+                                    <input type="text" id="kyc_company_other_address-input" name="kyc_company_other_address-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label  for="kyc_company_telephone-input" class="form-control-label">Telephone no</label>
+                                    <input type="text" id="kyc_company_telephone-input" name="kyc_company_telephone-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="kyc_company_fax-input" class=" form-control-label">Fax no (if available)</label>
+                                    <input type="text" id="kyc_company_fax-input" name="kyc_company_fax-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="kyc_company_concernedperson_one-input" class=" form-control-label">Concerned Person 1</label>
+                                    <input type="text" id="kyc_company_concernedperson_one-input" name="kyc_company_concernedperson_one-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="kyc_company_concernedperson_one_designation-input" class=" form-control-label">Designation</label>
+                                    <input type="text" id="kyc_company_concernedperson_one_designation-input" name="kyc_company_concernedperson_one_designation-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label  for="kyc_company_concernedperson_one_mobile-input" class="form-control-label">Mobile no</label>
+                                    <input type="text" id="kyc_company_concernedperson_one_mobile-input" name="kyc_company_concernedperson_one_mobile-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="kyc_company_concernedperson_one_email-input" class=" form-control-label">Email address</label>
+                                    <input type="text" id="kyc_company_concernedperson_one_email-input" name="kyc_company_concernedperson_one_email-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="kyc_company_concernedperson_two-input" class=" form-control-label">Concerned Person 2</label>
+                                    <input type="text" id="kyc_company_concernedperson_two-input" name="kyc_company_concernedperson_two-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="kyc_company_concernedperson_two_designation-input" class=" form-control-label">Designation</label>
+                                    <input type="text" id="kyc_company_concernedperson_two_designation-input" name="kyc_company_concernedperson_two_designation-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label  for="kyc_company_concernedperson_two_mobile-input" class="form-control-label">Mobile no</label>
+                                    <input type="text" id="kyc_company_concernedperson_two_mobile-input" name="kyc_company_concernedperson_two_mobile-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="kyc_company_concernedperson_two_email-input" class=" form-control-label">Email address</label>
+                                    <input type="text" id="kyc_company_concernedperson_two_email-input" name="kyc_company_concernedperson_two_email-input" class="form-control">
+                                 </div>
+                              </div>
+
+
+                                     <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_bankername-input" class=" form-control-label">Banker's Name</label>
+                                    <input type="text" id="kyc_company_bankername-input" name="kyc_company_bankername-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label  for="kyc_company_bankeraddress-input" class="form-control-label">Address</label>
+                                    <input type="text" id="kyc_company_bankeraddress-input" name="kyc_company_bankeraddress-input" class="form-control">
+                                 </div>
+                               </div>
+                               <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_bankerswiftcode-input" class=" form-control-label">Swift Code</label>
+                                    <input type="text" id="kyc_company_bankerswiftcode-input" name="kyc_company_bankerswiftcode-input" class="form-control">
+                                 </div>
+                                    <div class="col col-md-6">
+                                    <label for="kyc_company_bankersaccountnumber-input" class=" form-control-label">Account Number</label>
+                                    <input type="text" id="kyc_company_bankersaccountnumber-input" name="kyc_company_bankersaccountnumber-input" class="form-control">
+                                 </div>
+
+                              </div>
+                              <div class="modal-footer">
+                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                 <input type="submit" onclick="return Validate()" class="btn btn-primary" value="Save Details">
+                              </div>
+                        </div>
+                     </div>
+                  </div>
+                  </form>
+               </div>
+            </div>
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Kismat KYC Details</h3>
+               </div>
+               <input type="text" placeholder="Filter Using Company" class='table-search-company' data-table-search="myTable"></input>
+            </div>
+         </div>
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table1 table-striped table-dark table-bordered tablekyc" id="myTable">
+               <thead>
+                  <tr>
+                    <th scope="col">S.N</th>
+                     
+                     <th scope="col">Name of the company</th>
+                     <th scope="col">Date</th>
+                     <th scope="col">Company registration number & date</th>
+                     <th scope="col">Registered Address</th>
+                     <th scope="col">Mailing address if other than the
+                        registered address
+                     </th>
+                     <th scope="col">Telephone no</th>
+                     <th scope="col">Fax no (if available)</th>
+                     <th scope="col">Concerned Person 1</th>
+                     <th scope="col">Designation</th>
+                     <th scope="col">Mobile no</th>
+                     <th scope="col">Email address</th>
+                     <th scope="col">Concerned Person 2</th>
+                     <th scope="col">Designation</th>
+                     <th scope="col">Mobile no</th>
+                     <th scope="col">Email address</th>
+                     <th scope="col">Banker's Name</th>
+                     <th scope="col">Address</th>
+                     <th scope="col">Swift Code</th>
+                     <th scope="col">Account Number</th>
+                     <th scope="col">Manager 1</th>
+                     <th scope="col">Manager 2</th>
+                     {% if user.authority != 'Viewer' %}
+                     <th scope="col">Status</th>
+                     {% endif %}
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for i in records %}
+                  <tr>
+                    <td>{{forloop.counter}}</td>
+                     
+                     <td>{{i.name}}</td>
+                     <td>{{i.date}}</td>
+                     <td>{{i.companyRegNo}}</td>
+                     <td>{{i.regAddress}}</td>
+                     <td>{{i.mailingAddress}}</td>
+                     <td>{{i.telephone}}</td>
+                     <td>{{i.fax}}</td>
+                     <td>{{i.person1}}</td>
+                     <td>{{i.designation1}}</td>
+                     <td>{{i.mobile1}}</td>
+                     <td>{{i.email1}}</td>
+                     <td>{{i.person2}}</td>
+                     <td>{{i.designation2}}</td>
+                     <td>{{i.mobile2}}</td>
+                     <td>{{i.email2}}</td>
+                     <td>{{i.banker}}</td>
+                     <td>{{i.address}}</td>
+                     <td>{{i.swiftCode}}</td>
+                     <td>{{i.accountNumber}}</td>
+                     {% if i.approve1 == True %}
+                     <td><input type="checkbox" checked name=""></td>
+                     {% else %}
+                     <td><input type="checkbox"  name=""></td>
+                     {% endif %}
+
+                     {% if i.approve2 == True %}
+                     <td><input type="checkbox" checked="" name=""></td>
+                     {% else %}
+                     <td><input type="checkbox"  name=""></td>
+                     {% endif %}
+
+                     <td>
+                      {% if i.approve2 == False %}
+                      {% if user.authority == 'Manager 1' or user.authority == 'Manager 2'%}
+                      <button type="button" class="btn btn-primary editbtn0" value="{{i.name}}" data-toggle="modal" data-target="#edit0">
+                        Edit
+                        </button>
+                          {% endif %}
+                        {% endif %}
+
+                        {% if i.approve2 == True %}
+                        {% if user.authority == 'Manager 2'%}
+                        <button type="button" class="btn btn-primary editbtn0" value="{{i.name}}" data-toggle="modal" data-target="#edit0">
+                        Edit
+                        </button>
+
+                        {% endif %}
+                        {% endif %}
+                        {% if user.authority == 'Manager 2' %}
+                        <button type="button" class="btn btn-danger" value="{{i.name}}" onclick="Del('{{i.name}}')">
+                        Delete
+                        </button>
+                        {% endif %}
+                      
+
+                     </td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+          </div>
+         </div>
+  
+   <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h3 class="modal-title title" id="exampleModalLabel">Kismat KYC Document Entry</h3>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <div class="card-body card-block">
+                  <form action="{% url 'home:editkyc' %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                     {% csrf_token %}
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="kyc_company_date-input" class=" form-control-label">Date</label>
+                           <!-- <input type="text" class="form-control date" name="kyc_company_date-input" id="edit-kyc_company_date-input" placeholder="Choose the date"> -->
+                           <div class="datefield">
+                              <input type="text" class="form-control" id="edit-kyc_company_date-input" name="kyc_company_date-input">
+                              <span>
+                              <i class="fa fa-calendar date" id="edit-kyc_company_date-input-date"></i>
+                              </span>
+                           </div>
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="kyc_company_name-input" class=" form-control-label">Name of the company</label>
+                           <input type="text" id="edit-kyc_company_name-input" name="kyc_company_name-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="kyc_company_registrationnum_date-input" class=" form-control-label">Company registration number</label>
+                           <input type="text" id="edit-kyc_company_registrationnum_date-input" name="kyc_company_registrationnum_date-input" class="form-control">
+                           <!-- <input type="text" class="form-control date" name="regcopdate" placeholder="Choose the date"> -->
+                           <!--      <div class="datefield">
+                              <input type="text" class="form-control" id="edit-regcopdate-input" name="regcopdate-input">
+                              <span>
+                              <i class="fa fa-calendar date" id="edit-regcopdate-input-date"></i>
+                              </span>
+                              </div> -->
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="kyc_company_registered_address-input" class=" form-control-label">Registered Address</label>
+                           <input type="text" id="edit-kyc_company_registered_address-input" name="kyc_company_registered_address-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="kyc_company_other_address-input" class=" form-control-label">Mailing address if other than the
+                           registered address</label>
+                           <input type="text" id="edit-kyc_company_other_address-input" name="kyc_company_other_address-input" class="form-control">
+                        </div>
+                        <div class="col col-md-6">
+                           <label  for="kyc_company_telephone-input" class="form-control-label">Telephone no</label>
+                           <input type="text" id="edit-kyc_company_telephone-input" name="kyc_company_telephone-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label for="kyc_company_fax-input" class=" form-control-label">Fax no (if available)</label>
+                           <input type="text" id="edit-kyc_company_fax-input" name="kyc_company_fax-input" class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="kyc_company_concernedperson_one-input" class=" form-control-label">Concerned Person 1</label>
+                           <input type="text" id="edit-kyc_company_concernedperson_one-input" name="kyc_company_concernedperson_one-input" class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="kyc_company_concernedperson_one_designation-input" class=" form-control-label">Designation</label>
+                           <input type="text" id="edit-kyc_company_concernedperson_one_designation-input" name="kyc_company_concernedperson_one_designation-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label  for="kyc_company_concernedperson_one_mobile-input" class="form-control-label">Mobile no</label>
+                           <input type="text" id="edit-kyc_company_concernedperson_one_mobile-input" name="kyc_company_concernedperson_one_mobile-input" class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="kyc_company_concernedperson_one_email-input" class=" form-control-label">Email address</label>
+                           <input type="text" id="edit-kyc_company_concernedperson_one_email-input" name="kyc_company_concernedperson_one_email-input" class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="kyc_company_concernedperson_two-input" class=" form-control-label">Concerned Person 2</label>
+                           <input type="text" id="edit-kyc_company_concernedperson_two-input" name="kyc_company_concernedperson_two-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label for="kyc_company_concernedperson_two_designation-input" class=" form-control-label">Designation</label>
+                           <input type="text" id="edit-kyc_company_concernedperson_two_designation-input" name="kyc_company_concernedperson_two_designation-input" class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label  for="kyc_company_concernedperson_two_mobile-input" class="form-control-label">Mobile no</label>
+                           <input type="text" id="edit-kyc_company_concernedperson_two_mobile-input" name="kyc_company_concernedperson_two_mobile-input" class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="kyc_company_concernedperson_two_email-input" class=" form-control-label">Email address</label>
+                           <input type="text" id="edit-kyc_company_concernedperson_two_email-input" name="kyc_company_concernedperson_two_email-input" class="form-control">
+                        </div>
+                     </div>
+
+
+
+                                     <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_bankername-input" class=" form-control-label">Banker's Name</label>
+                                    <input type="text" id="edit-kyc_company_bankername-input" name="kyc_company_bankername-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label  for="kyc_company_bankeraddress-input" class="form-control-label">Address</label>
+                                    <input type="text" id="edit-kyc_company_bankeraddress-input" name="kyc_company_bankeraddress-input" class="form-control">
+                                 </div>
+                               </div>
+                               <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="kyc_company_bankerswiftcode-input" class=" form-control-label">Swift Code</label>
+                                    <input type="text" id="edit-kyc_company_bankerswiftcode-input" name="kyc_company_bankerswiftcode-input" class="form-control">
+                                 </div>
+                                    <div class="col col-md-6">
+                                    <label for="kyc_company_bankersaccountnumber-input" class=" form-control-label">Account Number</label>
+                                    <input type="text" id="edit-kyc_company_bankersaccountnumber-input" name="kyc_company_bankersaccountnumber-input" class="form-control">
+                                 </div>
+
+                              </div>
+
+                     <div class="modal-footer">
+                     {%if user.authority == 'Manager 1'%}
+                      <button type="button" class="btn btn-info kycmanager1" id="kycmanager1" value="">Manager 1</button>
+                     {%endif%}
+		     {%if user.authority == 'Manager 2'%}
+                      <button type="button" class="btn btn-info kycmanager2" id="kycmanager2" value="">Manager 2</button>
+                     {%endif%}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" onclick="return EditValidate()" class="btn btn-primary"  value="Save Details">
+                     </div>
+               </div>
+            </div>
+         </div>
+         </form>
+      </div>
+   </div>
+      </div>
+   </div>
+   {% include 'footer.html'%}
+
+   </body>
+</html>
+<!-- end document-->

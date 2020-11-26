@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+{%load staticfiles%}
+{% load custom_tags %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Sales and Purchase</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0-RC1/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.css" rel="stylesheet">
+
+ 
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.min.css">
+	
+	<script type="text/javascript">
+        $(document).ready(function(){
+          $('.select2').select2();
+        });
+      </script>
+
+      <script type="text/javascript">
+         var tolerance=0;
+           var max_qty=0;
+           var bill=0;
+
+         $(document).ready(function(){
+
+             $("#dropdown").change(function(){
+                    var id=this.value;
+
+                    $.post("{% url 'home:getsalespurchase'%}",
+                    {
+                        'type':id,
+                    },
+                    function(data,status){
+
+                       $('#rowid').empty();
+                       for (var i = 0; i < data.data.length; i++) {
+                        var str;
+                        if (data.data[i].reviewed==true) {str="<input type='checkbox' checked name=''>"}
+                            else{str="<input type='checkbox' name=''>"}
+
+                        $("#rowid").append("<tr><th>"+data.trn[i].sn+"</th><td>"+data.trn[i].types+"</td><td>"+data.trn[i].company+"</td><td>"+data.trn[i].trn+"</td><td>"+data.trn[i].baseproduct+"</td><td>"+parseFloat(data.data[i].billQty).toFixed(4)+" "+data.trn[i].contractUnit+"</td><td>"+parseFloat(data.trn[i].ratePMT).toFixed(4)+"</td><td>"+data.data[i].invoiceDate+"</td><td>"+data.data[i].invoiceNumber+"</td><td>"+data.trn[i].client+"</td><td>"+str+"</td><td><button type='button' class='btn btn-primary view' id="+data.trn[i].trn+" value="+data.trn[i].trn+" data-toggle='modal' data-target='#view0'>View</button> {% if user.authority != 'Viewer' and user.authority != 'Accounts' %}<button type='button' class='btn btn-primary editbtn0' id="+data.trn[i].trn+" value="+data.trn[i].trn+" data-toggle='modal' data-target='#edit0'>Edit</button> {% endif %}{% if user.authority == 'Manager 2'%}<button type='button' class='btn btn-danger delete' value="+data.trn[i].trn+">Delete</button>{% endif %}</td></tr>");
+                           //alert(data.data[i].trn);
+                       }
+                    });
+                });
+
+             $(document).on('click','#approve',function() {
+                    var trn = this.value;
+                    // alesrt(trn);
+                    $.post("{% url 'home:approveSalesPurchase' %}", {
+                            'trn': trn,
+                        },
+                        function(data, status) {
+
+                            window.location.reload(true);
+                        });
+
+                });
+
+ $("#invoicedate-input-date").datepicker({
+}).on("changeDate", function (e) {
+    var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#invoicedate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+
+
+ $("#bldate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+  $('#bldate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+$("#production_date_input_date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+  $('#production_date_input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#etd-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#etd-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+
+
+ $("#eta-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#eta-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+
+ $("#edit-invoicedate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#edit-invoicedate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#edit-bldate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+  var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+  $('#edit-bldate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+$("#edit_production_date_input_date").datepicker({
+
+}).on("changeDate", function (e) {
+  var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+  $('#edit_production_date_input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#edit-etd-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#edit-etd-input').val(d.toLocaleDateString());
+    // console.log(e.date);
+    // alert('hi');
+});
+
+
+
+ $("#edit-eta-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+    var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#edit-eta-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+var stockqty = 0;
+var i=null;
+      $('#traderefno').change(function(){
+          var trn=this.value;
+          
+             $.post("{% url 'home:helperSalesPurchase' %}",
+               {
+                  'traderef': trn,
+               },
+                function(data,status){
+                  $('#tradetype-input').val(data.types);
+			if(data.types=='Sales'){
+                    $(".pbn").removeAttr("disabled");
+                  }
+                  else{
+                    $(".pbn").attr('disabled','disabled');
+                    $('#blnumber-input').val('');
+                  }
+                  $('#salespurchaseparty').val(data.client);
+                  $('#salespurchaseproductname').val(data.baseproduct);
+                     // alert("Data: " + data.packaginglist + "\nStatus: " + status);
+                     i=data;
+
+                     $("#commissionagent-input").val(i.commissionagent);
+                     // $("#commission_amount-input").val(i.commissionamount);
+
+                     $("#logisticagent-input").val(i.logisticagent);
+                     $("#logisticcost-input").val(parseFloat(i.logisticcost).toFixed(2));
+                     tolerance=i.tolerance;
+
+                     max_qty=((tolerance/100)*i.billqty)+parseFloat(i.billqty);
+                    // alert(i.billqty+" "+max_qty);
+
+             });
+             
+         });
+	
+	$('.pbn').change(function(){
+	
+		$('#invoice_amount-input').val('');
+                $('#commission_amount-input').val('');
+                //$('#logisticagent-input').val('');
+                $('#liner-input').val('');
+                $('#bl_quantity-input').val('');
+
+              $('#blnumber-input').val(this.value);
+		if($('#tradetype-input').val() == 'Sales'){
+
+              var billNo=$('#blnumber-input').val();
+              stockqty = 0;
+              $.post("{% url 'home:getsalesbill' %}",
+              {
+                'bill':billNo,
+                'product':$('#traderefno').val(),
+              },
+              function(data,status){
+               
+                // alert(data.billqty+'from');
+                bill=data.billqty;
+               if(bill != ''){
+		$('#batch_no_input').val(data.batch_no);
+		$('#production_date_input').val(data.production_date);
+                  $('#bl_quantity-input').val(data.billqty);
+                  $('#liner-input').val(data.liner);
+                   $("#invoice_amount-input").val(parseFloat(parseFloat(i.ratePMT).toFixed(4) * parseFloat($('#bl_quantity-input').val())).toFixed(2));
+                $("#commission_amount-input").val(parseFloat(parseFloat(i.commissionRate)* parseFloat($('#bl_quantity-input').val())).toFixed(2));
+                  return true;
+                }
+              if(bill == '' || bill == null){
+                  alert('not allowed');
+                  // bill=0;
+
+                  return false;
+                }
+              });
+            }
+            });
+      
+       $(document).on('keyup','#bl_quantity-input',function(){
+        // alert(max_qty+' '+stockqty);
+            if(stockqty == 0){
+              if (parseFloat(this.value)<=max_qty) {
+                // alert(max_qty);
+                $("#invoice_amount-input").val(parseFloat(parseFloat(i.ratePMT).toFixed(4) * this.value).toFixed(2));
+                $("#commission_amount-input").val(parseFloat(parseFloat(i.commissionRate).toFixed(4)* this.value).toFixed(2));
+                }
+                 else{
+                  alert('Max quantity for trade exceeded!');
+                }
+              }
+              else{
+                // alert(stockqty);
+                if (parseFloat(this.value)<=stockqty) {
+                // alert(max_qty);
+                $("#invoice_amount-input").val(parseFloat(i.ratePMT * this.value).toFixed(2));
+                $("#commission_amount-input").val(parseFloat(i.commissionRate* this.value).toFixed(2));
+                }
+                 else{
+                  alert('Max quantity for trade exceeded!');
+                }
+               
+              }
+            });
+
+       // $(document).on('focusout','#bl_quantity-input',function(){
+       //  // alert(max_qty+' '+stockqty);
+       //      if(stockqty == 0){
+       //        if (parseFloat(this.value)<=max_qty) {
+       //          // alert(max_qty);
+       //          $("#invoice_amount-input").val(parseFloat(i.ratePMT * this.value).toFixed(2));
+       //          $("#commission_amount-input").val(parseFloat(i.commissionRate* this.value).toFixed(2));
+       //          }
+       //           else{
+       //            alert('Max quantity for trade exceeded!');
+       //          }
+       //        }
+       //        else{
+       //          // alert(stockqty);
+       //          if (parseFloat(this.value)<=stockqty) {
+       //          // alert(max_qty);
+       //          $("#invoice_amount-input").val(parseFloat(i.ratePMT * this.value).toFixed(2));
+       //          $("#commission_amount-input").val(parseFloat(i.commissionRate* this.value).toFixed(2));
+       //          }
+       //           else{
+       //            alert('Max quantity for trade exceeded!');
+       //          }
+               
+       //        }
+       //      });
+
+      $(document).on('click','.editbtn0',function(){
+                  var trn=this.value;
+                  $.post("{% url 'home:alterSalesPurchase' %}",
+                  {
+                     'trn':trn
+                  },
+          function(data,status){
+              $('#edit-tradetype-input').val(data.types);
+              $('#edit-salespurchaseparty').val(data.client);
+              $('#edit-number-input').val(data.sn);
+              $('#edit-company-input').val(data.company);
+              $('#edit-traderefdate-input').val(data.trd);
+              $('#edit-traderefno-input').val(data.trn);
+              $('#edit-types-input').val(data.types);
+              $('#edit-invoicedate-input').val(data.invoiceDate);
+              $('#edit-invoicenumber-input').val(data.invoiceNumber);
+              $('#edit-invoice_amount-input').val(parseFloat(data.invoiceAmount).toFixed(2));
+              $('#edit-commissionagent-input').val(data.commissionAgent);
+              $('#edit-commission_amount-input').val(parseFloat(data.commissionAmount).toFixed(2));
+              $('#edit-salespurchaseproductname').val(data.baseproduct);
+              $('#edit-packaginglist-input').val(data.packingListDetails);
+              $('#edit-blnumber-input').val(data.billNumber);
+              $('#edit-bl_quantity-input').val(parseFloat(data.billQty).toFixed(4));
+              $('#edit-bldate-input').val(data.billDate);
+              $('#edit-logisticagent-input').val(data.logisticAgent);
+              $('#edit-logisticcost-input').val(parseFloat(data.logisticCost).toFixed(2));
+              $('#edit-liner-input').val(data.liner);
+              $('#edit-eta-input').val(data.eta);
+              $('#edit-etd-input').val(data.etd);
+              $('#edit-shipmentstatus-input').val(data.shipmentStatus);
+
+              $('#edit-traderefno').val(data.trn);
+              $('#edit-salespurchase_remarks-input').val(data.remarks);
+
+              $('#edit_batch_no_input').val(data.batch_no);
+              $('#edit_production_date_input').val(data.production_date);
+             });
+            });
+
+
+      $(document).on('click','.view',function(){
+                  var trn=this.value;
+                  $.post("{% url 'home:alterSalesPurchase' %}",
+                  {
+                     'trn':trn
+                  },
+              function(data,status){
+
+              $('#sn').text(data.sn);
+              $('#company').text(data.company);
+              $('#trd').text(data.trd);
+              $('#trn').text(data.trn);
+              $('#types').text(data.types);
+              $('#invoiceDate').text(data.invoiceDate);
+              $('#invoiceNumber').text(data.invoiceNumber);
+              $('#invoiceAmount').text(parseFloat(data.invoiceAmount).toFixed(2));
+              $('#commissionAgent').text(data.commissionAgent);
+              $('#commissionAmount').text(parseFloat(data.commissionAmount).toFixed(2));
+              $('#baseproduct').text(data.baseproduct);
+              $('#packingListDetails').text(data.packingListDetails);
+              $('#billNumber').text(data.billNumber);
+              $('#billQty').text(parseFloat(data.billQty).toFixed(4));
+              $('#billDate').text(data.billDate);
+              $('#logisticAgent').text(data.logisticAgent);
+              $('#logisticCost').text(parseFloat(data.logisticCost).toFixed(2));
+              $('#liner').text(data.liner);
+              $('#eta').text(data.eta);
+              $('#etd').text(data.etd);
+              $('#shipmentStatus').text(data.shipmentStatus);
+              $('#viewremarks').text(data.remarks);
+
+              $('#billbatch_no').text(data.batch_no);
+              $('#billProduction_date').text(data.production_date);
+
+
+              if(data.reviewed==true){
+                // alert('yes');
+                 $("#approve").attr("disabled", "disabled");
+               }else{
+                 $('#approve').val(data.trn);
+               }
+             
+
+
+             });
+            });
+
+
+            $('.excel').click(function(){
+                        $(this).attr('href',"{% url 'home:exportSalesPurchase'%}");
+                     });
+
+            $('.delete').click(function(){
+                    var trn=this.value;
+                    $.post("{% url 'home:delSP' %}",
+                        {
+                            'trn':trn
+                        },
+                        function(data,status){
+                            // alert(data.result);
+                        });
+                });
+            
+          //
+           $('.dropdown-menu li a').click(function(){
+
+             $('#invoice_amount-input').val('');
+                $('#commission_amount-input').val('');
+                //$('#logisticagent-input').val('');
+                $('#liner-input').val('');
+                $('#bl_quantity-input').val('');
+
+            
+             $('#bl_quantity-input').val('');
+
+            $(this).closest('.dropdown').find('input.billno').val($(this).attr('data-value'));
+
+            if($('#tradetype-input').val() == 'Sales'){
+
+              // $('.dropdown-menu a').click(function() {
+
+//     $(this).closest('.dropdown').find('input.billno')
+//       .val($(this).attr('data-value'));
+//   });
+
+              var billNo=$('#blnumber-input').val();
+              stockqty = 0;
+              $.post("{% url 'home:getsalesbill' %}",
+              {
+                'bill':billNo,
+                'product':$('#traderefno').val(),
+              },
+              function(data,status){
+               
+                // alert(data.billqty+'from');
+                bill=data.billqty;
+               if(bill != ''){
+
+                  $('#bl_quantity-input').val(data.billqty);
+                  $('#liner-input').val(data.liner);
+                   $("#invoice_amount-input").val(parseFloat(i.ratePMT * parseFloat($('#bl_quantity-input').val())).toFixed(2));
+                $("#commission_amount-input").val(parseFloat(i.commissionRate* parseFloat($('#bl_quantity-input').val())).toFixed(2));
+                  return true;
+                }
+              if(bill == '' || bill == null){
+                  // alert('not allowed');
+                  // bill=0;
+
+                  return false;
+                }
+              });
+            }
+          });
+           
+           $('#bl_quantity-input').focus(function(){
+              var product=$('#blnumber-input').val();
+              $.post("{% url 'home:getStockInventory'%}",
+              {
+                'product':product,
+              },
+              function(data,status){
+                if(data.qty != null){
+                   stockqty=data.qty;
+                }
+               
+                // alert(stockqty);
+              });
+           });
+
+
+        });
+      // $('#blnumber-input').keyup(function(){
+        function Validate(){
+          if($('#tradetype-input').val()!="Sales" && $('#tradetype-input').val()!="Purchase"){
+               alert($('#tradetype-input').val());
+               $('#tradetype-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+            }
+             else if(parseFloat($('#bl_quantity-input').val()) > max_qty){
+              // alert(parseFloat($('#bl_quantity-input').val()));
+                 alert('Max quantity for trade exceeded!');
+                 $('#bl_quantity-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+
+
+            return false;
+             }
+
+            else if($('#invoicedate-input').val()==''){
+            alert($('#invoicedate-input').val());
+             $('#invoicedate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+            else if($('#invoicenumber-input').val()==''){
+             $('#invoicenumber-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+            else if($('#invoice_amount-input').val()==''){
+             $('#invoice_amount-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#commissionagent-input').val()==''){
+             $('#commissionagent-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#commission_amount-input').val()==''){
+             $('#commission_amount-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#packaginglist-input').val()==''){
+             $('#packaginglist-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#blnumber-input').val()==''){
+             $('#blnumber-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#bl_quantity-input').val()==''){
+             $('#bl_quantity-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#bldate-input').val()==''){
+             $('#bldate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#logisticagent-input').val()==''){
+             $('#logisticagent-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#logisticcost-input').val()==''){
+             $('#logisticcost-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#liner-input').val()==''){
+             $('#liner-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#etd_eta-input').val()==''){
+             $('#etd_eta-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#shipmentstatus-input').val()==''){
+             $('#shipmentstatus-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#salespurchase_remarks-input').val()==''){
+             $('#salespurchase_remarks-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#tradetype-input').val()=='Sales'){
+             if(bill != 0){
+
+                  // $('#bl_quantity-input').val(data.billqty);
+                  return true;
+                }
+              if(bill == 0){
+                  alert('not allowed');
+                  // bill=0;
+                  // $('#bl_quantity-input').val(data.billqty);
+                  return false;
+                }
+             }
+
+            else{
+              return true;
+            }
+        }
+
+      function ValidateEdit(){
+          if($('#edit-tradetype-input').val()!="Sales" && $('#edit-tradetype-input').val()!="Purchase"){
+               // alert($('#edit-tradetype-input').val());
+               $('#edit-tradetype-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+            }
+             else if(parseFloat($('#bl_quantity-input').val()) > max_qty){
+              // alert(parseFloat($('#bl_quantity-input').val()));
+                 alert('Max quantity for trade exceeded!');
+                 $('#bl_quantity-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+
+
+            return false;
+             }
+
+            else if($('#edit-invoicedate-input').val()==''){
+            // alert($('#edit-invoicedate-input').val());
+             $('#edit-invoicedate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+            else if($('#edit-invoicenumber-input').val()==''){
+             $('#edit-invoicenumber-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+            else if($('#edit-invoice_amount-input').val()==''){
+             $('#edit-invoice_amount-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#edit-commissionagent-input').val()==''){
+             $('#edit-commissionagent-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#edit-commission_amount-input').val()==''){
+             $('#edit-commission_amount-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#edit-packaginglist-input').val()==''){
+             $('#edit-packaginglist-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#edit-blnumber-input').val()==''){
+             $('#edit-blnumber-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#edit-bl_quantity-input').val()==''){
+             $('#edit-bl_quantity-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#edit-bldate-input').val()==''){
+             $('#edit-bldate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#edit-logisticagent-input').val()==''){
+             $('#edit-logisticagent-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#edit-logisticcost-input').val()==''){
+             $('#edit-logisticcost-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#edit-liner-input').val()==''){
+             $('#edit-liner-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#edit-etd_eta-input').val()==''){
+             $('#edit-etd_eta-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#edit-shipmentstatus-input').val()==''){
+             $('#edit-shipmentstatus-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#edit-salespurchase_remarks-input').val()==''){
+             $('#edit-salespurchase_remarks-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+            else{
+              return true;
+            }
+        }
+      </script>
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+                           <div class="headingtitle">
+               <div class="title">
+                  <h3>Sales and Purchase Details</h3>
+               </div>
+              <input type="text" placeholder="Filter Using TRN" class='table-search' id="table-search" data-table-search="myTable">
+                  <select class="form-control" id="dropdown">
+                    <option value="" id="" selected disabled >By Trade</option>
+                      <option value="salestrade" id="salestrade">By Sales Trade</option>
+                      <option value="purchasetrade" id="purchasetrade">By Purchase Trade</option>
+                      <option value="cancelsales" id="cancelsales">By Cancel Sales </option>
+                      <option value="cancelpurchase" id="cancelpurchase">By Cancel Purchase</option>
+                      <option value="salesamendment" id="salesamendment">By Sales Amendment</option>
+                      <option value="purchaseamendment" id="purchaseamendment">By Purchase Amendment</option>
+                  </select>
+                  </input>
+            </div>
+
+            <div class="headingrow">
+              {% if user.authority != 'Viewer' and user.authority != 'Accounts'%}
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New Entry
+               </button>
+               {% else %}
+               <button type="button" class="btn btn-primary" disabled>
+               New Entry
+               </button>
+               {% endif %}
+            </div>
+               </div>
+            <!-- Modal -->
+            <div class="modal fade" id="entry0" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">Sales and Purchase Data Entry</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <div class="modal-body">
+                        <div class="card-body card-block">
+                           <form action="{%url 'home:saveSalesPurchase'%}" method="post" class="form-horizontal">
+                              {%csrf_token%}
+                              <div class="numbertraderef">
+                                 <label for="traderefno">Trade Reference Number</label>
+                                 <select class="form-control" name="traderefno" id="traderefno">
+                                    <option value="trn">select trn</option>
+                                    {%for trn in trns %}
+                                    <option value="{{trn.trn}}">{{trn.trn}}</option>
+                                    {% endfor %}
+                                 </select>
+                              </div>
+                              <div class="tradeselect">
+                                <div class="row form-group">
+                                 <div class="col-md-6">
+                                 <!--    <select class="form-control" id="tradetype-input" name="tradetype-input">
+                                       <option value="company" selected="true">Select your trade type</option>
+                                       <option value="Sales">Sales</option>
+                                       <option value="Purchase">Purchase</option>
+                                    </select> -->
+
+                             <input type="text" id="tradetype-input" name="tradetype-input" value="Sales" class="form-control">
+                           </div>
+                                <div class="col-md-6">
+                                  <input type="text" class="form-control" id="salespurchaseproductname" placeholder="Product Name" name="salespurchaseproductname">
+                                 </div>
+                                 
+                                </div>
+                                 <div class="row form-group">
+                                  <div class="col-md-12">
+                                  <input type="text" class="form-control" id="salespurchaseparty" placeholder="Buyer/ Seller Name" name="salespurchaseparty">
+                                 <!--   <select class="form-control" id="salespurchaseparty">
+                                    <option value="name1" selected disabled>Buyer/Seller Name</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                   </select> -->
+                                 </div>
+                                 
+                               </div>
+                             
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label  for="invoicedate-input" class=" form-control-label"> Invoice Date</label>
+                                    <!-- <input type="text" class="form-control date" name="invoicedate-input" id="invoicedate-input"/> -->
+
+                                    <div class="datefield">
+                                    <input type="text" class="form-control" id="invoicedate-input" name="invoicedate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="invoicedate-input-date"  data-date-end-date="0d"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="invoicenumber-input" class=" form-control-label"> Invoice Number</label>
+                                    <input type="text" id="invoicenumber-input" name="invoicenumber-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="invoice_amount-input" class=" form-control-label">Invoice Amount</label>
+                                    {%if user.authority == 'Manager 2'%}
+                                    <input type="text" id="invoice_amount-input" name="invoice_amount-input" class="validatenum form-control">
+                                    {%else%}
+                                    <input type="text" id="invoice_amount-input" readonly name="invoice_amount-input" class="validatenum form-control">
+                                    {%endif%}
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="commissionagent-input" class=" form-control-label">Commission Agent</label>
+                                    {%if user.authority == 'Manager 2'%}
+                                    <input type="text" id="commissionagent-input" name="commissionagent-input" class="form-control">
+                                    {%else%}
+                                    <input type="text" id="commissionagent-input" readonly name="commissionagent-input" class="form-control">
+                                    {%endif%}
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="commission_amount-input" class=" form-control-label">Comission Amount</label>
+                                    {%if user.authority == 'Manager 2'%}
+                                    <input type="text" id="commission_amount-input" name="commission_amount-input" class="validatenum form-control">
+                                     {%else%}
+                                      <input type="text" id="commission_amount-input" readonly name="commission_amount-input" class="validatenum form-control">
+                                     {%endif%}
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="packaginglist-input" class=" form-control-label">Packaging List/Container Details</label>
+                                    <input type="text" id="packaginglist-input" name="packaginglist-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="blnumber-input" class=" form-control-label">BL Number</label>
+                                    <div class="input-group dropdown">
+                                    <input type="text" id="blnumber-input" name="blnumber-input" class="form-control billno dropdown-toggle">
+			{% comment %}
+                                    <ul class="dropdown-menu" id="dropdown-menu">
+                                      {% for bill in records %}
+                                        {% if bill.trn.types == 'Purchase' %}
+            <li><a href="#" data-value="{{bill.billNumber}}">{{bill.billNumber}}</a></li>
+                                        {% endif %}
+                                      {% endfor %}
+                                      {% for p in stock_product %}
+                                        
+            <li><a href="#" data-value="{{p.product}}">{{p.product}}</a></li>
+                                        
+                                      {% endfor %}
+            <!-- <li><a href="#" data-value="Bill No. 2">Bill No. 2</a></li>
+            <li><a href="#" data-value="Bill No. 3">Bill No. 3</a></li> -->
+          </ul>
+		
+          <span role="button" class="input-group-addon dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></span>
+		{% endcomment %}
+        </div>
+      </div>
+
+		<div class="col col-md-4">
+        <label class=" form-control-label">Purchase Bill No.</label>
+        <select class="form-control pbn select2" disabled>
+          <option value=""></option>
+          {% for bill in records %}
+        {% if bill.trn.types == 'Purchase' %}
+            <option value="{{bill.billNumber}}">{{bill.billNumber}}</option>
+        {% endif %}
+        {% endfor %}
+        {% for p in stock_product %}
+                                        
+      <option value="{{p.product}}">{{p.product}}</option>
+                                        
+      {% endfor %}
+        </select>
+      </div>
+      </div>
+
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="bl_quantity-input" class=" form-control-label">BL Quantity</label>
+                                    
+                                    <input type="text" id="bl_quantity-input" name="bl_quantity-input" class="validatenum form-control">
+                                    
+                                    
+                                    
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="bldate-input" class=" form-control-label">BL Date</label>
+                                    <!-- <input type="text" class="form-control date" id="bldate-input" name="bldate-input" placeholder="Choose the date"> -->
+                                       <div class="datefield">
+                                    <input type="text" class="form-control" id="bldate-input" name="bldate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="bldate-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="logisticagent-input" class=" form-control-label">Logistics  Agent</label>
+                                    {%if user.authority == 'Manager 2'%}
+                                    <input type="text" id="logisticagent-input" name="logisticagent-input" class="form-control ">
+                                    {%else%}
+                                    <input type="text" id="logisticagent-input" readonly name="logisticagent-input" class="form-control ">
+                                    {%endif%}
+                                 </div>
+                              </div>
+<!-- new added batch number and production date -->
+<div class="row form-group">
+                            <div class="col col-md-6">
+                              <label for="bl_quantity-input" class=" form-control-label">Batch Number</label>
+                                    
+                                    <input type="text" id="batch_no_input" name="batch_no_input" class="form-control">
+                                    
+                                    
+                                    
+                                 </div>
+                            <div class="col col-md-6">
+                                <label for="bldate-input" class=" form-control-label">Production Date</label>
+                                    <!-- <input type="text" class="form-control date" id="bldate-input" name="bldate-input" placeholder="Choose the date"> -->
+                                       <div class="datefield">
+                                    <input type="text" class="form-control" id="production_date_input" name="production_date_input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="production_date_input_date"></i>
+                                 </span>
+                                 </div>
+                            </div>
+                                 <!-- <div class="col col-md-4">
+                                    <label for="logisticagent-input" class=" form-control-label">Logistics  Agent</label>
+                                    {%if user.authority == 'Manager 2'%}
+                                    <input type="text" id="logisticagent-input" name="logisticagent-input" class="form-control ">
+                                    {%else%}
+                                    <input type="text" id="logisticagent-input" readonly name="logisticagent-input" class="form-control ">
+                                    {%endif%}
+                                 </div> -->
+                              </div>
+                              <!-- ------------------------------------------------- -->
+
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="logisticcost-input" class=" form-control-label">Logitics Cost</label>
+                                    {%if user.authority == 'Manager 2'%}
+                                    <input type="text" id="logisticcost-input" name="logisticcost-input" class="validatenum form-control">
+                                    {%else%}
+                                     <input type="text" id="logisticcost-input" readonly name="logisticcost-input" class="validatenum form-control">
+                                    {%endif%}
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="liner-input" class=" form-control-label">Liner</label>
+                                    <input type="text" id="liner-input" name="liner-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="etd_eta-input" class=" form-control-label">ETD</label>
+                                    <!-- <input type="text" class="form-control date" id="etd_eta-input" name="etd_eta-input" placeholder="Choose the date"/> -->
+
+                                         <div class="datefield">
+                                    <input type="text" class="form-control" id="etd-input" name="etd-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="etd-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                     <div class="col col-md-4">
+                                    <label for="etd_eta-input" class=" form-control-label">ETA</label>
+                                    <!-- <input type="text" class="form-control date" id="etd_eta-input" name="etd_eta-input" placeholder="Choose the date"/> -->
+
+                                         <div class="datefield">
+                                    <input type="text" class="form-control" id="eta-input" name="eta-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="eta-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="shipmentstatus-input" class=" form-control-label">Status Of Shipment</label>
+                                    <input type="text" id="shipmentstatus-input" name="shipmentstatus-input" class="form-control">
+                                 </div>
+                              </div>
+                               <div class="row form-group">
+                                <div class="col-md-12">
+                                  <label for="salespurchase_remarks-input" class=" form-control-label">Remarks</label>
+                                  <input type="text" class="form-control" id="salespurchase_remarks-input" name="salespurchase_remarks-input">
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <!-- <input type="button" class="btn btn-info" value="Approve"> -->
+                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                 <input type="submit" onclick="return Validate()" class="btn btn-primary"  value="Save Details">
+                              </div>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered tablecolumnfixed" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">S.N</th>
+                     <th scope="col">Trade Type</th>
+                     <th scope="col">Company</th>
+                     <th scope="col">TRN</th>
+                     <th scope="col">Product Name</th>
+                     <th scope="col">Qty</th>
+                     <th scope="col">Rate</th>
+                     <th scope="col">Invoice Date</th>
+                     <th scope="col">Invoice Number</th>
+                     <th scope="col">Buyer/Supplier</th>
+                     <th scope="col">Reviewed</th>
+                    <!-- <th scope="col">Remarks</th> -->
+                     <th scope="col">Status</th>
+
+                  </tr>
+               </thead>
+               <tbody id="rowid">
+                  {% for i in records %}
+                  <tr>
+                     <th scope="row" >{{i.trn.sn}}</th>
+                     <td >{{i.trn.types}}</td>
+                     <td >{{i.trn.company}}</td>
+
+                     <td >{{i.trn.trn}}</td>
+                     <td >{{i.trn.baseproduct}}</td>
+                     <td >{{i.billQty|floatformat:4}} {{i.trn.contractUnit}}</td>
+                     <td >{{i.trn.ratePMT|floatformat:4}}</td>
+                     <td >{{i.invoiceDate}}</td>
+                     <td >{{i.invoiceNumber}}</td>
+                     <td >{{i.trn.client}}</td>
+                     {% if i.reviewed == True %}
+                     <td><input type="checkbox" checked name=""></td>
+                     {% else %}
+                     <td><input type="checkbox" name=""></td>
+                     {% endif %}
+                    <!-- <td>{{i.remarks}}</td> -->
+                     <td  scope="row">
+                      <button type="button" class="btn btn-primary view" data-toggle="modal" value="{{i.trn.trn}}" id="{{i.trn.trn}}" data-target="#view0">
+                        View
+                        </button>
+                        {% if user.authority != 'Viewer' and user.authority != 'Accounts' %}
+                      <button type="button" class="btn btn-primary editbtn0" data-toggle="modal" value="{{i.trn.trn}}" id="{{i.trn.trn}}" data-target="#edit0">
+                        Edit
+                        </button>
+                        {% endif %}
+                        {% if user.authority == 'Manager 2'%}
+                         <button type="button" class="btn btn-danger delete" value="{{i.trn.trn}}">Delete</button>
+                        {% endif %}
+                     </td>
+
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+</div>
+
+
+<!-- view -->
+
+
+ <div class="modal fade" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Sales and Purchase Report Detail</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <div class="displaydata">
+                           <table class="table table-bordered tableview">
+                            <div class="description companytitle">
+
+                              <ul>
+                                 <li>S.N :<span id="sn"></span></li>
+                                 <li>Company :<span id="company"></span></li>
+                                 <li>Trade Ref. Date :<span id="trd"></span></li>
+                                 <li>Trade Ref. No :<span id="trn"></span></li>
+                              </ul>
+                           </div>
+                              <tbody>
+                                 <tr>
+                                    <th scope="col">Purchase/Sales Invoice Date</th>
+                                    <td id="invoiceDate"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Invoice No.</th>
+                                    <td id="invoiceNumber"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Product Name</th>
+                                    <td id="baseproduct"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Invoice Amount</th>
+                                    <td id="invoiceAmount"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Comission Agent</th>
+                                    <td id="commissionAgent"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Commission Amount</th>
+                                    <td id="commissionAmount"></td>
+                                 </tr>
+                                <!--  <tr>
+                                    <th scope="col">Sales Commission Amount</th>
+                                    <td>45000</td>
+                                 </tr> -->
+                                 <tr>
+                                    <th scope="col">Packing List/Container Loading Details</th>
+                                    <td id="packingListDetails"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Bill Number </th>
+                                    <td id="billNumber">21</td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Bill Quantity</th>
+                                    <td id="billQty"></td>
+                                 </tr>
+
+                                 <tr>
+                                    <th scope="col">Bill Date</th>
+                                    <td id="billDate"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Batch Number</th>
+                                    <td id="billbatch_no"></td>
+                                 </tr>
+
+                                 <tr>
+                                    <th scope="col">Production Date</th>
+                                    <td id="billProduction_date"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Logistics Agent</th>
+                                    <td id="logisticAgent"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Logistics Cost</th>
+                                    <td id="logisticCost"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Liner</th>
+                                    <td id="liner"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">ETD</th>
+                                    <td id="etd"></td>
+                                 </tr>
+                                  <tr>
+                                    <th scope="col">ETA</th>
+                                    <td id="eta"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Status Of Shipment</th>
+                                    <td id="shipmentStatus"></td>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Remarks</th>
+                                    <td id="viewremarks"></td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                     </div>
+                     <div class="modal-footer">
+                      {% if user.authority != 'Admin' and user.authority != 'Viewer'%}
+                         <button type="button" class="btn btn-primary" id="approve" value="">Approve</button>
+                         {% endif %}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                     </div>
+                  </div>
+               </div>
+            </div>
+        </div>
+
+
+
+         <!-- edit -->
+         <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Sales and Purchase Data Entry</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <form action="{% url 'home:editSalesPurchase' %}" method="post" class="form-horizontal">
+                           {%csrf_token%}
+                           <div class="numbertraderef">
+                              <label for="traderefno">Trade Reference Number</label>
+                              <select class="form-control" name="traderefno" id="edit-traderefno">
+                                 <option value="trn">select trn</option>
+                                 {%for trn in trns %}
+                                 <option value="{{trn.trn}}">{{trn.trn}}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                           <div class="tradeselect">
+                             <div class="row form-group">
+                              <div class="col-md-6">
+                               <!--   <select class="form-control" id="edit-tradetype-input" name="tradetype-input">
+                                    <option value="company" selected="true">Select your trade type</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Purchase">Purchase</option>
+                                 </select> -->
+
+                             <input type="text" id="edit-tradetype-input" name="tradetype-input" value="Sales" class="form-control">
+                           </div>
+
+                             <div class="col-md-6">
+                                  <input type="text" class="form-control" id="edit-salespurchaseproductname" placeholder="Product Name" name="salespurchaseproductname">
+                                 </div>
+                             
+                                  </div>
+                                  <div class="row form-group">
+                                      <div class="col-md-12">
+                                <input type="text" class="form-control" id="edit-salespurchaseparty" name="edit-salespurchaseparty">
+                                   <!-- <select class="form-control" id="edit-salespurchaseparty">
+                                    <option value="name1" selected disabled>Buyer/Seller Name</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                   </select> -->
+                                 </div>
+                                  </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-4">
+                                 <label  for="invoicedate-input" class=" form-control-label"> Invoice Date</label>
+                                 <!-- <input type="text" class="form-control date" name="invoicedate-input" id="edit-invoicedate-input" placeholder="Choose the date"/> -->
+
+   <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-invoicedate-input" name="invoicedate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-invoicedate-input-date" data-date-end-date="0d"></i>
+                                 </span>
+                                 </div>
+
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="invoicenumber-input" class=" form-control-label"> Invoice Number</label>
+                                 <input type="text" id="edit-invoicenumber-input" name="invoicenumber-input" class="form-control">
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="invoice_amount-input" class=" form-control-label">Invoice Amount</label>
+                                 {%if user.authority == 'Manager 2'%}
+                                 <input type="text" id="edit-invoice_amount-input" name="invoice_amount-input" class="validatenum form-control">
+                                 {%else%}
+                                 <input type="text" id="edit-invoice_amount-input" readonly name="invoice_amount-input" class="validatenum form-control">
+                                 {%endif%}
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="commissionagent-input" class=" form-control-label">Commission Agent</label>
+                                 {% if user.authority == 'Manager 2'%}
+                                 <input type="text" id="edit-commissionagent-input" name="commissionagent-input" class="form-control">
+                                 {%else%}
+                                 <input type="text" id="edit-commissionagent-input" readonly name="commissionagent-input" class="form-control">
+                                 {%endif%}
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="commission_amount-input" class=" form-control-label">Comission Amount</label>
+                                 {% if user.authority == 'Manager 2'%}
+                                 <input type="text" id="edit-commission_amount-input" name="commission_amount-input" class="validatenum form-control">
+                                 {%else%}
+                                 <input type="text" id="edit-commission_amount-input" readonly name="commission_amount-input" class="validatenum form-control">
+                                 {%endif%}
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="packaginglist-input" class=" form-control-label">Packaging List/Container Loading Details</label>
+                                 <input type="text" id="edit-packaginglist-input" name="packaginglist-input" class="form-control">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="blnumber-input" class=" form-control-label">BL Number</label>
+                                 <input type="text" id="edit-blnumber-input" name="blnumber-input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-4">
+                                 <label for="bl_quantity-input" class=" form-control-label">BL Quantity</label>
+                                  {% if user.authority == 'Manager 2'%}
+                                 <input type="text" id="edit-bl_quantity-input" name="bl_quantity-input" class="validatenum form-control">
+                                 {%else%}
+                                 <input type="text" id="edit-bl_quantity-input" readonly name="bl_quantity-input" class="validatenum form-control">
+                                 {%endif%}
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="bldate-input" class=" form-control-label">BL Date</label>
+                                 <!-- <input type="text" class="form-control date" id="edit-bldate-input" name="bldate-input" placeholder="Choose the date"> -->
+                                      <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-bldate-input" name="bldate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-bldate-input-date"></i>
+                                 </span>
+                                 </div>
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="logisticagent-input" class=" form-control-label">Logistics  Agent</label>
+                                 {% if user.authority == 'Manager 2'%}
+                                 <input type="text" id="edit-logisticagent-input" name="logisticagent-input" class="form-control ">
+                                 {%else%}
+                                 <input type="text" id="edit-logisticagent-input" readonly name="logisticagent-input" class="form-control ">
+                                 {%endif%}
+                              </div>
+                           </div>
+
+                           <!-- new added batch number and production date -->
+<div class="row form-group">
+                            <div class="col col-md-6">
+                              <label for="bl_quantity-input" class=" form-control-label">Batch Number</label>
+                                    
+                                    <input type="text" id="edit_batch_no_input" name="edit_batch_no_input" class="form-control">
+                                    
+                                    
+                                    
+                                 </div>
+                            <div class="col col-md-6">
+                                <label for="bldate-input" class=" form-control-label">Production Date</label>
+                                    <!-- <input type="text" class="form-control date" id="bldate-input" name="bldate-input" placeholder="Choose the date"> -->
+                                       <div class="datefield">
+                                    <input type="text" class="form-control" id="edit_production_date_input" name="edit_production_date_input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit_production_date_input_date"></i>
+                                 </span>
+                                 </div>
+                            </div>
+                                 <!-- <div class="col col-md-4">
+                                    <label for="logisticagent-input" class=" form-control-label">Logistics  Agent</label>
+                                    {%if user.authority == 'Manager 2'%}
+                                    <input type="text" id="logisticagent-input" name="logisticagent-input" class="form-control ">
+                                    {%else%}
+                                    <input type="text" id="logisticagent-input" readonly name="logisticagent-input" class="form-control ">
+                                    {%endif%}
+                                 </div> -->
+                              </div>
+                              <!-- ------------------------------------------------- -->
+
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="logisticcost-input" class=" form-control-label">Logitics Cost</label>
+                                 {% if user.authority == 'Manager 2'%}
+                                 <input type="text" id="edit-logisticcost-input" name="logisticcost-input" class="validatenum form-control">
+                                 {%else%}
+                                 <input type="text" id="edit-logisticcost-input" readonly name="logisticcost-input" class="validatenum form-control">
+                                 {%endif%}
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="liner-input" class=" form-control-label">Liner</label>
+                                 <input type="text" id="edit-liner-input" name="liner-input" class="form-control">
+                              </div>
+                           </div>
+                          <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="etd-input" class=" form-control-label">ETD</label>
+                                    <!-- <input type="text" class="form-control date" id="etd_eta-input" name="etd_eta-input" placeholder="Choose the date"/> -->
+
+                                         <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-etd-input" name="etd-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-etd-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                     <div class="col col-md-4">
+                                    <label for="eta-input" class=" form-control-label">ETA</label>
+                                    <!-- <input type="text" class="form-control date" id="etd_eta-input" name="etd_eta-input" placeholder="Choose the date"/> -->
+
+                                         <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-eta-input" name="eta-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-eta-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="shipmentstatus-input" class=" form-control-label">Status Of Shipment</label>
+                                    <input type="text" id="edit-shipmentstatus-input" name="shipmentstatus-input" class="form-control">
+                                 </div>
+                              </div>
+                                <div class="row form-group">
+                                <div class="col-md-12">
+                                  <label for="edit-salespurchase_remarks-input" class="form-control-label">Remarks</label>
+                                  <input type="text" class="form-control" id="edit-salespurchase_remarks-input" name="salespurchase_remarks-input">
+                                </div>
+                              </div>
+                           <div class="modal-footer">
+                            <!-- <input type="button" class="btn btn-info" value="Approve"> -->
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <input type="submit" onclick="return ValidateEdit()" class="btn btn-primary"  value="Save Details">
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+       </div>
+       </div>
+     </div>
+         {% include 'footer.html'%}
+      </div>
+   </div>
+   </body>
+</html>
+<!-- end document-->

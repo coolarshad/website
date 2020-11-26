@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+{%load staticfiles%}
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="{%static 'login/login.css'%}">
+  </head>
+  <body>
+    <h1>Welcome</h1>{{user}}
+    <p>Your password is {{role}}</p>
+  </body>
+</html>

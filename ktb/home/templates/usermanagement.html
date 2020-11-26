@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>User Management</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css'%}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{%  static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/datepicker/datepicker.css'%}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css'%}" rel="stylesheet" media="all">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script>
+         var allowsubmit = false;
+         $(function(){
+            //on keypress 
+            $('#user-management_con_password-input').keyup(function(e){
+               //get values 
+               var pass = $('#user-management_password-input').val();
+               var confpass = $(this).val();
+               
+               //check the strings
+               if(pass == confpass){
+                  //if both are same remove the error and allow to submit
+                  $('.error').text('');
+                  allowsubmit = true;
+               }else{
+                  //if not matching show error and not allow to submit
+                  $('.error').text('Password not matching');
+                  allowsubmit = false;
+               }
+            });
+            
+            //jquery form submit
+            $('#form').submit(function(){
+            
+               var pass = $('#user-management_password-input').val();
+               var confpass = $('#user-management_con_password-input').val();
+         
+               //just to make sure once again during submit
+               //if both are true then only allow submit
+               if(pass == confpass){
+                  allowsubmit = true;
+               }
+               if(allowsubmit){
+                  return true;
+               }else{
+                  return false;
+               }
+            });
+         });
+         function UserDel(name1){
+             var name=name1;
+               // alert(name);
+                     $.post("{% url 'home:delUser' %}",
+                     {
+                        'name':name
+                     },
+               function(data,status){
+                    
+         
+                });
+         }
+      </script>
+      <script type="text/javascript">
+         $(document).ready(function(){
+            $('.editbtn0').click(function(){
+               var name=this.value;
+               // alert(name)
+               $.post("{% url 'home:alteruser' %}",
+                  {
+                     'name':name
+                  },
+                  function(data,status){
+         
+                     $('#edit-user-management_name-input').val(data.name1);
+                     $('#edit-user-management_position-input').val(data.position);
+                     $('#edit-user-management_authority-input').val(data.authority);
+                     $('#edit-user-management_contact-input').val(data.contact);
+                     $('#edit-user-management_email-input').val(data.email);
+                     $('#edit-user-management_password-input').val(data.password);
+                     $('#edit-user-management_con_password-input').val(data.password);
+                  });
+            });
+         });
+      </script>
+   </head>
+   {%include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingrow">
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New User
+               </button>
+            </div>
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>User Details</h3>
+               </div>
+            </div>
+         </div>
+           <div class="boxone drag">
+         <table class="table table1 table-striped table-dark table-bordered">
+            <thead>
+               <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Position</th>
+                  <th scope="col">Authority</th>
+                  <th scope="col">Contact Number</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Status</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for i in users %}
+               <tr>
+                  <td >{{i.name}}</td>
+                  <td>{{i.position}}</td>
+                  <td>{{i.authority}}</td>
+                  <td>{{i.contact}}</td>
+                  <td>{{i.email}}</td>
+                  </td>
+                  <td>   <button type="button" class="btn btn-primary edibtn editbtn0" value="{{i.name}}" data-toggle="modal" data-target="#edit0">
+                     Edit
+                     </button>
+                     <button type="button" onclick="UserDel('{{i.name}}')" class="btn btn-danger">
+                     Delete
+                     </button>
+                  </td>
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+         <div class="modal fade" id="entry0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">User Entry Data</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <form action="{% url 'home:saveUsers'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                           {% csrf_token %}
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="user-management_name-input" class=" form-control-label">Name</label>
+                                 <input type="text" id="user-management_name-input" name="user-management_name-input" class="form-control">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="user-management_position-input" class=" form-control-label">Position</label>
+                                 <input type="text" id="user-management_position-input" name="user-management_position-input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="user-management_authority-input" class=" form-control-label">Authority</label>
+                                 <select class="form-control" name="user-management_authority-input">
+                                    <option value="Admin">Admin</option>
+                                    <option value="Manager 1">Manager 1</option>
+                                    <option value="Manager 2">Manager 2</option>
+                                    <option value="Viewer">Viewer</option>
+                                    <option value="Accounts">Accounts</option>
+				 <option value="Chemist">Chemist</option>				
+                                 </select>
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="user-management_contact-input" class=" form-control-label">Contact Number</label>
+                                 <input type="text"  id="user-management_contact-input" name="user-management_contact-input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-12">
+                                 <label for="user-management_email-input" class=" form-control-label">Email</label>
+                                 <input type="text" id="user-management_email-input" name="user-management_email-input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="user-management_address-input" class=" form-control-label">Password</label>
+                                 <input type="password" id="user-management_password-input" name="user-management_password-input" class="form-control">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="user-management_email-input" class=" form-control-label"> Confirm Password</label>
+                                 <input type="password" id="user-management_con_password-input" name="user-management_con_password-input" class="form-control">
+                              </div>
+                              <div class="form-group">
+                                 <span class="error" style="color:red"></span><br />
+                              </div>
+                           </div>
+                           <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <input type="submit" name="submit" class="btn btn-primary"  value="Save Details">
+                           </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            </form>
+         </div>
+
+   <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h3 class="modal-title title" id="exampleModalLabel">User Entry Data</h3>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <div class="card-body card-block">
+                  <form action="{% url 'home:edituser'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                     {% csrf_token %}
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="user-management_name-input" class=" form-control-label">Name</label>
+                           <input type="text" id="edit-user-management_name-input" name="user-management_name-input" class="form-control">
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="user-management_position-input" class=" form-control-label">Position</label>
+                           <input type="text" id="edit-user-management_position-input" name="user-management_position-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="user-management_authority-input" class=" form-control-label">Authority</label>
+                           <select class="form-control" id="edit-user-management_authority-input" name="user-management_authority-input">
+                              <option value="Admin">Admin</option>
+                              <option value="Manager 1">Manager 1</option>
+                              <option value="Manager 2">Manager 2</option>
+                              <option value="Viewer">Viewer</option>
+                              <option value="Accounts">Accounts</option>
+				 <option value="Chemist">Chemist</option>
+                           </select>
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="user-management_contact-input" class=" form-control-label">Contact Number</label>
+                           <input type="text"  id="edit-user-management_contact-input" name="user-management_contact-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-12">
+                           <label for="user-management_email-input" class=" form-control-label">Email</label>
+                           <input type="text" id="edit-user-management_email-input" name="user-management_email-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="user-management_address-input" class=" form-control-label">Password</label>
+                           <input type="password" id="edit-user-management_password-input" name="user-management_password-input" class="form-control">
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="user-management_email-input" class=" form-control-label"> Confirm Password</label>
+                           <input type="password" id="edit-user-management_con_password-input" name="user-management_con_password-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input type="submit" name="submit" class="btn btn-primary"  value="Save Details">
+                     </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      </form>
+   </div>
+
+   </div>
+   </div>
+   {%include 'footer.html'%}
+   </body>
+</html>
+<!-- end document

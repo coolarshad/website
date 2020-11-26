@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Additives View</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'costmanagement/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'costmanagement/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'costmanagement/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'costmanagement/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'costmanagement/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'costmanagement/css/style.css' %}" rel="stylesheet" media="all">
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script type="text/javascript">
+      $(document).ready(function(){
+
+         {% for i in polymers %}
+         $('#polymers').html("<tr><td>{{i.name}}</td><td>{{i.qtyInPercent}}</td><td>{{i.qtyInLiters}}</td><td>{{i.density}}</td><td>{{i.qtyInKgs}}</td></tr>");
+         {% endfor %}
+
+         {% for i in oils %}
+         $('#oils').html("<tr><td>{{i.name}}</td><td>{{i.qtyInPercent}}</td><td>{{i.qtyInLiters}}</td><td>{{i.density}}</td><td>{{i.qtyInKgs}}</td></tr>");
+         {% endfor %}
+
+         $('.ok').click(function(){
+
+            $.post("{% url 'costmanagement:getAdditives' %}",
+            {
+               'product':$('#product').text(),
+               'netBlendingQtyLiter':$('#netBlendingQtyLiter').text(),
+            },
+            function(data,status){
+
+               for (var i = 0; i < data.polymers.length; i++) {
+                  
+                  $('#polymers').html("<tr><td>"+data.polymers[i].name+"</td><td>"+data.polymers[i].qtyInPercent.toFixed(2)+"</td><td>"+data.polymers[i].qtyInLiters.toFixed(2)+"</td><td>"+data.polymers[i].density+"</td><td>"+data.polymers[i].qtyInKgs.toFixed(2)+"</td></tr>");
+               }
+
+               for (var i = 0; i < data.oils.length; i++) {
+                  
+                  $('#oils').html("<tr><td>"+data.oils[i].name+"</td><td>"+data.oils[i].qtyInPercent.toFixed(2)+"</td><td>"+data.oils[i].qtyInLiters.toFixed(2)+"</td><td>"+data.oils[i].density+"</td><td>"+data.oils[i].qtyInKgs.toFixed(2)+"</td></tr>");
+               }
+
+               for (var i = 0; i < data.costs.length; i++) {
+                  
+                  $('#costs').html("<tr><td>"+data.costs[i].crfPrice+"</td><td>"+data.costs[i].addCost.toFixed(2)+"</td><td>"+data.costs[i].costPriceInLiter.toFixed(4)+"</td><td>"+data.costs[i].density+"</td><td>"+data.costs[i].totalCost.toFixed(2)+"</td></tr>");
+               }
+                
+
+             // alert(data.polymers[0].qtyInPercent+" "+data.oils[0].qtyInKgs);
+             // alert(data.polymers.length);
+            });
+         });
+      });
+   </script>
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingtitle">
+               <div class="headingrow">
+                <button type="button" class="btn btn-primary view" value="{{additive.product}}" data-toggle="modal" data-target="#view0">
+               View
+               </button>
+            </div>
+               <div class="title">
+                  <h3>Additive Formation Details</h3>
+               </div>
+
+            </div>
+         </div>
+
+
+
+
+         <table class="table table0 table-dark table-bordered tableedit " id="myTable">
+            <thead>
+               <tr>
+                  <!-- <th scope="col">S.N</th> -->
+                  <th scope="col">Product</th>
+                  <th scope="col">Import Rate</th>
+                  <th scope="col">Add Cost</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">MT to KL</th>
+                  <th scope="col">Usage</th>
+                  <th scope="col">Net Cost</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for i in raws %}
+               <tr>
+                  <!-- <td></td> -->
+                  <td>{{i.product}}</td>
+                  <td>{{i.importRate}}</td>
+                  <td>{{i.addCost}}</td>
+                  <td>{{i.total}}</td>
+                  <td>{{i.mtToKl}}</td>
+                  <td>{{i.usage}}</td>
+                  <td>{{i.netCost|floatformat:2}}</td>
+                 
+               </tr>
+              {% endfor %}
+               
+               <tr>
+                  <td colspan="5">
+                     Totals Per KL
+                  </td>
+                  <td>{{usage|floatformat:2}}</td>
+                  <td>{{net|floatformat:2}} </td>
+               </tr>
+               <tr>
+                  <td colspan="6">Per Liter Cost</td>
+                  <td> {{per_liter|floatformat:4}}</td>
+               </tr>
+            </tbody>
+         </table>
+         <table class="table table0 table-dark table-bordered tableedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Information</h4>
+            </div>
+            <thead>
+             
+               <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Product Name</th>
+                  <th scope="col">Net Blending Quantity Liters</th>
+                  <th scope="col">Gross Vol CrossCheck</th>
+                  <th scope="col">% Cross Check</th>
+               </tr>
+             
+            </thead>
+            <tbody>
+               
+               <tr>
+                  <td>{{additive.date}}</td>
+                  <td >{{additive.product}}</td>
+                  <td>{{additive.netBlendingQtyLiter}}</td>
+                  <td>{{additive.grossVolCrosscheck}}</td>
+                  <td>{{additive.percentCrosscheck}}</td>
+               </tr>
+              
+            </tbody>
+         </table>
+         <table class="table table0 table-dark table-bordered tableedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Polymers</h4>
+            </div>
+            <thead>
+               <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity in %</th>
+                  <th scope="col">Quantity in Liters</th>
+                  <th scope="col">Density</th>
+                  <th scope="col">Quantity in Kgs</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for i in polymers %}
+               <tr>
+                   <td>{{i.name}}</td>
+                  <td >{{i.qtyInPercent}}</td>
+                  <td>{{i.qtyInLiters}}</td>
+                  <td>{{i.density}}</td>
+                  <td>{{i.qtyInKgs}}</td>
+               </tr>
+               {% endfor%}
+            </tbody>
+         </table>
+         <table class="table table0 table-dark table-bordered tableedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Base Oils</h4>
+            </div>
+            <thead>
+               <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity in %</th>
+                  <th scope="col">Quantity in Liters</th>
+                  <th scope="col">Density</th>
+                  <th scope="col">Quantity in Kgs</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for i in oils %}
+               <tr>
+                  <td>{{i.name}}</td>
+                  <td >{{i.qtyInPercent}}</td>
+                  <td>{{i.qtyInLiters}}</td>
+                  <td>{{i.density}}</td>
+                  <td>{{i.qtyInKgs}}</td>
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+         <input type="submit" class="btn btn-primary"  value="Save">
+         <button type="button" class="btn btn-danger">Delete</button>
+      </div>
+   </div>
+
+
+
+    <div class="modal fade" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Additives Details</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                         <table class="table table0 table-dark table-bordered tablenoedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Information</h4>
+            </div>
+            <thead>
+             
+               <tr>
+                 
+                  <th scope="col">Product Name</th>
+                  <th scope="col">Net Blending Quantity Liters</th>
+                  <th scope="col">Gross Vol CrossCheck</th>
+                  <th scope="col">% Cross Check</th>
+               </tr>
+             
+            </thead>
+            <tbody>
+               
+               <tr>
+               
+                  <td id="product">{{additive.product}}</td>
+                  <td contenteditable="true" id="netBlendingQtyLiter">{{additive.netBlendingQtyLiter}}</td>
+                  <td id="grossVolCrosscheck">{{additive.grossVolCrosscheck}}</td>
+                  <td id="percentCrosscheck">{{additive.percentCrosscheck}}</td>
+               </tr>
+              
+            </tbody>
+         </table>
+         <div class="saveaction">
+            <button class="btn btn-primary ok">
+               OK
+            </button>
+         </div>
+
+
+ <table class="table table0 table-striped table-dark table-bordered" id="myTable">
+    <div class="heading">
+               <h4 class="tradetitle1">Detail</h4>
+            </div>
+               <thead>
+                  <tr>
+                   
+                     
+                     <th scope="col" >CFR Price/KG in USD</th>
+                     <th scope="col" >Add Cost</th>
+                     <th scope="col" >Cost Price in Liters</th>
+                     <th scope="col" >Density at 15 Degree Celsius</th>
+                     <th scope="col" >Total Cost EX DKin Kgs</th>
+                     
+               </thead>
+               <tbody id="costs">
+                 
+                  <tr>
+                   
+                   
+                     <td id="crfPrice">{{alladditive.crfPrice}}</td>
+                     <td id="addCost">{{alladditive.addCost}}</td>
+                     <td id="costPriceInLiter">{{alladditive.costPriceInLiter}}</td>
+                     <td id="density">{{alladditive.density}}</td>
+                     <td id="totalCost">{{alladditive.totalCost}}</td>
+                    
+                  </tr>
+              
+               </tbody>
+            </table>
+
+         <table class="table table0 table-dark table-bordered tablenoedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Polymers</h4>
+            </div>
+            <thead>
+               <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity in %</th>
+                  <th scope="col">Quantity in Liters</th>
+                  <th scope="col">Density</th>
+                  <th scope="col">Quantity in Kgs</th>
+               </tr>
+            </thead>
+            <tbody id="polymers">
+               
+              
+              
+            </tbody>
+         </table>
+         <table class="table table0 table-dark table-bordered tablenoedit" id="myTable">
+            <div class="heading">
+               <h4 class="tradetitle1">Base Oils</h4>
+            </div>
+            <thead>
+               <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity in %</th>
+                  <th scope="col">Quantity in Liters</th>
+                  <th scope="col">Density</th>
+                  <th scope="col">Quantity in Kgs</th>
+               </tr>
+            </thead>
+            <tbody id="oils">
+              
+            </tbody>
+         </table>
+                     </div>
+                  </div>
+                  
+               </div>
+            </div>
+         </div>
+   {% include 'footer.html'%}
+   </div>
+   </div>
+   </body>
+</html>
+<!-- end document

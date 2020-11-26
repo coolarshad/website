@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load mathfilters %}
+<!-- <html lang="en"> -->
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <title>Dashboard</title>
+   <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+   <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+   <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+   <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+   <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+   <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+   <link href="{% static 'home/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+   <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+   <style type="text/css">
+      .exp {
+          padding: 5px;
+          font-size: 12px;
+          /* float: right; */
+          position: absolute;
+          right: 20px;
+          top: 12px;
+      }
+   </style>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script type="text/javascript">
+      $(document).ready(function(){
+
+      const brandProduct = 'rgba(0,181,233,0.8)';
+      const brandService = 'rgba(0,173,95,0.8)';
+      var label=['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+      // var elements =GetChart();
+
+       // var data1=[0,0,0,1,2,55,100,457.45,10,44,78]; //new Array(0,0,0);
+      var data2=function GetChart(){
+         alert(data1);
+         var values=new Array();
+      $.post("{% url 'home:getpiedata'%}",
+      {},
+      function(data,status)
+      {
+
+          p=Math.ceil(data.profit);
+            values.push(Math.ceil(p));
+          l=Math.ceil(data.loss);
+           values.push(Math.ceil(l));
+          log.e(values);
+           alert(values);
+      });
+       p=Math.ceil(100.2);
+            values.push(Math.ceil(p));
+          l=Math.ceil(10.12);
+           values.push(Math.ceil(l));
+          log.e(values);
+           alert(values);
+      return values;
+      };
+      var data1=data2;
+      var elements =2;
+
+      var ctx = document.getElementById("recent-rep-chart");
+      if (ctx) {
+         ctx.height = 250;
+         var myChart = new Chart(ctx, {
+         type: 'bar',
+         data: {
+         labels: label.slice(0,elements),
+         datasets: [
+            {
+           backgroundColor: brandService,
+           borderColor: 'transparent',
+           pointHoverBackgroundColor: 'transparent',
+           borderWidth: 0,
+           data: data1
+
+            }
+          ]
+         },
+         options: {
+            maintainAspectRatio: true,
+            legend: {
+            display: false
+         },
+         tooltips:{
+         enabled:true
+         },
+         responsive: true,
+         scales: {
+         xAxes: [{
+            gridLines: {
+            drawOnChartArea: true,
+            color: '#f2f2f2'
+            },
+            ticks: {
+               fontFamily: "Poppins",
+               fontSize: 12
+            }
+         }],
+         yAxes: [{
+           ticks: {
+             beginAtZero: true,
+             maxTicksLimit: 5,
+             stepSize: 50,
+             max: 150,
+             fontFamily: "Poppins",
+             fontSize: 12
+            },
+           gridLines: {
+             display: true,
+             color: '#f2f2f2'
+
+            }
+         }]
+      },
+       elements: {
+         point: {
+           radius: 0,
+           hitRadius: 10,
+           hoverRadius: 4,
+           hoverBorderWidth: 3
+            }
+         }
+
+
+      }
+      });
+      }
+
+      // $('.au-card-inner .exp').click(function(){
+      //    alert('Clicked');
+      // });
+
+
+      $('.excel').click(function(){
+         var id=this.id;
+         if (id=='comissiondue') {
+            $(this).attr('href',"{% url 'home:exportComissionDue'%}");
+         }
+         if (id=='logisticsdue') {
+            $(this).attr('href',"{% url 'home:exportLogisticDue'%}");
+         }
+         if (id=='dashinventory') {
+            $(this).attr('href',"{% url 'home:exportdashinventory'%}");
+         }
+      });
+
+      });
+
+   </script>
+</head>
+{% include 'header.html' %}
+{% if user.is_authenticated %}
+<!-- MAIN CONTENT-->
+<div class="main-content">
+<div class="section__content section__content--p30">
+<div class="container-fluid">
+   <div class="row">
+      <div class="col-md-12">
+         <div class="overview-wrap">
+            <h2 class="title-1">Overview</h2>
+         </div>
+      </div>
+   </div>
+   <div class="row m-t-25">
+      <div class="col-sm-6 col-lg-4">
+         <div class="overview-item overview-item--c1">
+            <a href="#">
+               <div class="overview__inner">
+                  <div class="overview-box clearfix">
+                     <div class="icon">
+                        <i class="zmdi zmdi-calendar-note"></i>
+                     </div>
+                     <div class="text">
+                        <h4>Pending Trades</h4>
+                        <p>{{balanceinventory}}</p>
+                     </div>
+                  </div>
+                  <div class="overview-chart">
+                     <canvas id="widgetChart1"></canvas>
+                  </div>
+               </div>
+            </a>
+         </div>
+      </div>
+      <div class="col-sm-6 col-lg-4">
+         <div class="overview-item overview-item--c2">
+            <a href="{% url 'home:tradeApproved'%}">
+               <div class="overview__inner">
+                  <div class="overview-box clearfix">
+                     <div class="icon">
+                        <i class="zmdi zmdi-calendar-check"></i>
+                     </div>
+                     <div class="text">
+                        <h4>Trade Approved</h4>
+                        <p>{{approved}}</p>
+                     </div>
+                  </div>
+                  <div class="overview-chart">
+                     <canvas id="widgetChart2"></canvas>
+                  </div>
+               </div>
+            </a>
+         </div>
+      </div>
+      <div class="col-sm-6 col-lg-4">
+         <div class="overview-item overview-item--c3">
+            <a href="{% url 'home:tradeApproval'%}">
+               <div class="overview__inner">
+                  <div class="overview-box clearfix">
+                     <div class="icon">
+                        <i class="zmdi zmdi-calendar-close"></i>
+                     </div>
+                     <div class="text">
+                        <h4>Trade Unapproved</h4>
+                        <p>{{unapproved}}</p>
+                     </div>
+                  </div>
+                  <div class="overview-chart">
+                     <canvas id="widgetChart3"></canvas>
+                  </div>
+               </div>
+            </a>
+         </div>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-lg-6">
+         <div class="au-card recent-report">
+            <h4>Payment And Finance</h4>
+            <a href="{% url 'home:getpayablemore'%}">
+               <div class="box-info1 boxdetail">
+                  <table class="table table-fixed">
+                     <thead>
+                        <tr>
+                           <th class="col-md-4">
+                              Party
+                           </th>
+                           <th class="col-md-4">
+                              Due Date
+                           </th>
+                           <th class="col-md-4">Amount</th>
+                           <!--    <th>
+                              Purchase Quantity Approved
+                              </th> -->
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {% for i in payf %}
+                        {% if i.balanceDue != 0.0 %}
+                        <tr>
+                           <td  class="col-md-4">{{i.trn.client}}</td>
+                           <td  class="col-md-4">{{i.dueDate}}</td>
+                           <td  class="col-md-4">{{i.balanceDue|floatformat:2}}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </a>
+         </div>
+      </div>
+      <div class="col-lg-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Prepayment/LC</h4>
+               <a href="{% url 'home:getreceivablemore'%}">
+                  <div class="box-info1 boxdetail">
+                     <table class="table table-fixed">
+                        <thead>
+
+                           <tr>
+                              <th  class="col-md-4">
+                                 TRN
+                              </th>
+                              <th class="col-md-4">
+                                 Due Date
+                              </th>
+                              <th class="col-md-4">Amount</th>
+                              <!-- <th>Adv. Incoming</th> -->
+                              <!-- <th>Adv. Outgoing</th> -->
+                              <!--    <th>
+                                 Purchase Quantity Approved
+                                 </th> -->
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for i in prepay %}
+                           {% if i.advance|sub:i.advanceFromBuyers != 0.0 and i.advance|sub:i.advanceToSellers != 0.0 %}
+                           <tr>
+                              <td  class="col-md-4">{{i.trn.trn}}</td>
+                              <td  class="col-md-4">{{i.dueDate}}</td>
+
+                              {% if i.trn.types == 'Sales' %}
+
+                     <td  class="col-md-4">{{i.advance|sub:i.advanceFromBuyers|floatformat:2}}</td>
+
+                     {% else %}
+
+                     <td  class="col-md-4">{{i.advance|sub:i.advanceToSellers|floatformat:2}}</td>
+                     {% endif %}
+                     {% endif %}
+                              <!-- <td>223</td> -->
+                              <!-- <td>213</td> -->
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </a>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col col-md-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Sales Quantity Approved</h4>
+               <a>
+                  <div class="box-info1 boxdetail">
+                     <table class="table table-fixed">
+                        <thead>
+                           <tr>
+                              <th class="col-md-3">Product Code</th>
+                              <th class="col-md-3">Product</th>
+                              <th class="col-md-3">Qnty</th>
+                              <th class="col-md-3">Value</th>
+                              <!--    <th>
+                                 Purchase Quantity Approved
+                                 </th> -->
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for i in salesproduct %}
+                           <tr>
+                              <td class="col-md-3">{{i.product}}</td>
+                              <td class="col-md-3">{{i.baseproduct}}</td>
+                              <td class="col-md-3">{{i.tuq|floatformat:2}}</td>
+                              <td class="col-md-3">{{i.tuq|mul:i.ratePMT|floatformat:2}}</td>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </a>
+            </div>
+         </div>
+      </div>
+      <div class="col col-md-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Purchase Quantity Approved</h4>
+               <a>
+                  <div class="box-info1 boxdetail">
+                     <table class="table table-fixed">
+                        <thead>
+                           <tr>
+                              <th class="col-md-3">
+                                 Product Code
+                              </th>
+                              <th class="col-md-3">Product</th>
+                              <th class="col-md-3">Qty</th>
+                              <th class="col-md-3">Value</th>
+                              <!--    <th>
+                                 Purchase Quantity Approved
+                                 </th> -->
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for i in purchaseproduct %}
+                           <tr>
+                              <td class="col-md-3">{{i.product}}</td>
+                              <td class="col-md-3">{{i.baseproduct}}</td>
+                              <td class="col-md-3">{{i.tuq|floatformat:2}}</td>
+                              <td class="col-md-3">{{i.tuq|mul:i.ratePMT|floatformat:2}}</td>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </a>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="row">
+      <!--            <div class="headingindex">
+         <h4>Sales And Purchase</h4>
+         </div> -->
+      <div class="col col-md-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Sales</h4>
+               <a href="{% url 'home:qtyapproveddetailsales'%}">
+                  <div class="box-info1 boxdetail">
+                     <table class="table table-fixed">
+                        <thead>
+                           <tr>
+                              <th class="col-md-4">
+                                 Product
+                              </th>
+                              <th class="col-md-4">
+                                 Quantity
+                              </th>
+                              <th class="col-md-4">Rate</th>
+                              <!--    <th>
+                                 Purchase Quantity Approved
+                                 </th> -->
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for i in sales %}
+                           {%if i.trn.types == 'Sales' %}
+                           <tr>
+                              <td class="col-md-4">{{i.trn.baseproduct}}</td>
+                              <td class="col-md-4">{{i.billQty|floatformat:2}}</td>
+                              <td class="col-md-4">{{i.trn.ratePMT|floatformat:2}}</td>
+                           </tr>
+                           {%endif%}
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </a>
+            </div>
+         </div>
+      </div>
+      <div class="col col-md-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Purchase</h4>
+               <a href="{% url 'home:qtyapproveddetailpurchase'%}">
+                  <div class=" box-info1 boxdetail">
+                     <table class="table table-fixed">
+                        <thead>
+                           <tr>
+                              <th class="col-md-4">
+                                 Product
+                              </th>
+                              <th class="col-md-4">
+                                 Quantity
+                              </th>
+                              <th class="col-md-4">Rate</th>
+                              <!--    <th>
+                                 Purchase Quantity Approved
+                                 </th> -->
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for i in sales %}
+                           {%if i.trn.types == 'Purchase' %}
+                           <tr>
+                              <td class="col-md-4">{{i.trn.baseproduct}}</td>
+                              <td class="col-md-4">{{i.billQty|floatformat:2}}</td>
+                              <td class="col-md-4">{{i.trn.ratePMT|floatformat:2}}</td>
+                           </tr>
+                           {%endif%}
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </a>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="row">
+	{% if user.authority == 'Manager 2' or user.authority == 'Accounts' %}
+      <div class="col col-md-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Profit and Loss</h4>
+               <a>
+                  <div class="box-info1 boxdetail">
+                     <table class="table table-fixed">
+                        <thead>
+                           <tr>
+                              <th class="col-md-3">
+                                 Product
+                              </th>
+                              <th class="col-md-3">
+                                 Quantity
+                              </th>
+                              <th class="col-md-3">P&L Total</th>
+                              <th class="col-md-3">P&L/ Unit</th>
+                              <!--    <th>
+                                 Purchase Quantity Approved
+                                 </th> -->
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% if user.authority == 'Manager 2'%}
+                           {% for i in pl %}
+                           <tr>
+                              <td class="col-md-3">{{i.trn.baseproduct}}</td>
+                              <td class="col-md-3">{{i.trn.tuq|floatformat:2}}</td>
+                              <td class="col-md-3">{{i.grossProfit|floatformat:2}}</td>
+                              <td class="col-md-3">{{i.profitPerDrum|floatformat:2}}</td>
+                           </tr>
+                           {% endfor %}
+                           {% endif %}
+                        </tbody>
+                     </table>
+                  </div>
+               </a>
+            </div>
+         </div>
+      </div>
+{% endif %}
+      <div class="col col-md-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Inventory</h4>
+               <a><a class="excel" id="dashinventory"><button class="exp">Export to Excel</button></a>
+                  <div class="box-info1 boxdetail">
+                     <table class="table table-fixed">
+                        <thead>
+                           <tr>
+                              <th class="col-md-6">
+                                 Product
+                              </th>
+                              <th class="col-md-6">
+                                 Quantity
+                              </th>
+                             <!-- <th class="col-md-3">Rate</th> -->
+                             <!-- <th class="col-md-3">Value</th> -->
+                             
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for i,j in inventory_product %}
+                           <tr>
+                              <td class="col-md-6">{{i}}</td>
+                              <td class="col-md-6">{{j|floatformat:4}}</td>
+                         <!--      <td class="col-md-3"></td>
+                              <td class="col-md-3"></td> -->
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               <!-- </a> -->
+            </div>
+         </div>
+      </div>
+   </div>
+     <div class="row">
+      <div class="col col-md-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Logistics Due</h4>
+               <a class="excel" id="logisticsdue"><button class="exp">Export to Excel</button></a>
+                  <div class="box-info1 boxdetail">
+                      <table class="table table-fixed">
+                        <thead>
+                           <tr>
+                              <th class="col-md-3">
+                                 TRN
+                              </th>
+                              <th class="col-md-3">
+                                 Agent
+                              </th>
+                              <th class="col-md-3">
+                                 Due Date
+                              </th>
+                              <th class="col-md-3">Due Amount</th>
+                             
+                              <!--    <th>
+                                 Purchase Quantity Approved
+                                 </th> --> 
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for i in payf %}
+                           {% if i.logisticsPaymentDue > 0.0 %}
+                           <tr>
+                              <td class="col-md-3">{{i.trn.trn}}</td>
+                               <td class="col-md-3">{{i.trn.logisticProvider}}</td>
+                              <td class="col-md-3">{{i.logisticsCommissionDueDate}}</td>
+                              <td class="col-md-3">{{i.logisticsPaymentDue}}</td>
+                              {% endif %}
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+              
+            </div>
+         </div>
+      </div>
+      <div class="col col-md-6">
+         <div class="au-card recent-report">
+            <div class="au-card-inner">
+               <h4>Comission Due</h4>
+               <a class="excel" id="comissiondue"><button class="exp">Export to Excel</button></a>
+                  <div class="box-info1 boxdetail">
+                     <table class="table table-fixed">
+                        <thead>
+                           <tr>
+                              <th class="col-md-3">
+                                 TRN
+                              </th>
+                              <th class="col-md-3">
+                                 Agent
+                              </th>
+                              <th class="col-md-3">
+                                 Due Date
+                              </th>
+                              <th class="col-md-3">Due Amount</th>
+                             
+                              <!--    <th>
+                                 Purchase Quantity Approved
+                                 </th> -->
+                           </tr>
+                        </thead>
+                        <tbody>
+                              {% for i in payf %}
+                           {% if i.agentCommissionPaid > 0.0 %}
+                           <tr>
+                              <td class="col-md-3">{{i.trn.trn}}</td>
+                              <td class="col-md-3">{{i.trn.commissionAgent}}</td>
+                              <td class="col-md-3">{{i.agentCommissionDueDate}}</td>
+                              <td class="col-md-3">{{i.agentCommissionPaid}}</td>
+                              {% endif %}
+                           </tr>
+                           {% endfor %}
+
+                        </tbody>
+                     </table>
+                  </div>
+               
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="extras">
+      <h4>Extras</h4>
+      <div class="au-card recent-report">
+         <div class="au-card-inner">
+            <a>
+               <div class="box-info1 boxdetail">
+                  <table class="table table-fixed">
+                     <thead>
+                        <tr>
+                           <th class="col-md-6">
+                              Product Name
+                           </th>
+                           <th class="col-md-6">
+                              Extra Cost
+                           </th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {% for i in extras %}
+                        <tr>
+                           <td class="col-md-6">{{i.trn.baseproduct}}</td>
+                           <td class="col-md-6">{{i.bankCharges|add:i.billFee|add:i.billCollectionCharges|add:i.otherCharges|floatformat:2}}</td>
+                        </tr>
+                        {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </a>
+         </div>
+      </div>
+   </div>
+   <!-- END MAIN CONTENT-->
+   <!-- END PAGE CONTAINER-->
+   <!--  </div>
+      </div>
+      </body> -->
+  </div>
+</div>
+</div>
+   {% endif %}
+   {% include 'footer.html' %}
+
+<!-- </html>
+   --><!-- end document

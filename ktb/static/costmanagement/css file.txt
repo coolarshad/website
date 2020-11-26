@@ -1,0 +1,64 @@
+.box{height: 100%;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+   
+}
+.row.form-group:nth-child(odd) .box {
+    background: #676767;
+}
+.row.form-group:nth-child(even) .box {
+    background: #3a3838;
+}
+.box h4{
+    color: #fff;
+}
+.additives {
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+table.more.table-bordered td{
+border-left: 0;
+    border-bottom: 0;
+}
+table.more tbody{
+width: 50%;
+    float: left;
+}
+table.more thead{
+width: 50%;
+    float: left;
+}
+
+table.more thead tr {
+    width: 100%;
+    display: inline-block;
+    float: left;
+}
+table.more tbody tr {
+    width: 100%;
+    float: right;
+}
+table.more thead th,table.more tbody td{
+    display: block;
+}
+
+table.more thead th {
+border-bottom:  none!important;
+}
+
+table.more.table-striped tbody tr:nth-of-type(odd),table.more1.table-striped tbody tr:nth-of-type(odd) {
+    background-color: transparent;
+}
+.tradetitle1{
+    margin-bottom: 15px;
+    text-align: center;
+}
+input+.row.form-group {
+    margin-top: 15px;
+}
+
+table.tableedit{
+    white-space: nowrap;
+}

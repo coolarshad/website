@@ -1,0 +1,87 @@
+body.login{
+background-image: url('../images/image1.jpg');
+background-size: cover;
+background-repeat: no-repeat;
+height: 100%;
+font-family: 'Numans', sans-serif;
+}
+html{
+    height: 100%;
+}
+.card{
+height: 425px;
+margin: 0 auto;
+width: 400px;
+background-color: rgba(0,0,0,0.5) !important;
+}
+.card .logo{
+    text-align: center;
+}
+.container{
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.card-header h4{
+color: white;
+}
+.card-header i{
+    padding-left: 11px;
+}
+
+
+.input-group-prepend span{
+width: 50px;
+background-color: #D02B3C;
+color: #fff;
+border:0 !important;
+}
+
+input:focus{
+outline: 0 0 0 0  !important;
+box-shadow: 0 0 0 0 !important;
+
+}
+
+.remember{
+color: white;
+}
+
+.remember input
+{
+width: 20px;
+height: 20px;
+margin-left: 15px;
+margin-right: 5px;
+}
+
+.login_btn{
+color: #fff;
+/*background-color: #D02B3C;*/
+background: linear-gradient(to left, #D02B3C 0%,#960305 99%);
+width: 100px;
+
+}
+
+.login_btn:hover{
+color: #fff;
+background: linear-gradient(to left,  #960305 0%,#D02B3C 99%);
+
+}
+
+.passwordlink a{
+color: white;
+
+}
+.passwordlink {
+    text-align: center;
+}
+.card-header{
+        text-align: center;
+}
+.passwordlink span {
+    color: #fff;
+    padding: 9px;
+}

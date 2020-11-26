@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+{%load staticfiles%}
+{% load custom_tags %}
+{% temp as i %}
+{% load mathfilters %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Pre-Payments/LC's</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0-RC1/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript">
+          $(document).ready(function(){
+
+            $("#dropdown").change(function(){
+                    var id=this.value;
+
+                    $.post("{% url 'home:getprepayment'%}",
+                    {
+                        'type':id,
+                    },
+                    function(data,status){
+
+                       $('#rowid').empty();
+                       for (var i = 0; i < data.data.length; i++) {
+                       var amt=null;
+                       if(data.trn[i].types=='Sales'){amt=data.data[i].advanceFromBuyers;}
+                        if(data.trn[i].types=='Purchase'){amt=data.data[i].advanceToSellers;}
+
+                        $("#rowid").append("<tr><th>"+data.trn[i].sn+"</th><td>"+data.trn[i].types+"</td><td>"+data.trn[i].company+"</td><td>"+data.trn[i].trn+"</td><td>"+data.data[i].dueDate+"</td><td>"+data.data[i].advance.toFixed(2)+"</td><td>"+amt.toFixed(2)+"</td><td>"+data.trn[i].client+"</td><td>"+data.data[i].receivedDate+"</td><td>"+data.data[i].paidDate+"</td><td>"+data.data[i].remarks+"</td><td><button type='button' class='btn btn-primary view' id="+data.trn[i].trn+" value="+data.trn[i].trn+" data-toggle='modal' data-target='#view0'>View</button> {% if user.authority != 'Viewer' and user.authority != 'Accounts' %}<button type='button' class='btn btn-primary editbtn0' id="+data.trn[i].trn+" value="+data.trn[i].trn+" data-toggle='modal' data-target='#edit0'>Edit</button>{% endif %}{% if user.authority == 'Manager 2'%}<button type='button' class='btn btn-danger delete' value="+data.trn[i].trn+">Delete</button>{% endif %}</td></tr>");                         
+                          //alert(data.data[i].trn);
+                       }
+                    });
+                });
+
+$(".table-search-pre").on("keyup", function() {
+  var value = $(this).val().toLowerCase(),
+    tableattr = $(this).attr("data-table-search"),
+    tablesearch = $('#' + tableattr).find('tbody tr');
+
+  tablesearch.hide();                           //start with all rows hidden
+                  //initiate our stored rowspan with the default of 1
+
+  tablesearch.each(function() {
+    var $row = $(this);
+    var $firstCell = $row.find("td:nth-child(1)");
+    var id = $firstCell.text().toLowerCase();
+    if (id.indexOf(value) > -1) {               //if the text is found
+      $row.show();         //show this row, and the next (n-1) rows as well
+    }
+
+  });
+
+});
+
+ $("#duedate-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+// d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+d= d.getFullYear() + '-' + (d.getMonth() + 1)+ '-'+ (d.getDate() );
+
+  $('#duedate').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#paymentdate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+  var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#paymentdate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#lc_expirydate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#lc_expirydate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#lc_shipmentdate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#lc_shipmentdate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+
+
+ $("#edit-duedate-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d= d.getFullYear() + '-' + (d.getMonth() + 1)+ '-'+ (d.getDate() );
+
+
+  $('#edit-duedate').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#edit-paymentdate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#edit-paymentdate-input').val(d);
+    // console.log(e.date);
+    // alert('hi');
+});
+
+ $("#edit-lc_expirydate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#edit-lc_expirydate-input').val(d);
+
+});
+
+ $("#edit-lc_shipmentdate-input-date").datepicker({
+
+}).on("changeDate", function (e) {
+   var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+  $('#edit-lc_shipmentdate-input').val(d);
+
+});
+
+          $(document).on('click','.editbtn0',function(){
+            var trn=this.value;
+            $.post("{% url 'home:alterPrePayments' %}",
+            {
+                'trn':trn
+            },
+
+            function(data,status){
+              $('#edit-paymentterm-input').val(data.incoterm);
+              $('#edit-tradetype-input').val(data.types);
+              $('#edit-number-input').val(data.sn);
+              $('#edit-company-input').val(data.company);
+              $('#edit-traderefdate-input').val(data.trd);
+              $('#edit-traderefno-input').val(data.trn);
+              $('#edit-types-input').val(data.types);
+              $('#edit-duedate').val(data.dueDate);
+              $('#edit-advance-input').val(data.advance);
+              $('#edit-inlcnum-input').val(data.lcNumberValue);
+              $('#edit-lcissuingval-input').val(data.lcIssuingBank);
+              $('#edit-advancepayment-input').val(data.advancePay);
+              $('#edit-paymentdate-input').val(data.Date);
+              $('#edit-lc_expirydate-input').val(data.lcExpiryDate);
+              $('#edit-lc_shipmentdate-input').val(data.nextShipmentDate);
+              $('#edit-lc_remarks-input').val(data.remarks);
+              $('#edit-prepaymentparty').val(data.client);
+              if(data.types=='Sales'){
+                $('#edit-advanceAmt').text('Advance Received From Buyers');
+                $('#edit-inout').text('Incoming');
+              }
+              else{
+                $('#edit-advanceAmt').text('Advance Paid To Supplier');
+                $('#edit-inout').text('Outgoing');
+              }
+
+             });
+            });
+
+              $('.delete').click(function(){
+                    var trn=this.value;
+                    $.post("{% url 'home:delPrepayment' %}",
+                        {
+                            'trn':trn
+                        },
+                        function(data,status){
+                            // alert(data.result);
+                        });
+                });
+
+               $(document).on('click','.view',function(){
+                  var trn=this.value;
+
+                  $.post("{% url 'home:alterPrePayments' %}",
+                  {
+                     'trn':trn
+                  },
+
+              function(data,status){
+
+               $('#sn').text(data.sn);
+               $('#company').text(data.company);
+               $('#trd').text(data.trd);
+               $('#trn').text(data.trn);
+               $('#types').text(data.types);
+              $('#dueDate').text(data.dueDate);
+              $('#advance').text(data.advance);
+              $('#lcNumberValue').text(data.lcNumberValue);
+              $('#lcIssuingBank').text(data.lcIssuingBank);
+              if(data.types=='Sales'||data.types=='Sales Amendment'){
+                $('#advancepayment-buyer').text(data.advancePay);
+                $('#advancepayment-seller').text(0);
+              }
+              if(data.types=='Purchase'||data.types=='Purchase Amendment'){
+                $('#advancepayment-buyer').text(0);
+                $('#advancepayment-seller').text(data.advancePay);
+              }
+
+              $('#paymentDate').text(data.Date);
+               $('#lcExpiryDate').text(data.lcExpiryDate);
+              $('#nextShipmentDate').text(data.nextShipmentDate);
+              $('#viewremarks').text(data.remarks);
+             });
+            });
+
+            $('#tradetype-input').change(function(){
+               if(this.value=='Purchase'){
+
+                  $('#advanceAmt').text('Advance Paid To Supplier');
+                  $('#date').text('Paid Date');
+                  $('#inout').text('Outgoing');
+
+               }
+                if(this.value=='Sales'){
+
+                  $('#advanceAmt').text('Advance Received From Buyers');
+                  $('#date').text('Received Date');
+                  $('#inout').text('Incoming');
+
+               }
+            });
+            $('#pre_trn-input').change(function(){
+               var trn=this.value;
+               $.post("{% url 'home:prepaymentsHelper' %}",
+                {
+                  'trn':trn,
+                },
+                function(data,status){
+                 $('#tradetype-input').val(data.types);
+                 $('#paymentterm-input').val(data.paymentTerm);
+                 $('#prepaymentparty').val(data.client);
+
+                  var payment_term=data.paymentTerm;
+                  if(payment_term=="100% against OBL Copy Documents"){
+                    $('#duedate').val('NA');
+                    $('#advance-input').val(0.0);
+                    $('#inlcnum-input').val('NA');
+                    $('#lcissuingval-input').val('NA');
+                    $('#advancepayment-input').val(0.0);
+                    $('#paymentdate-input').val('NA');
+                    $('#lc_expirydate-input').val('NA');
+                  }
+                  if(payment_term=="10% advance & 90% against OBL Copy Documents" || payment_term=="10% ADVANCE & 90% AGAINST LOADING DOCUMENT"){
+                     $('#duedate').val(data.duedate);
+
+                     var advance=data.total*(10/100);
+                    $('#advance-input').val(advance);
+                  }
+                  if(payment_term=="20% advance & 80% against OBL Copy Documents" || payment_term=="20% ADVANCE & 80% AGAINST LOADING DOCUMENT"){
+                     $('#duedate').val(data.duedate);
+                    var advance=data.total*(20/100);
+                    // alert(data.total);
+                    $('#advance-input').val(advance);
+                  }
+                  if(payment_term=="30% advance & 70% against OBL Copy Documents" || payment_term=="30% ADVANCE & 70% AGAINST LOADING DOCUMENT"){
+                     $('#duedate').val(data.duedate);
+                    var advance=data.total*(30/100);
+                    $('#advance-input').val(advance);
+                  }
+                   if(payment_term=="60% advance & 40% against OBL Copy Documents"){
+                     $('#duedate').val(data.duedate);
+                    var advance=data.total*(60/100);
+                    $('#advance-input').val(advance);
+                  }
+                  if(payment_term=="100% advance against PI"){
+                     $('#duedate').val(data.duedate);
+                    var advance=data.total;
+                    $('#advance-input').val(advance);
+                  }
+
+                  if(payment_term=="100% against Delivery"){
+
+                    $('#duedate').val('NA');
+                    $('#advance-input').val(0.0);
+                    $('#inlcnum-input').val('NA');
+                    $('#lcissuingval-input').val('NA');
+                    $('#advancepayment-input').val(0.0);
+                    $('#paymentdate-input').val('NA');
+                    $('#lc_expirydate-input').val('NA');
+                  }
+
+
+                  if(payment_term=="Sight DLC"){
+                     $('#duedate').val(data.duedate);
+                    // var advance=data.total*(30/100);
+                    var advance=data.total*(100/100);
+                    $('#advance-input').val(advance);
+                    // $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="Usance 30 days DLC" || payment_term=="LC 30 DAYS FROM BL DATE" || payment_term=="30 DAYS DAP"){
+                    // alert('Usance');
+                     $('#duedate').val(data.duedate);
+                     var advance=data.total*(100/100);
+                    $('#advance-input').val(advance);
+                    // $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="Usance 45 days DLC" || payment_term=="LC 45 DAYS FROM BL DATE"){
+                    // alert('Usance');
+                     $('#duedate').val(data.duedate);
+                     var advance=data.total*(100/100);
+                    $('#advance-input').val(advance);
+                    // $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="Usance 60 days DLC" || payment_term=="LC 60 DAYS FROM BL DATE" || payment_term=="60 DAYS DAP"){
+                     $('#duedate').val(data.duedate);
+                     var advance=data.total*(100/100);
+                    $('#advance-input').val(advance);
+                    // $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="Usance 90 days DLC" || payment_term=="LC 90 DAYS FROM BL DATE" || payment_term=="90 DAYS DAP"){
+                     $('#duedate').val(data.duedate);
+                     var advance=data.total*(100/100);
+                    $('#advance-input').val(advance);
+                    // $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="DAP 100%"){
+                    $('#duedate').val('NA');
+                    $('#advance-input').val(0.0);
+                    $('#inlcnum-input').val('NA');
+                    $('#lcissuingval-input').val('NA');
+                    $('#advancepayment-input').val(0.0);
+                    $('#paymentdate-input').val('NA');
+                    $('#lc_expirydate-input').val('NA');
+                  }
+                  if(payment_term=="20% advance & 80% DAP"){
+                     $('#duedate').val(data.duedate);
+                    var advance=data.total*(20/100);
+                    $('#advance-input').val(advance);
+                  }
+                  if(payment_term=="7 days after OBL date upon clean documents"){
+                    // alert(data.)
+                     $('#duedate').val('NA');
+                    $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="10 days after OBL date upon clean documents"){
+                    // alert(data.)
+                     $('#duedate').val('NA');
+                    $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="15 days after OBL date upon clean documents"){
+                    // alert(data.)
+                     $('#duedate').val('NA');
+                    $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="30 days after OBL date upon clean documents"){
+                     $('#duedate').val('NA');
+                    $('#advance-input').val(0.0);
+                  }
+                  if(payment_term=="60 days after OBL date upon clean documents"){
+                     $('#duedate').val('NA');
+                    $('#advance-input').val(0.0);
+                  }
+                });
+            });
+
+             $('.excel').click(function(){
+                        $(this).attr('href',"{% url 'home:exportPrepayment'%}");
+                     });
+          });
+
+      function Validate(){
+          if($('#tradetype-input').val()!="Sales" && $('#tradetype-input').val()!="Purchase" && $('#tradetype-input').val()!="Purchase Amendment" && $('#tradetype-input').val()!="Sales Amendment"){
+               // alert($('#tradetype-input').val());
+             $('#tradetype-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+              });
+            return false;
+              }
+              else if($('#duedate').val()==''){
+              $('#duedate').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#advance-input').val()==''){
+             $('#advance-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#inlcnum-input').val()==''){
+             $('#inlcnum-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#lcissuingval-input').val()==''){
+             $('#lcissuingval-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#advancereceived-input').val()==''){
+             $('#advancereceived-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#receiveddate-input').val()==''){
+             $('#receiveddate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+               else if($('#lc_expirydate-input').val()==''){
+             $('#lc_expirydate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#lc_shipmentdate-input').val()==''){
+             $('#lc_shipmentdate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#lc_remarks-input').val()==''){
+             $('#lc_remarks-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else{
+               return true;
+             }
+      }
+
+      function ValidateEdit(){
+          if($('#edit-tradetype-input').val()!="Sales" && $('#edit-tradetype-input').val()!="Purchase"){
+               // alert($('#tradetype-input').val());
+               $('#edit-tradetype-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+            }
+            else if($('#edit-duedate').val()==''){
+             $('#edit-duedate').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#edit-advance-input').val()==''){
+             $('#edit-advance-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#edit-inlcnum-input').val()==''){
+             $('#edit-inlcnum-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#edit-lcissuingval-input').val()==''){
+             $('#edit-lcissuingval-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#edit-advancereceived-input').val()==''){
+             $('#edit-advancereceived-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+              else if($('#edit-receiveddate-input').val()==''){
+             $('#edit-receiveddate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+               else if($('#edit-lc_expirydate-input').val()==''){
+             $('#edit-lc_expirydate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#edit-lc_shipmentdate-input').val()==''){
+             $('#edit-lc_shipmentdate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#edit-lc_remarks-input').val()==''){
+             $('#edit-lc_remarks-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else{
+               return true;
+             }
+      }
+       </script>
+
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+           <div class="headingtitle">
+               <div class="title">
+                  <h3>Pre-Payments/ LC's Details</h3>
+               </div>
+            <input type="text" placeholder="Filter Using TRN" class='table-search' id="table-search" data-table-search="myTable">
+                  <select class="form-control" id="dropdown">
+                    <option value="" id="" selected disabled >By Trade</option>
+                      <option value="salestrade" id="salestrade">By Sales Trade</option>
+                      <option value="purchasetrade" id="purchasetrade">By Purchase Trade</option>
+                      <option value="cancelsales" id="cancelsales">By Cancel Sales </option>
+                      <option value="cancelpurchase" id="cancelpurchase">By Cancel Purchase</option>
+                      <option value="salesamendment" id="salesamendment">By Sales Amendment</option>
+                      <option value="purchaseamendment" id="purchaseamendment">By Purchase Amendment</option>
+                  </select>
+                  </input>
+            </div>
+
+            <div class="headingrow">
+              {% if user.authority != 'Viewer' and user.authority != 'Accounts' %}
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New Entry
+               </button>
+               {% else %}
+               <button type="button" disabled class="btn btn-primary">
+               New Entry
+               </button>
+               {% endif %}
+            </div>
+
+          </div>
+            <!-- Modal -->
+            <div class="modal fade" id="entry0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">Pre-Payments/ LC's Data Entry</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <form action="{% url 'home:savepre' %}" method="post" class="form-horizontal">
+                        {% csrf_token %}
+
+
+
+                        <div class="modal-body">
+                           <div class="card-body card-block">
+
+                              <div class="numbertraderef">
+                           <label for="traderefno">Trade Reference Number</label>
+                           <select class="form-control" name="pre_trn-input" id="pre_trn-input">
+                            <option value="">Select TRN</option>
+                              {%for trn in trns %}
+                              {% if trn.types != 'Cancel Sales' and trn.types != 'Cancel Purchase' and trn.trade_status == 'Approved'%}
+
+                              <option value="{{trn.trn}}">{{trn.trn}}</option>
+                              {% endif %}
+                              {% endfor %}
+
+                           </select>
+                        </div>
+                              <div class="tradeselect">
+                         <div class="col-md-12">
+                         <div class="form-group">
+                          <label for="paymentterm" class=" form-control-label">Payment Term</label>
+                             <input type="text" id="paymentterm-input" name="paymentterm-input" value="Payment Term" class="form-control">
+                           </div>
+
+                                <div class="form-group">
+                             <input type="text" id="tradetype-input" name="tradetype-input" value="Sales" class="form-control">
+                           </div>
+
+
+                   </div>
+
+                       <div class="row form-group">
+                              <div class="col-md-6">
+                                <input type="text" class="form-control" id="prepaymentparty" placeholder="Buyer/ Seller Name" name="prepaymentparty">
+                                   <!-- <select class="form-control" id="prepaymentparty">
+                                    <option value="name1" selected disabled>Buyer/Seller Name</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                   </select> -->
+                                 </div>
+                </div>
+   </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="duedate" class=" form-control-label">Due Date</label>
+                                    <!-- <input type="text" value="" class="form-control date" name="duedate" id="duedate" placeholder="Choose the date"/> -->
+                                     <div class="datefield">
+                                    <input type="text" class="form-control" id="duedate" name="duedate">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="duedate-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="advance-input" class=" form-control-label">As Per PI Cash/TT/Advance</label>
+                                    <input type="text" id="advance-input" name="advance-input" class="validatenum form-control ">
+
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="inlcnum-input" class=" form-control-label">Incoming/Outgoing LC Number/Value</label>
+                                    <input type="text" id="inlcnum-input" name="inlcnum-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="lcissuingval-input" class=" form-control-label">LC Issuing/Advising Bank/Value</label>
+                                    <input type="text" id="lcissuingval-input" name="lcissuingval-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="advancereceived-input" class=" form-control-label"><span id="advanceAmt">Advance Paid/Received</span></label>
+                                    <input type="text" id="advancepayment-input" name="advancepayment-input" class="validatenum form-control">
+
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="receiveddate-input" class=" form-control-label"><span id="date">Received Date</span></label>
+                                    <!-- <input type="text" value="" name="paymentdate-input" id="paymentdate-input" class="form-control date" placeholder="Choose the date"/> -->
+                                        <div class="datefield">
+                                    <input type="text" class="form-control" id="paymentdate-input" name="paymentdate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="paymentdate-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="lc_expirydate-input" class=" form-control-label">LC Expiry Date</label>
+                                    <!-- <input type="text" value="" name="lc_expirydate-input" id="lc_expirydate-input" class="form-control date" placeholder="Choose the date"/> -->
+                                         <div class="datefield">
+                                    <input type="text" class="form-control" id="lc_expirydate-input" name="lc_expirydate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="lc_expirydate-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+
+                                   <div class="col col-md-4">
+                                    <label for="lc_shipmentdate-input" class=" form-control-label">Latest Shipment Date</label>
+                                    <!-- <input type="text" value="" name="lc_expirydate-input" id="lc_expirydate-input" class="form-control date" placeholder="Choose the date"/> -->
+                                         <div class="datefield">
+                                    <input type="text" class="form-control" id="lc_shipmentdate-input" name="lc_shipmentdate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="lc_shipmentdate-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                  </div>
+                              <div class="row form-group">
+                                <div class="col-md-12">
+                                  <label for="lc_remarks-input" class=" form-control-label">Remarks</label>
+                                  <input type="text" class="form-control" id="lc_remarks-input" name="lc_remarks-input">
+                                </div>
+
+                              </div>
+                              <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <input type="submit" onclick="return Validate()" class="btn btn-primary"  value="Save Details">
+                           </div>
+
+                        </div>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+            </div>
+
+<!-- view -->
+
+ <div class="modal fade" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title title" id="exampleModalLabel">Pre-Payments/LC's Report Detail</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+   <div class="modal-body">
+        <div class="card-body card-block">
+
+
+<div class="displaydata">
+                                                <table class="table tableview table-bordered">
+                                                  <div class="description companytitle">
+
+                              <ul>
+                                 <li>S.N :<span id="sn"></span></li>
+                                 <li>Company :<span id="company"></span></li>
+                                 <li>Trade Ref. Date :<span id="trd"></span></li>
+                                 <li>Trade Ref. No :<span id="trn"></span></li>
+                              </ul>
+                           </div>
+
+  <tbody>
+     <tr>
+      <th scope="col">Due Date</th>
+ <td id="dueDate"></td>
+    </tr>
+    <tr>
+           <th scope="col">As per PI Cash/TT/Advance </th>
+ <td id="advance"></td>
+
+    </tr>
+    <tr>
+           <th scope="col">Incoming/Outgoing LC Number/ Value</th>
+ <td id="lcNumberValue"></td>
+
+    </tr>
+    <tr>
+          <th scope="col">LC Issuing/Advising Bank/ Value</th>
+ <td id="lcIssuingBank"></td>
+
+    </tr>
+        <tr>
+          <th scope="col">Advance Received From Buyers</th>
+ <td id="advancepayment-buyer"></td>
+
+    </tr>
+        <tr>
+          <th scope="col">Advance Paid to Sellers</th>
+ <td id="advancepayment-seller"></td>
+
+    </tr>
+        <tr>
+          <th scope="col">Paid/Received Date</th>
+ <td id="paymentDate"></td>
+
+    </tr>
+        <tr>
+          <th scope="col">LC Expiry Date</th>
+ <td id="lcExpiryDate"></td>
+
+    </tr>
+
+  <tr>
+          <th scope="col">Latest Date For Shipment</th>
+ <td id="nextShipmentDate"></td>
+
+    </tr>
+         <tr>
+          <th scope="col">Remarks</th>
+ <td id="viewremarks"></td>
+
+    </tr>
+  </tbody>
+</table>
+
+      </div>
+  </div>
+</div>
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- edit -->
+<div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">Pre-Payments/ LC's Data Entry</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <form action="{% url 'home:editPrePayments' %}" method="post" class="form-horizontal">
+                        {% csrf_token %}
+
+
+                        <div class="modal-body">
+                           <div class="card-body card-block">
+
+                              <div class="numbertraderef">
+                           <label for="traderefno">Trade Reference Number</label>
+                           <select class="form-control" name="traderefno-input" id="edit-traderefno-input">
+                             {%for trn in trns %}
+                              {% if trn.types != 'Cancel Sales' and trn.types != 'Cancel Purchase'%}
+
+                              <option value="{{trn.trn}}">{{trn.trn}}</option>
+                              {% endif %}
+                              {% endfor %}
+                           </select>
+                        </div>
+                       <div class="tradeselect">
+                         <div class="col-md-12">
+                         <div class="form-group">
+                          <label for="paymentterm" class=" form-control-label">Payment Term</label>
+                             <input type="text" id="edit-paymentterm-input" name="paymentterm-input" value="Payment Term" class="form-control">
+                           </div>
+
+                                <div class="form-group">
+                             <input type="text" id="edit-tradetype-input" name="tradetype-input" value="Sales" class="form-control">
+                           </div>
+
+                   </div>
+                        <div class="row form-group">
+                              <div class="col-md-6">
+                             <input type="text" class="form-control" id="edit-prepaymentparty" name="edit-prepaymentparty">
+                                 <!--   <select class="form-control" id="edit-prepaymentparty">
+                                    <option value="name1" selected disabled>Buyer/Seller Name</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                     <option value="name1">Name1</option>
+                                   </select> -->
+                                 </div>
+                </div>
+                </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="duedate" class=" form-control-label">Due Date</label>
+                                    <!-- <input type="text" value="" class="form-control date" id="edit-duedate" name="duedate" placeholder="Choose the date"/> -->
+                                        <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-duedate" name="duedate">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-duedate-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="advance-input" class=" form-control-label">As Per PI Cash/TT/Advance</label>
+                                    <input type="text" id="edit-advance-input" name="advance-input" class="validatenum form-control ">
+
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="inlcnum-input" class=" form-control-label">Incoming/Outgoing LC Number/Value</label>
+                                    <input type="text" id="edit-inlcnum-input" name="inlcnum-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="lcissuingval-input" class=" form-control-label">LC Issuing/Advising Bank/Value</label>
+                                    <input type="text" id="edit-lcissuingval-input" name="lcissuingval-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="advancereceived-input" class=" form-control-label">Advance Paid/Received</label>
+                                    <input type="text" id="edit-advancepayment-input" name="advancepayment-input" class="validatenum form-control">
+
+                                 </div>
+                              </div>
+                              <div class="row form-group">
+                                 <div class="col col-md-4">
+                                    <label for="receiveddate-input" class=" form-control-label">Received Date</label>
+                                    <!-- <input type="text" name="paymentdate-input" id="edit-paymentdate-input" class="form-control date"/> -->
+                                             <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-paymentdate-input" name="paymentdate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-paymentdate-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+                                 <div class="col col-md-4">
+                                    <label for="lc_expirydate-input" class=" form-control-label">LC Expiry Date</label>
+                                    <!-- <input type="text" name="lc_expirydate-input" id="edit-lc_expirydate-input" class="form-control date"/> -->
+                                           <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-lc_expirydate-input" name="lc_expirydate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-lc_expirydate-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+
+                                       <div class="col col-md-4">
+                                    <label for="edit-lc_shipmentdate-input" class=" form-control-label">
+                                    Latest Shipment Date</label>
+                                    <!-- <input type="text" name="lc_expirydate-input" id="edit-lc_expirydate-input" class="form-control date"/> -->
+                                           <div class="datefield">
+                                    <input type="text" class="form-control" id="edit-lc_shipmentdate-input" name="lc_shipmentdate-input">
+                                    <span>
+                                    <i class="fa fa-calendar date" id="edit-lc_shipmentdate-input-date"></i>
+                                 </span>
+                                 </div>
+                                 </div>
+
+                              </div>
+                               <div class="row form-group">
+                                <div class="col-md-12">
+                                  <label for="edit-lc_remarks-input" class="form-control-label">Remarks</label>
+                                  <input type="text" class="form-control" id="edit-lc_remarks-input" name="lc_remarks-input">
+                                </div>
+
+                              </div>
+                              <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <input type="submit" onclick="return ValidateEdit()" class="btn btn-primary"  value="Save Details">
+                           </div>
+
+                        </div>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+            </div>
+
+
+
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered tablecolumnfixed" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">S.N</th>
+                     <th scope="col">Trade Type</th>
+                     <th scope="col">Company</th>
+                     <th scope="col">TRN</th>
+                     <th scope="col">Due Date</th>
+                     <th scope="col">Due Amount</th>
+                     <th scope="col">Received/Paid Amount</th>
+		                 <th scope="col">Buyer/Supplier</th>
+                     <th scope="col">Received Date
+                     </th>
+                     <th scope="col">Paid Date
+                     </th>
+                      <!-- <th scope="col">Remarks
+                     </th> -->
+                     <th scope="col">Status</th>
+
+                  </tr>
+               </thead>
+               <tbody id="rowid">
+                {% for i in records %}
+                  <tr>
+                     <th scope="row">{{i.trn.sn}}</th>
+
+                     <td >{{i.trn.types}}</td>
+                     <td >{{i.trn.company}}</td>
+
+                     <td>{{i.trn.trn}}</td>
+                     <td>{{i.dueDate}}</td>
+
+                     <td>{{i.advance|floatformat:2}}</td>
+                    {% if i.trn.types == 'Sales' %}
+                    <td>{{i.advanceFromBuyers|floatformat:2}}</td>
+                     {% else %}
+                     <td>{{i.advanceToSellers|floatformat:2}}</td>
+                     {% endif %}
+                     <td>{{i.trn.client}}</td>
+                     <td>{{i.receivedDate}}</td>
+                     <td >{{i.paidDate}}</td>
+                     <!-- <td>{{i.remarks}}</td> -->
+
+
+                     <td>
+                      <button type="button" class="btn btn-primary view" id="{{i.trn.trn}}" value="{{i.trn.trn}}" data-toggle="modal" data-target="#view0">
+                        View
+                        </button>
+                       {% if user.authority != 'Viewer' and user.authority != 'Accounts' %}
+                        <button type="button" class="btn btn-primary editbtn0" id="{{i.trn.trn}}" value="{{i.trn.trn}}" data-toggle="modal" data-target="#edit0" >
+                        Edit
+                        </button>
+                        {% endif %}
+                        {% if user.authority == 'Manager 2'%}
+                         <button type="button" class="btn btn-danger delete" value="{{i.trn.trn}}">Delete</button>
+                        {% endif %}
+                     </td>
+
+                  </tr>
+
+                  {% endfor %}
+
+               </tbody>
+            </table>
+         </div>
+       </div>
+      </div>
+   </div>
+   {% include 'footer.html'%}
+   </div>
+   </div>
+   </body>
+    
+</html>
+<!-- end document-->

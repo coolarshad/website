@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+{%load staticfiles%}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Dispute and Remarks</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+       <script type="text/javascript">
+           $(document).ready(function(){
+
+             $('.editbtn').click(function(){
+               var text=$(this).text();
+               var type=this.value;
+               var trn=this.id;
+               if(text=='Edit'){
+                   // alert('sales'+trn+' '+type+' '+text);
+                  if(type=='sales'){
+                     alert('sales'+trn);
+                  $.post("{% url 'home:editDisputes' %}",
+                  {
+                     'id':type,
+                     'sn': $('#sn').text(),
+                     'type':$('#s_types').text(),  
+                     'company':$('#s_company').text(),  
+                     // 'trd':$('#s_trd').text(),  
+                     'trn':$('#s_trn').text(),  
+                  's_dispute':$('#s_dispute').text(),
+                   's_remark':$('#s_remark').text(),
+                     
+                  },
+                   function(data,status){
+                     // alert(data)
+                  });
+
+                 
+                  }
+                  else{
+                      $.post("{% url 'home:editDisputes' %}",
+                  {
+                    'id':type,
+                     'sn': $('#sn').text(),
+                     'type':$('#p_types').text(),  
+                     'company':$('#p_company').text(),  
+                     // 'trd':$('#s_trd').text(),  
+                     'trn':$('#p_trn').text(),  
+                   'p_dispute':$('#p_dispute').text(),
+                   'p_remark':$('#p_remark').text(),
+                    
+                  },
+                   function(data,status){
+                     // alert(data)
+                  });
+                  }
+                 
+               }
+               
+            });
+           });
+       </script>
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingrow">
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#basicExampleModal">
+               New Entry
+               </button>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="basicExampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">Disput and Remarks Data Entry</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                    
+                     <div class="modal-body">
+                        <div class="card-body card-block">
+                           <form action="{% url 'home:savedispute' %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                              {% csrf_token %}
+                              <div class="numbertraderef">
+                        <label for="traderefno">Trade Reference Number</label> 
+                        <select class="form-control" name="traderefno">
+                          {%for trn in trns %}
+                              {% if trn.s_trn == trn.p_trn %}
+                          <option value="{{trn.s_trn}}">{{trn.s_trn}}</option>
+                              {% endif %}
+                              {% if trn.s_trn != trn.p_trn %}
+                              <option value="{{trn.s_trn}}">{{trn.s_trn}}</option>
+                              <option value="{{trn.p_trn}}">{{trn.p_trn}}</option>
+                              {% endif %}
+                              {% endfor %}
+                        </select>
+                     </div>
+                              <h4 class="tradetitle">Sales</h4>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="salesdispute-input" class=" form-control-label">Dispute</label>
+                                    <input type="text" id="salesdispute-input" name="salesdispute-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="salesremarks-input" class=" form-control-label">Remarks</label>
+                                    <input type="text" id="salesremarks-input" name="salesremarks-input" class="form-control">
+                                 </div>
+                              </div>
+                              <!-- //////////////////////////////////purchase////////////////////// -->
+                              <h4 class="tradetitle">Purchase</h4>
+                              <div class="row form-group">
+                                 <div class="col col-md-6">
+                                    <label for="purchasedispute-input" class=" form-control-label">Dispute</label>
+                                    <input type="text" id="purchasedispute-input" name="purchasedispute-input" class="form-control">
+                                 </div>
+                                 <div class="col col-md-6">
+                                    <label for="purchaseremarks-input" class=" form-control-label">Remarks</label>
+                                    <input type="text" id="purchaseremarks-input" name="purchaseremarks-input" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="modal-footer">
+                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                 <input type="submit" class="btn btn-primary"  value="Save Details">
+                              </div>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Dispute and Remarks Details</h3>
+               </div>
+               <input type="text" placeholder="Filter Using TRN" class='table-search' id="table-search" data-table-search="myTable"></input>
+            </div>
+         </div>
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">S.N</th>
+                     <th scope="col">Trade Type</th>
+                     <th scope="col">Company Name</th>
+                     <th scope="col">Trade Ref Date</th>
+                     <th scope="col">Trade Ref no.</th>
+                     <th scope="col">Dispute</th>
+                     <th scope="col">Remarks</th>
+                     <th scope="col">Status</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for i in records%}
+                  <tr>
+                     <th scope="row" id="sn">{{i.trn.sn}}</th>
+                     <td id="type">{{i.trn.s_type}}</td>
+                     <td id="company">{{i.trn.s_company}}</td>
+                     <td id="s_trd">{{i.trn.s_trd}}</td>
+                     <td id="s_trn">{{i.trn.s_trn}}</td>
+                     <td id="s_dispute">{{i.s_dispute}}</td>
+                     </td>
+                     <td id="s_remark">{{i.s_remark}}</td>
+                     <td>  <button type="button" class="btn btn-primary editbtn" value="sales" id="{{i.trn.s_trn}}">
+                        Edit
+                        </button>
+                     </td>
+                  </tr>
+                  <tr>
+                      <th scope="row" id="sn">{{i.trn.sn}}</th>
+                     <td id="type">{{i.trn.p_type}}</td>
+                     <td id="company">{{i.trn.p_company}}</td>
+                     <td id="p_trd">{{i.trn.p_trd}}</td>
+                     <td id="p_trn">{{i.trn.p_trn}}</td>
+                     <td id="p_dispute">{{i.p_dispute}}</td>
+                     </td>
+                     <td id="p_remark">{{i.p_remark}}</td>
+                     <td> <button type="button" class="btn btn-primary editbtn" value="purchase" id="{{i.trn.p_trn}}">
+                        Edit
+                        </button>
+                     </td>
+                  </tr>
+                  {% endfor %}
+                 
+               </tbody>
+            </table>
+         </div>
+      </div>
+   </div>
+      {% include 'footer.html'%}
+   </div>
+   </div>
+   </body>
+</html>
+<!-- end document-->

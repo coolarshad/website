@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Inventory</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'costmanagement/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'costmanagement/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'costmanagement/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'costmanagement/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'costmanagement/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'costmanagement/css/style.css' %}" rel="stylesheet" media="all">
+
+   </head>
+   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+      var count=1;
+      function resetall(){
+                $('.resetbtn').on('click',function(){
+                $(this).parent().parent().prevAll('div').find('select').find('option:eq(0)').removeAttr('selected');
+                $(this).parent().parent().prevAll('div').find('input').val(" ");
+                $(this).parent().parent().prevAll('div').find('select').find('option:eq(0)').attr('selected','true');
+              })
+             }
+      var countinventory=1;
+            function selectblock(block){
+                var data=document.querySelectorAll(block);
+                  data.forEach(function(datarow){
+                    console.log(datarow);
+                   
+                 
+                      // console.log($(datarow).siblings(block).length);
+                        var length=$(datarow).siblings(block).length;
+                         console.log(length);
+                     $(datarow).on('click','.remove',function(e){
+                          if(length>=1){
+                            e.stopImmediatePropagation();
+                          alert('more sibling');
+                          
+                      $(this).parent().parent().parent().remove();
+                      count=count-1;
+                      // alert(count);
+                       $('#count').val(count);
+                    }
+                  
+                  else if(length!=1){
+                  
+                      e.stopImmediatePropagation();
+                        alert('single block');
+                    }
+                  })
+                  })
+               }
+      $('.addinventory').click(function(){
+                     // alert('add entry');
+                     var $div = $('div[id^="inventorydata"]:last');
+                     var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                       
+                     var $clone = $div.clone().prop('id', 'inventorydata'+num );
+                     console.log($clone);
+                     $clone.find('#costinventorycategory-input'+(num-1)).prop('name','costinventorycategory-input'+num);
+                     $clone.find('#costinventorycategory-input'+(num-1)).prop('id','costinventorycategory-input'+num).addClass('inventory_product');;
+                     $clone.find('#costinventorycategory-input'+num).val("").end();
+
+                     $clone.find('#costinventoryproduct-input'+(num-1)).prop('name','costinventoryproduct-input'+num);
+                     $clone.find('#costinventoryproduct-input'+(num-1)).prop('id','costinventoryproduct-input'+num).addClass('validatenum get_rate');
+                     $clone.find('#costinventoryproduct-input'+num).val("").end();
+
+                     $clone.find('#costinventoryquantity-input'+(num-1)).prop('name','costinventoryquantity-input'+num);
+                     $clone.find('#costinventoryquantity-input'+(num-1)).prop('id','costinventoryquantity-input'+num).addClass('validatenum');
+                     $clone.find('#costinventoryquantity-input'+num).val("").end();
+
+                     $clone.find('#costinventoryunits-input'+(num-1)).prop('name','costinventoryunits-input'+num);
+                     $clone.find('#costinventoryunits-input'+(num-1)).prop('id','costinventoryunits-input'+num).addClass('validatenum');
+                     $clone.find('#costinventoryunits-input'+num).val("").end();
+
+                     $clone.find('#costinventoryrate-input'+(num-1)).prop('name','        costinventoryrate-input'+num);
+                     $clone.find('#costinventoryrate-input'+(num-1)).prop('id','costinventoryrate-input'+num).addClass('validatenum rate');
+                     $clone.find('#costinventoryrate-input'+num).val("").end();
+
+                      $clone.find('#costinventoryvalue-input'+(num-1)).prop('name','costinventory_value-input'+num);
+                      $clone.find('#costinventoryvalue-input'+(num-1)).prop('id','costinventoryvalue-input'+num).addClass('validatenum getvalue');
+                     $clone.find('#costinventoryvalue-input'+num).val("").end();
+
+
+                     $div.after($clone);
+                     console.log( $div.after($clone));
+                     count=count+1;
+                     $('#count').val(count);
+                     // alert(count);
+                     countinventory=countinventory+1;
+                     $('#count-inventory').val(countinventory);
+                     selectblock('.inventorydata');
+                     // if($($clone).children('input,select').hasClass('.validatenum')){
+                     //   alert('hi');
+                     // }
+                     if($($clone).find('input').hasClass('validatenum')){
+                      checkInp();
+                     }
+                     resetall();
+                  });
+                 selectblock('.inventorydata');
+
+                 $(document).on('change','.inventory_product',function(){
+                  var id=this.id;
+                  var i=parseInt( id.match(/\d+/g), 10 );
+                  // alert(this.value);
+                  if(this.value == 'Raw Material'){
+                    $('#costinventoryproduct-input'+i).empty();
+                    {%for i in raw %}
+                    $('#costinventoryproduct-input'+i).append('<option value="{{i.product}}">{{i.product}}</option>');
+                    {% endfor %}
+                    // alert(i);
+                  }
+                  if(this.value == 'Packing Material'){
+                    $('#costinventoryproduct-input'+i).empty();
+                    // alert(i);
+                    {%for i in packing %}
+                    $('#costinventoryproduct-input'+i).append('<option value="{{i.product}}">{{i.product}}</option>');
+                    {% endfor %}
+
+                  }
+                  if(this.value == 'Additives'){
+                    $('#costinventoryproduct-input'+i).empty();
+                    {%for i in additives %}
+                    $('#costinventoryproduct-input'+i).append('<option value="{{i.product}}">{{i.product}}</option>');
+                    {% endfor %}
+
+                  }
+                  if(this.value == 'Consumption'){
+                    $('#costinventoryproduct-input'+i).empty();
+                    {%for i in consumptions %}
+                    $('#costinventoryproduct-input'+i).append('<option value="{{i.product}}">{{i.product}}</option>');
+                    {% endfor %}
+                  }
+                 });
+
+                 // $(document).on('change','.get_rate',function(){
+                 //  var id=this.id;
+                 //  var i=parseInt( id.match(/\d+/g), 10 );
+                 //  // alert(i);
+                 //  // alert($('#costinventorycategory-input'+i).val());
+                 //  $.post("{% url 'costmanagement:getRate' %}",
+                 //  {
+                 //    'category':$('#costinventorycategory-input'+i).val(),
+                 //    'product':this.value,
+                 //  },
+                 //  function(data,status){
+                 //    $('#costinventoryrate-input'+i).val(data.rate);
+                 //  });
+                 // });
+
+                 //  $(document).on('focusin','.rate',function(){
+                 //  var id=this.id;
+                 //  var i=parseInt( id.match(/\d+/g), 10 );
+                 //  // alert(i);
+                 //  // alert($('#costinventorycategory-input'+i).val());
+                 //  $.post("{% url 'costmanagement:getRate' %}",
+                 //  {
+                 //    'category':$('#costinventorycategory-input'+i).val(),
+                 //    'product':$('#costinventoryproduct-input'+i).val(),
+                 //  },
+                 //  function(data,status){
+                 //    $('#costinventoryrate-input'+i).val(data.rate);
+                 //  });
+                 // });
+                   $('.excel').click(function(){
+            $(this).attr('href',"{% url 'costmanagement:exportInventoryForProduction'%}");
+         });
+
+                 $(document).on('focusin','.getvalue',function(){
+                  var id=this.id;
+                  var i=parseInt( id.match(/\d+/g), 10 );
+
+                  var qty=parseFloat($('#costinventoryquantity-input'+i).val());
+                  var rate=parseFloat($('#costinventoryrate-input'+i).val());
+
+                  this.value=(qty*rate).toFixed(4);
+                 });
+
+                $(document).on('focusin','#edit-costinventoryvalue-input',function(){
+                
+
+                  var qty=parseFloat($('#edit-costinventoryquantity-input').val());
+                  var rate=parseFloat($('#edit-costinventoryrate-input').val());
+
+                  this.value=(qty*rate).toFixed(4);
+                 });
+
+                 $('.edit').click(function(){
+                  var product=this.value;
+                  $.post("{% url 'costmanagement:alterInventory'%}",
+                  {
+                    'product':product,
+                  },
+                  function(data,status){
+                    $('#edit-costinventory-sninput').val(data.sn);
+                    $('#edit-costinventorydate-input').val(data.date);
+                    $('#edit-costinventorycategory').val(data.category);
+                    // $('#edit-costinventoryproduct').empty();
+                    $('#edit-costinventoryproduct').val(data.product);
+                    $('#edit-costinventoryquantity-input').val(data.qty);
+                    $('#edit-costinventoryunits').val(data.unit);
+                    $('#edit-costinventoryrate-input').val(data.rate);
+                    $('#edit-costinventoryvalue-input').val(data.value);
+                  });
+                 });
+
+                 $('.delete').click(function(){
+                  var product=this.value;
+                  $.post("{%url 'costmanagement:deleteInventory'%}",
+                    {'product':product
+                  },
+                    function(data,status){
+
+                    });
+                 });
+
+   });
+</script>
+   {% include 'header.html' %}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingrow">
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New Request
+               </button>
+ <!--               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#view0">
+               View
+               </button> -->
+            </div>
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Inventory for Production Details</h3>
+               </div>
+               
+                  <input type="text" placeholder="Filter Using Product" class='table-search-product' data-table-search="myTable"></input>
+               
+            </div>
+         </div>
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">S.N</th>
+                     <th scope="col">Date</th>
+                     <th scope="col">Category</th>
+                     <th scope="col">Product</th>
+                     <th scope="col">Quantity</th>
+                     <th scope="col">Units</th>
+                     <th scope="col">Rate </th>
+                     <th scope="col">Value</th>
+		     <!-- <th scope="col">Approved</th>-->
+                     <th scope="col">Status</th>
+                  
+                  </tr>
+               </thead>
+               <tbody>
+                {% for i in records %}
+                  <tr>
+                     <td>{{i.sn}}</td>
+                     <td >{{i.date}}</td>
+                     <td>{{i.category}}</td>
+                     <td>{{i.product}}</td>
+                     <td>{{i.qty|floatformat:4}}</td>
+                     <td>{{i.unit}}</td>
+                     <td>{{i.rate|floatformat:4}}</td>
+                     <td>{{i.value|floatformat:4}}</td>
+		<!--			<td><input type="checkbox"></td> -->
+                     <td scope="row"><button type="button" class="btn btn-primary edit" data-toggle="modal" data-target="#edit0" value="{{i.product}}" >Edit</button>
+                        <button type="button" class="btn btn-danger delete" value="{{i.product}}">Delete</button></td>
+                  </tr>
+                 {% endfor %}
+               </tbody>
+            </table>
+         </div>
+      </div>
+         <div class="modal fade" id="entry0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Cost Management Inventory Entry Data</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <form action="{% url 'costmanagement:saveinventory'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                      {% csrf_token %}
+                           <div class="row form-group">
+                              <div class="col-12 col-md-6">
+                                 <label for="costinventory-input"  class="form-control-label">S.N</label>
+                                 <input type="text" id="costinventory-sninput" name="costinventory-sninput" class="form-control" readonly="" value="{{sn}}">
+                              </div>
+                              <input type="hidden" id="count" name="count" value="1">
+                              <div class="col col-md-6">
+                                 <label for="costinventorydate-input" class=" form-control-label">Date</label>
+
+                                    <div class="datefield">
+                                       <input type="text" class="form-control" name="costinventorydate-input" id="costinventorydate-input">
+                                        <span>
+                                           <i class="fa fa-calendar date" id="costinventorydate-input-date" ></i>
+                                       </span>
+                                    </div>
+                                 <!-- <input type="text" id="costinventorydate-input" name="costinventorydate-input" class="form-control"> -->
+                              </div>
+                           </div>
+                           <div id="inventorydata1" class="inventorydata">
+                                 <div class="row form-group">
+                                    <div class="col col-md-6">
+                                       <label for="costinventorycategory-input" class=" form-control-label">Category</label>
+                                       <select class="form-control inventory_product" id="costinventorycategory-input1" name="costinventorycategory-input1">
+                                          <option value="Raw Material">Raw Material</option>
+                                          <option value="Additives">Additives</option>
+                                          <option value="Packing Material">Packing Material</option>
+                                          <option value="Consumption">Consumption & Blending Material</option>
+                                       </select>
+                                    </div>
+                                    <div class="col col-md-6">
+                                          <label for="costinventoryproduct-input" class=" form-control-label">Product</label>
+                                          <select class="form-control get_rate" id="costinventoryproduct-input1" name="costinventoryproduct-input1">
+                                            {% for i in raw %}
+                                             <option value="{{i.product}}">{{i.product}}</option>
+                                             {% endfor %}
+                                          </select>
+                                       </div>
+                                 </div> 
+                                 <div class="row form-group">
+                                    <div class="col col-md-3">
+                                       <label for="costinventoryquantity-input" class=" form-control-label">Quantity</label>
+                                       <input type="text"  id="costinventoryquantity-input1" name="costinventoryquantity-input1" class="form-control validatenum">
+                                    </div>
+                                    <div class="col col-md-3">
+                                       <label for="costinventory_unit-input" class=" form-control-label">Units</label>
+                                          <select class="form-control" name="costinventoryunits-input1" id="costinventoryunits-input1">
+                                             <option value="kg">Kg</option>
+                                             <option value="liter">Liter</option>
+                                             <option value="mt">MT</option>
+                                             <option value="piece">Piece</option>
+                                             <option value="each">Each</option>
+                                          </select>
+                                    </div>
+             
+                                       <div class="col col-md-3">
+                                          <label for="costinventoryrate-input" class=" form-control-label">Rate </label>
+                                          <input type="text"  id="costinventoryrate-input1" name="costinventoryrate-input1" class="form-control validatenum rate">
+                                       </div>
+                                       <div class="col col-md-3">
+                                          <label for="costinventoryvalue-input" class="form-control-label">Value</label>
+                                          <input type="text"  id="costinventoryvalue-input1" name="costinventory_value-input1" class="form-control validatenum getvalue">
+                                       </div>
+                                 </div>
+                                 <div class="row form-group">
+                                         <div class="col-md-12">
+                                             <input type="button" class="resetbtn" value="Reset">
+                                             <input type="button" class="btn  remove" value="Remove">
+                                         </div>
+                                 </div>
+                           </div>
+                       
+                          <div class="row form-group">
+                              <div class="col-md-12">
+                                 <input type="hidden" value="1" id="count-inventory" name="count-inventory"/>
+                                 <input type="button" class="btn btn-primary addinventory" value="Add More">
+                                 <!-- <button class="btn btn-primary addblending">Add More</button> -->
+                              </div>
+                           </div>
+                            <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary"  value="Save Details">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                     </div>
+                        </form>
+                     </div>
+                    <!--  <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary"  value="Save Details">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                     </div> -->
+                  </div>
+               </div>
+                  
+            </div>
+         </div>
+       
+
+
+
+
+
+<!-- ///////////////////////////////////////////////////////////////////////-->
+         <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Cost Management Inventory Entry Data</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="card-body card-block">
+                        <form action="{% url 'costmanagement:editInvProduction'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                      
+                           <div class="row form-group">
+                              <div class="col-12 col-md-6">
+                                 <label for="costinventory-input"  class="form-control-label">S.N</label>
+                                 <input type="text" id="edit-costinventory-sninput" name="costinventory-sninput" class="form-control" readonly="true">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="costinventorydate-input" class=" form-control-label">Date</label>
+                                 <div class="datefield">
+                                       <input type="text" class="form-control" name="costinventorydate-input" id="edit-costinventorydate-input">
+                                        <span>
+                                           <i class="fa fa-calendar date" id="edit-costinventorydate-input-date" ></i>
+                                       </span>
+                                    </div>
+                                 <!-- <input type="text" id="edit-costinventorydate-input" name="edit-costinventorydate-input" class="form-control"> -->
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="edit-costinventorycategory-input" class=" form-control-label">Category</label>
+                                 <select class="form-control" name="costinventorycategory" id="edit-costinventorycategory">
+                                    <option value="Raw Material">Raw Material</option>
+                                    <option value="Additives">Additives</option>
+                                    <option value="Packing Material">Packing Material</option>
+                                    <option value="Consumption">Consumption and Blending Material</option>
+                                 </select>
+                              </div>
+                              <div class="col col-md-6">
+                                    <label for="edit-costinventorycategory-input" class=" form-control-label">Product</label>
+                                    <input class="form-control" name="costinventoryproduct" id="edit-costinventoryproduct">
+                                       <!-- <option value="produc1">Product1</option> -->
+                                     
+                                    </input>
+                                 </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-3">
+                                 <label for="edit-costinventoryquantity-input" class=" form-control-label">Quantity</label>
+                                 <input type="text"  id="edit-costinventoryquantity-input" name="costinventoryquantity-input" class="form-control validatenum">
+                              </div>
+                              <div class="col col-md-3">
+                                 <label for="edit-costinventory_unit-input" class=" form-control-label">Units</label>
+                                    <select class="form-control" id="edit-costinventoryunits" name="costinventoryunits">
+                                      <option value="kg">Kg</option>
+                                       <option value="liter">Liter</option>
+                                       <option value="mt">MT</option>
+                                       <option value="piece">Piece</option>
+                                       <option value="each">Each</option>
+                                    </select>
+                              </div>
+
+                                 <div class="col col-md-3">
+                                    <label for="edit-costinventoryrate-input" class=" form-control-label">Rate</label>
+                                    <input type="text"  id="edit-costinventoryrate-input" name="costinventoryrate-input" class="form-control validatenum">
+                                 </div>
+                                 <div class="col col-md-3">
+                                    <label for="edit-costinventoryvalue-input" class=" form-control-label">Value</label>
+                                    <input type="text"  id="edit-costinventoryvalue-input" name="costinventory_value-input" class="form-control validatenum">
+                                 </div>
+                           </div>
+                        </div>
+                        <div class="modal-footer">
+                              <input type="submit" class="btn btn-primary" value="Save Details">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                     </form>
+                  </div>
+                  
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+  {% include 'footer.html' %}
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+      <script type="text/javascript">
+         $(document).ready(function(){
+            $("#costinventorydate-input-date").datepicker({
+
+       }).on("changeDate", function(e) {
+         var d=new Date();
+         d = e.date;
+         d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+         $('#costinventorydate-input').val(d);
+                    console.log(e.date);
+                    // alert('hi');
+         });
+        $("#edit-costinventorydate-input-date").datepicker({
+
+           }).on("changeDate", function(e) {
+                   var d=new Date();
+          d = e.date;
+         d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+         $('#edit-costinventorydate-input').val(d);
+                    // console.log(e.date);
+                    // alert('hi');
+                });
+
+
+           $(".table-search-product").on("keyup", function() {
+              var value = $(this).val().toLowerCase(),
+                tableattr = $(this).attr("data-table-search"),
+                tablesearch = $('#' + tableattr).find('tbody tr');
+
+              tablesearch.hide();                           //start with all rows hidden
+              
+              var previousRowspan = 1;                      //initiate our stored rowspan with the default of 1
+
+                tablesearch.each(function() {
+                var $row = $(this);
+                var $firstCell = $row.find("td:nth-child(4)");
+                var id = $firstCell.text().toLowerCase();
+                var rowspan = $firstCell.attr('rowspan');
+
+            if(previousRowspan>1){
+              previousRowspan--;
+              return true;
+            }
+
+            previousRowspan= +rowspan;
+
+              //get the row's rowspan
+                if (id.indexOf(value) > -1) {               //if the text is found
+                  var additionalRows = previousRowspan-1;   //use our n-1 formula
+                  var $additionalRows = $row.nextAll(':lt(' + additionalRows + ')');  //select the next (n-1) rows
+                  $row.add($additionalRows).show();         //show this row, and the next (n-1) rows as well
+                }
+
+              });
+            });
+         })
+     
+  </script>
+   </div>
+   </div>
+   </body>
+</html>
+<!-- end document

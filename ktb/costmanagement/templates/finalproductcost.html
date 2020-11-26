@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+
+<head>
+   <!-- Required meta tags-->
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <!-- Title Page-->
+   <title>Final Product Cost</title>
+   <!-- Fontfaces CSS-->
+   <link href="{% static 'costmanagement/css/font-face.css' %}" rel="stylesheet" media="all">
+   <!-- <link href="{% static 'costmanagement/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+   <link href="{% static 'costmanagement/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet"
+      media="all">
+   <link href="{% static 'costmanagement/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet"
+      media="all">
+   <!-- Bootstrap CSS-->
+   <link href="{% static 'costmanagement/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+   <!-- Vendor CSS-->
+   <link href="{% static 'costmanagement/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+   <link href="{% static 'costmanagement/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+   <!-- Main CSS-->
+   <link href="{% static 'costmanagement/css/style.css' %}" rel="stylesheet" media="all">
+   <style>
+      input[type='checkbox'] {
+         height: 18px;
+         width: 25px;
+      }
+   </style>
+
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.4.1/select2.min.css" rel="stylesheet">
+
+
+   <link rel="stylesheet" type="text/css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.min.css">
+   <script type="text/javascript">
+      $(document).ready(function () {
+         $('.finalproductname-input').select2();
+      });
+   </script>
+
+</head>
+{%include 'header.html'%}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+   $(document).ready(function () {
+
+      $(document).on('click', '.view', function () {
+         var product = this.value;
+         $.post("{% url 'costmanagement:getFinal'%}",
+            {
+               'product': product
+            },
+            function (data, status) {
+               // alert(data.product.product);
+               // $('#view-productsn').text(data.product.sn);
+               // $('#view-productdate').text(data.product.date);
+               // $('#view-productname').text(data.product.product);
+               // $('#view-packingsize').text(data.product.packingsize);
+               // $('#view-bottleperneck').text(data.product.bottlesperpack.toFixed(4));
+               // $('#view-litersperpack').text(data.product.litersperpack.toFixed(4));
+               // $('#view-totalqty').text(data.product.totalqty.toFixed(4));
+               // $('#view-qtyliters').text(data.product.qtyinliters.toFixed(4));
+               // $('#view-perlitercost').text(data.product.perlitercost.toFixed(4));
+               // $('#view-costpercasepail').text(data.product.costpercase.toFixed(4));
+               // $('#view-dkcost').text(data.product.dkcost.toFixed(4));
+               // $('#view_bottlepereac').text(data.product.bottlepereac.toFixed(4));
+               // $('#view_bottlepercase').text(data.product.bottlepercase.toFixed(4));
+               // $('#view_labelpereac').text(data.product.lablepereac.toFixed(4));
+               // $('#view_labelpercase').text(data.product.labelpercase.toFixed(4));
+               // $('#view_cartons').text(data.product.cartons.toFixed(4));
+               // $('#view_dkexprice').text(data.product.dkexprice.toFixed(4));
+               // $('#view_kscost').text(data.product.kscost.toFixed(4));
+               // $('#view_totalsellingprice').text(data.product.totalsp.toFixed(4));
+               $('#view-productsn').text(data.product.sn);
+               $('#view-productdate').text(data.product.date);
+               $('#view-productname').text(data.product.product);
+               $('#view-packingsize').text(data.product.packingsize);
+               $('#view-bottleperneck').text(data.product.bottlesperpack.toFixed(4));
+               $('#view-litersperpack').text(data.product.litersperpack.toFixed(4));
+               $('#view-totalqty').text(data.product.totalqty.toFixed(4));
+               $('#view-qtyliters').text(data.product.qtyinliters.toFixed(4));
+               $('#view-perlitercost').text(data.product.perlitercost.toFixed(4));
+               $('#view-costpercasepail').text(data.product.costpercase.toFixed(4));
+               $('#view-dkcost').text(data.product.dkcost.toFixed(4));
+               $('#view-priceperbottle').text(data.product.bottlepereac);
+               $('#view-bottlepercase').text(data.product.bottlepercase);
+               $('#view-priceperbottlecap').text(data.product.bottlecapprice);
+               $('#view-bottlecappercase').text(data.product.bottlecappercase);
+               $('#view-priceperlabel').text(data.product.lablepereac);
+               $('#view_labelpercase').text(data.product.labelpercase);
+               $('#view_pricepercarton').text(data.product.cartons);
+               $('#view_dkexprice').text(data.product.dkexprice);
+               $('#view_kscost').text(data.product.kscost);
+               $('#view_totalsellingprice').text(data.product.totalsp);
+               $('#view_remarks').text(data.product.remarks);
+            });
+      });
+
+      $('.excel').click(function () {
+         $(this).attr('href', "{% url 'costmanagement:exportFinalProduct'%}");
+      });
+      $('#view-finaltotalquantity-input').keyup(function () {
+         var netqty = this.value;
+         // alert(netqty);
+         $.post("{% url 'costmanagement:getFinalProduct'%}",
+            {
+               'product': $('#view-finalproduct-input').val(),
+               'totalQty': netqty,
+
+            },
+            function (data, status) {
+               $('#view-finalproduct-input').val(data.product);
+               // $('#view-isograde-input').val(data.product.sae);
+               $('#view-finaltotalquantity-input').val(data.totalQty);
+               $('#view-final_perlitercost-input').val(data.perLiterCost.toFixed(4));
+               // alert(data.perLiterCost);
+               // $('#view-final_blendingcost-input').val(data.product.costBlendDk);
+               // $('#view-finaltotal_cost-input').val(data.product.totalCost);
+               // $('#view-final_cost200liter-input').val(data.product.costPer200);
+               // $('#view-final_costofdrum-input').val(data.product.costPerDrum);
+               // $('#view-final_netcostex_dk-input').val(data.product.netCostExDk);
+               // $('#view-final_valuenet-input').val(data.product.valueNet);
+            });
+      });
+
+      $('#finalproductname-input').change(function () {
+         $.post("{% url 'costmanagement:getFinalAll'%}",
+            {
+               'product': this.value,
+            },
+            function (data, status) {
+
+               $('#final_perlitercost-input').val(data.product.perLiterCost);
+
+            })
+      });
+
+      $(document).on('change', '#final_packingsize-input', function () {
+         var pack = this.value;
+
+
+         // alert(pack);
+         if (pack == '208l') { $('#final_bottles_perpack-input').val('1'); $('#final_liters_perpack-input').val('208'); }
+         if (pack == '200l') { $('#final_bottles_perpack-input').val('1'); $('#final_liters_perpack-input').val('200'); }
+         if (pack == '185k') { $('#final_bottles_perpack-input').val('1'); $('#final_liters_perpack-input').val('185'); }
+         if (pack == '50l') { $('#final_bottles_perpack-input').val('1'); $('#final_liters_perpack-input').val('50'); }
+         if (pack == '25l') { $('#final_bottles_perpack-input').val('1'); $('#final_liters_perpack-input').val('25'); }
+         if (pack == '20l') { $('#final_bottles_perpack-input').val('1'); $('#final_liters_perpack-input').val('20'); }
+         if (pack == '18k') { $('#final_bottles_perpack-input').val('1'); $('#final_liters_perpack-input').val('18'); }
+         if (pack == '5l') { $('#final_bottles_perpack-input').val('3'); $('#final_liters_perpack-input').val('15'); }
+         if (pack == '5k') { $('#final_bottles_perpack-input').val('3'); $('#final_liters_perpack-input').val('15'); }
+         if (pack == '4l') { $('#final_bottles_perpack-input').val('4'); $('#final_liters_perpack-input').val('16'); }
+         if (pack == '1l') { $('#final_bottles_perpack-input').val('12'); $('#final_liters_perpack-input').val('12'); }
+         if (pack == '1k') { $('#final_bottles_perpack-input').val('12'); $('#final_liters_perpack-input').val('12'); }
+         if (pack == '500ml') { $('#final_bottles_perpack-input').val('24'); $('#final_liters_perpack-input').val('12'); }
+         if (pack == '500gm') { $('#final_bottles_perpack-input').val('24'); $('#final_liters_perpack-input').val('12'); }
+      });
+
+
+      $(document).on('change', '#edit-final_packingsize-input', function () {
+         var pack = this.value;
+
+
+         // alert(pack);
+         if (pack == '208l') { $('#edit-final_bottles_perpack-input').val('1'); $('#edit-final_liters_perpack-input').val('208'); }
+         if (pack == '200l') { $('#edit-final_bottles_perpack-input').val('1'); $('#edit-final_liters_perpack-input').val('200'); }
+         if (pack == '185k') { $('#edit-final_bottles_perpack-input').val('1'); $('#edit-final_liters_perpack-input').val('185'); }
+         if (pack == '50l') { $('#edit-final_bottles_perpack-input').val('1'); $('#edit-final_liters_perpack-input').val('50'); }
+         if (pack == '25l') { $('#edit-final_bottles_perpack-input').val('1'); $('#edit-final_liters_perpack-input').val('25'); }
+         if (pack == '20l') { $('#edit-final_bottles_perpack-input').val('1'); $('#edit-final_liters_perpack-input').val('20'); }
+         if (pack == '18k') { $('#edit-final_bottles_perpack-input').val('1'); $('#edit-final_liters_perpack-input').val('18'); }
+         if (pack == '5l') { $('#edit-final_bottles_perpack-input').val('3'); $('#edit-final_liters_perpack-input').val('15'); }
+         if (pack == '5k') { $('#edit-final_bottles_perpack-input').val('3'); $('#edit-final_liters_perpack-input').val('15'); }
+         if (pack == '4l') { $('#edit-final_bottles_perpack-input').val('4'); $('#edit-final_liters_perpack-input').val('16'); }
+         if (pack == '1l') { $('#edit-final_bottles_perpack-input').val('12'); $('#edit-final_liters_perpack-input').val('12'); }
+         if (pack == '1k') { $('#edit-final_bottles_perpack-input').val('12'); $('#edit-final_liters_perpack-input').val('12'); }
+         if (pack == '500ml') { $('#edit-final_bottles_perpack-input').val('24'); $('#edit-edit-edit-final_liters_perpack-input').val('12'); }
+         if (pack == '500gm') { $('#edit-edit-final_bottles_perpack-input').val('24'); $('#edit-final_liters_perpack-input').val('12'); }
+      });
+
+      $(document).on('click', '.edit', function () {
+         var product = this.id;
+         $.post("{% url 'costmanagement:getFinal'%}",
+            {
+               'product': product
+            },
+            function (data, status) {
+               // alert(data.product.product);
+               $('#edit-finalproduct_sn').val(data.product.sn);
+               $('#edit-finalproduct_date-input').val(data.product.date);
+               $('#edit-finalproductname-input').val(data.product.product);
+               $('#edit-final_packingsize-input').val(data.product.packingsize);
+               $('#edit-final_bottles_perpack-input').val(data.product.bottlesperpack.toFixed(4));
+               $('#edit-final_liters_perpack-input').val(data.product.litersperpack.toFixed(4));
+               $('#edit-final_totalquantity-text-input').val(data.product.totalqty.toFixed(4));
+               $('#edit-final_totalquantity-input').val(data.product.totalqtyunit);
+               $('#edit-final_qtylitrs-input').val(data.product.qtyinliters.toFixed(4));
+               $('#edit-final_perlitercost-input').val(data.product.perlitercost.toFixed(4));
+               $('#edit-final_costpercasepail-input').val(data.product.costpercase.toFixed(4));
+               $('#edit-final_dkcost-input').val(data.product.dkcost.toFixed(4));
+               $('#edit-final_bottle-eac-input').val(data.product.bottlepereac);
+               $('#edit-final_bottle-case-input').val(data.product.bottlepercase.toFixed(4));
+               $('#edit-final_label-eac-input').val(data.product.lablepereac);
+               $('#edit-final_price-bottlecap-input').val(data.product.bottlecapprice);
+               $('#edit-final_bottlecap_per-case-input').val(data.product.bottlecappercase.toFixed(4));
+               $('#edit-final_label-case-input').val(data.product.labelpercase.toFixed(4));
+               $('#edit-final_cartons-input').val(data.product.cartons);
+               $('#edit-final_dkexPrice-input').val(data.product.dkexprice.toFixed(4));
+               $('#edit-final_kscost-input').val(data.product.kscost.toFixed(4));
+               $('#edit-final_sellingprice-input').val(data.product.totalsp.toFixed(4));
+               $('#edit-final_remarks-input').val(data.product.remarks);
+               $('#final-approve-btn').val(data.product.sn);
+
+               //alert(data.product.approved);              
+               if (data.product.approved) {
+                  $('#final-approve-btn').prop('disabled', 'true');
+               } else {
+                  $('#final-approve-btn').removeAttr('disabled');
+               }
+
+               {% if user.authority == 'Manager 1' or user.authority == 'Accounts' %}
+               if (data.product.approved) {
+                  $('#final-edit-save').prop('disabled', 'true');
+               } else {
+                  $('#final-edit-save').removeAttr('disabled');
+               }
+
+               {% endif %}
+            });
+      });
+
+      $('#final_qtylitrs-input').focus(function () {
+         var total = parseFloat($('#final_totalquantity-text-input').val());
+         var liters = parseFloat($('#final_liters_perpack-input').val());
+         this.value = (total * liters).toFixed(4);
+      });
+
+      $('#edit-final_qtylitrs-input').focus(function () {
+         var total = parseFloat($('#edit-final_totalquantity-text-input').val());
+         var liters = parseFloat($('#edit-final_liters_perpack-input').val());
+         this.value = (total * liters).toFixed(4);
+      });
+
+      $('#final_costpercasepail-input').focus(function () {
+         var total = parseFloat($('#final_perlitercost-input').val());
+         var liters = parseFloat($('#final_liters_perpack-input').val());
+         this.value = (total * liters).toFixed(4);
+      });
+
+      $('#edit-final_costpercasepail-input').focus(function () {
+         var total = parseFloat($('#edit-final_perlitercost-input').val());
+         var liters = parseFloat($('#edit-final_liters_perpack-input').val());
+         this.value = (total * liters).toFixed(4);
+      });
+
+      $('#final_bottle-case-input').focus(function () {
+         if ($('#final_bottle-eac-input').val() == "NA") {
+            this.value = 0;
+         } else {
+            var total_str = $('#final_bottle-eac-input').val();
+            var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
+            var liters = parseFloat($('#final_bottles_perpack-input').val());
+            this.value = (total * liters).toFixed(4);
+         }
+      });
+
+      $('#edit-final_bottle-case-input').focus(function () {
+         if ($('#edit-final_bottle-eac-input').val() == "NA") {
+            this.value = 0;
+         } else {
+            var total_str = $('#edit-final_bottle-eac-input').val();
+            var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
+            var liters = parseFloat($('#edit-final_bottles_perpack-input').val());
+            this.value = (total * liters).toFixed(4);
+         }
+      });
+
+      $('#final_label-case-input').focus(function () {
+         if ($('#final_label-eac-input').val() == "NA") {
+            this.value = 0;
+         } else {
+            var total_str = $('#final_label-eac-input').val();
+            var patterntext=total_str.match(/\d+ *LITRE/g);
+           
+            var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
+            var liters = parseFloat($('#final_bottles_perpack-input').val());
+            if(patterntext == "1 LITRE" || patterntext == "1LITRE"){
+               liters=liters+1;
+            }
+            if(patterntext == "4 LITRE" || patterntext == "4LITRE"){
+               liters=liters+1;
+            }
+            if(patterntext == "5 LITRE" || patterntext == "5LITRE"){
+               liters=liters+1;
+            }
+
+            this.value = (total * liters).toFixed(4);
+         }
+      });
+
+      $('#edit-final_label-case-input').focus(function () {
+         if ($('#edit-final_label-eac-input').val() == "NA") {
+            this.value = 0;
+         } else {
+            var total_str = $('#edit-final_label-eac-input').val();
+            // alert(total_str.substring(total_str.lastIndexOf('-')+1));
+            // var total=parseFloat($('#edit-final_label-eac-input').val());
+            var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
+            var liters = parseFloat($('#edit-final_bottles_perpack-input').val());
+            this.value = (total * liters).toFixed(4);
+         }
+      });
+
+      $('#final_bottlecap_per-case-input').focus(function () {
+         if ($('#final_price-bottlecap-input').val() == "NA") {
+            this.value = 0;
+         } else {
+            var total_str = $('#final_price-bottlecap-input').val();
+            var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
+            var liters = parseFloat($('#final_bottles_perpack-input').val());
+            this.value = (total * liters).toFixed(4);
+         }
+      });
+
+      $('#edit-final_bottlecap_per-case-input').focus(function () {
+         if ($('#edit-final_price-bottlecap-input').val() == "NA") {
+            this.value = 0;
+         } else {
+            var total_str = $('#edit-final_price-bottlecap-input').val();
+            var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
+            var liters = parseFloat($('#edit-final_bottles_perpack-input').val());
+            this.value = (total * liters).toFixed(4);
+         }
+      });
+
+      $('#final_sellingprice-input').focus(function () {
+         var total = parseFloat($('#final_dkexPrice-input').val());
+         var liters = parseFloat($('#final_kscost-input').val());
+         // var label=parseFloat($('#final_label-case-input').val());
+         // var price=parseFloat($('#final_cartons-input').val());
+         // var bottle=parseFloat($('#final_bottle-case-input').val());
+         // var cap=parseFloat($('#final_bottlecap_per-case-input').val());
+         this.value = (total + liters).toFixed(4);
+      });
+
+      $('#edit-final_sellingprice-input').focus(function () {
+         var total = parseFloat($('#edit-final_dkexPrice-input').val());
+         var liters = parseFloat($('#edit-final_kscost-input').val());
+         // var label=parseFloat($('#edit-final_label-case-input').val());
+         // var price=parseFloat($('#edit-final_cartons-input').val());
+         // var bottle=parseFloat($('#edit-final_bottle-case-input').val());
+         // var cap=parseFloat($('#edit-final_bottlecap_per-case-input').val());
+         this.value = (total + liters).toFixed(4);
+      });
+
+      $(document).on('click', '.delete', function () {
+         var product = this.value;
+         $.post("{% url 'costmanagement:deletefinal' %}",
+            {
+               'product': product,
+            },
+            function (data, status) {
+               // body...
+            });
+      });
+
+      $(document).on('click', '.approve', function () {
+         var product = this.value;
+         $.post("{% url 'costmanagement:approve_final_product' %}",
+            {
+               'sn': product,
+               'csrfmiddlewaretoken': '{{csrf_token}}',
+            },
+            function (data, status) {
+               window.location.reload();
+            });
+      });
+
+
+
+      $(document).on('focusin', '#final_qtylitrs-input', function () {
+         var final = parseFloat($('#final_liters_perpack-input').val()) * parseFloat($('#final_totalquantity-text-input').val());
+         this.value = final.toFixed(4);
+      });
+
+      $(document).on('focusin', '#edit-final_qtylitrs-input', function () {
+         var final = parseFloat($('#edit-final_liters_perpack-input').val()) * parseFloat($('#edit-final_totalquantity-text-input').val());
+         this.value = final.toFixed(4);
+      });
+
+      $(document).on('focusin', '#final_dkexPrice-input', function () {
+         var total_str = $('#final_cartons-input').val();
+         var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
+         var final = parseFloat($('#final_costpercasepail-input').val()) + parseFloat($('#final_dkcost-input').val()) + parseFloat($('#final_bottle-case-input').val()) + parseFloat($('#final_label-case-input').val()) + parseFloat($('#final_bottlecap_per-case-input').val()) + total;
+         this.value = final.toFixed(4);
+      });
+
+      $(document).on('focusin', '#edit-final_dkexPrice-input', function () {
+         var total_str = $('#edit-final_cartons-input').val();
+         var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
+         var final = parseFloat($('#edit-final_costpercasepail-input').val()) + parseFloat($('#edit-final_dkcost-input').val()) + parseFloat($('#edit-final_bottle-case-input').val()) + parseFloat($('#edit-final_label-case-input').val()) + parseFloat($('#edit-final_bottlecap_per-case-input').val()) + total;
+         this.value = final.toFixed(4);
+      });
+
+      $("#finalproduct_date-input-date").datepicker({
+
+      }).on("changeDate", function (e) {
+         var d = new Date();
+         d = e.date;
+         d = (d.getDate()) + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+
+         $('#finalproduct_date-input').val(d);
+         // console.log(e.date);
+         // alert('hi');
+      });
+
+      $("#edit-finalproduct_date-input-date").datepicker({
+
+      }).on("changeDate", function (e) {
+         var d = new Date();
+         d = e.date;
+         d = (d.getDate()) + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+
+         $('#edit-finalproduct_date-input').val(d);
+         // console.log(e.date);
+         // alert('hi');
+      });
+
+
+      $(".table-search-product").on("keyup", function () {
+         var value = $(this).val().toLowerCase(),
+            tableattr = $(this).attr("data-table-search"),
+            tablesearch = $('#' + tableattr).find('tbody tr');
+
+         tablesearch.hide();                           //start with all rows hidden
+         //initiate our stored rowspan with the default of 1
+
+         tablesearch.each(function () {
+            var $row = $(this);
+            var $firstCell = $row.find("td:nth-child(3)");
+            var id = $firstCell.text().toLowerCase();
+            if (id.indexOf(value) > -1) {               //if the text is found
+               $row.show();         //show this row, and the next (n-1) rows as well
+            }
+
+         });
+      })
+   });
+
+</script>
+<!-- MAIN CONTENT-->
+<div class="main-content">
+   <div class="section__content section__content--p30">
+      <div class="container-fluid">
+         <div class="headingrow">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New Request
+            </button>
+         </div>
+         <div class="headingtitle">
+            <div class="title">
+               <h3>Final Product Cost Details</h3>
+            </div>
+
+            <input type="text" placeholder="Filter Using Product" class='table-search-product'
+               data-table-search="myTable"></input>
+
+         </div>
+      </div>
+      <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">S.N</th>
+                     <th scope="col">Packaging Date</th>
+                     <th scope="col">Product Name</th>
+                     <th scope="col">Packing Size</th>
+                     <!-- <th scope="col">Bottles Per Pack</th> -->
+                     <!-- <th scope="col">Liters Per Pack</th> -->
+                     <th scope="col">Total Qty</th>
+                     <th scope="col">Qty in Liters</th>
+                     <!-- <th scope="col">Liter value</th> -->
+                     <th scope="col">Totally Selling Price</th>
+                     <!-- <th scope="col">Cost Per Case Pail</th> -->
+                     <!-- <th scope="col">DK Cost</th> -->
+                     <!-- <th scope="col">Value Net</th> -->
+                     <th scope="col">Approved</th>
+                     <th scope="col">Status</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for i in records %}
+                  <tr>
+                     <td>{{i.sn}}</td>
+                     <td>{{i.date}}</td>
+                     <td>{{i.product}}</td>
+                     <td>{{i.packingsize}}</td>
+
+
+                     <td>{{i.totalqty|floatformat:4}} {{i.totalqtyunit}}</td>
+                     <td>{{i.qtyinliters|floatformat:4}}</td>
+                     <!-- <td>{{i.literValue}}</td> -->
+                     <td>{{i.totalsp|floatformat:4}}</td>
+
+                     <!-- <td>{{i.valueNet}}</td> -->
+                     {% if i.approved %}
+                     <td><input type="checkbox" checked></td>
+                     {% else %}
+                     <td><input type="checkbox"></td>
+                     {% endif %}
+                     <td scope="row">
+                        <button type="button" class="btn btn-primary view" value="{{i.sn}}" data-toggle="modal"
+                           data-target="#view0">View</button>
+                        {% if user.authority == 'Manager 2' or user.authority == 'Manager 1' or user.authority == 'Accounts' %}
+                        <button type="button" id="{{i.sn}}" class="btn btn-primary primary edit" data-toggle="modal"
+                           data-target="#edit0">Edit</button>
+                        {% endif %}
+                        {% if user.authority == 'Manager 2'%}
+                        <button type="button" value="{{i.sn}}" class="btn btn-danger delete">Delete</button>
+                        {% endif %}
+                        {% comment %}
+                        {% if user.authority == 'Manager 2' or user.authority == 'Accounts' or user.authority == 'Manager 1' %}
+                        <button value='{{i.sn}}' class="btn btn-primary approve">Approve</button>
+                        {% endif %}
+                        {%endcomment %}
+                     </td>
+                  </tr>
+
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+      </div>
+   </div>
+   <div class="modal fade" id="entry0" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h3 class="modal-title title" id="exampleModalLabel">Final Product Cost Entry Data</h3>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <div class="card-body card-block">
+                  <form action="{% url 'costmanagement:savefinalproduct' %}" method="post" enctype="multipart/form-data"
+                     class="form-horizontal">
+                     {% csrf_token %}
+                     <div class="row form-group">
+                        <div class="col-md-6">
+                           <label for="finalproduct_sn" class="form-control-label">S.N</label>
+                           <input type="text" id="finalproduct_sn" value="{{sn}}" name="finalproduct_sn"
+                              class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label for="finalproduct_date" class="form-control-label">Date</label>
+                           <!-- <input type="text" id="consumption_date" name="consumption_date" class="form-control"> -->
+                           <div class="datefield">
+                              <input type="text" class="form-control" id="finalproduct_date-input"
+                                 name="finalproduct_date-input">
+                              <span>
+                                 <i class="fa fa-calendar date" id="finalproduct_date-input-date"></i>
+                              </span>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="row form-group">
+
+                        <div class="col col-md-6">
+                           <label for="finalproductname-input" class=" form-control-label">Product Name</label>
+                           <!--  <input type="text" id="finalproductname-input" name="finalproductname-input" class="form-control"> -->
+                           <select class="form-control finalproductname-input" id="finalproductname-input"
+                              name="finalproductname-input">
+                              <option value="" selected="true"></option>
+
+                              {% for product in products %}
+                              {% if product.approved %}
+                              <option value="{{product.product}}">{{product.product}}</option>
+                              {% endif %}
+                              {% endfor %}
+                           </select>
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="final_packingsize-input" class=" form-control-label">Packing Size</label>
+                           <select class="form-control" name="final_packingsize-input" id="final_packingsize-input">
+                              <option value=""></option>
+                              <option value="208l">208 Liters</option>
+                              <option value="200l">200 Liters</option>
+                              <option value="185k">185 Kgs</option>
+                              <option value="50l">50 Liters</option>
+                              <option value="25l">25 Liters</option>
+                              <option value="20l">20 Liters</option>
+                              <option value="18k">18 Kgs</option>
+                              <option value="5l">5 Liters</option>
+                              <option value="5k">5 Kgs</option>
+                              <option value="4l">4 Liters</option>
+                              <option value="1l">1 Liter</option>
+                              <option value="1k">1 kg</option>
+                              <option value="500ml">500 ML</option>
+                              <option value="500gm">500 Grams</option>
+
+                           </select>
+                           <!-- <input type="text" id="final_packingsize-input" name="final_packingsize-input" class="form-control"> -->
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="final_bottles_perpack-input" class=" form-control-label">Bottles Per Pack</label>
+
+                           <input type="text" id="final_bottles_perpack-input" name="final_bottles_perpack-input"
+                              class="form-control">
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="final_liters_perpack-input" class=" form-control-label">Liters Per Pack</label>
+
+
+                           <input type="text" id="final_liters_perpack-input" name="final_liters_perpack-input"
+                              class="form-control">
+                        </div>
+
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="final_totalquantity-input" class=" form-control-label">Total Quantity</label>
+                           <input type="text" id="final_totalquantity-text-input" name="final_totalquantity-text-input"
+                              class="form-control doubleinput">
+                           <select class="form-control" id="final_totalquantity-input" name="final_totalquantity-input">
+                              <option value="final_totalquantity" disabled="disabled" selected="true">Qnty Value
+                              </option>
+                              <option value="ctns">CTNS</option>
+                              <option value="jerrican">JERRICAN</option>
+                              <option value="pails">Pails</option>
+                              <option value="drums">Drums</option>
+                              <option value="jar">Jar</option>
+
+                           </select>
+
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="final_qtylitrs-input" class=" form-control-label">Quantity in Liters</label>
+                           <input type="text" id="final_qtylitrs-input" name="final_qtylitrs-input"
+                              class="form-control">
+                        </div>
+
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label for="final_perlitercost-input" class=" form-control-label">Per Liter Cost</label>
+                           <input type="text" id="final_perlitercost-input" name="final_perlitercost-input"
+                              class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="final_costpercasepail-input" class=" form-control-label">Cost Per Case
+                              Pail/Drum/Jar</label>
+                           <input type="text" id="final_costpercasepail-input" name="final_costpercasepail-input"
+                              class="form-control">
+                        </div>
+
+                        <div class="col col-md-4">
+                           <label for="final_dkcost-input" class=" form-control-label">DK Cost</label>
+                           <input type="text" id="final_dkcost-input" name="final_dkcost-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label for="final_bottle-eac-input" class=" form-control-label">Price Per Bottle</label>
+                           <!-- <input type="text" id="final_bottle-eac-input" name="final_bottle-eac-input" class="form-control"> -->
+                           <select class="form-control finalproductname-input" id="final_bottle-eac-input"
+                              name="final_bottle-eac-input">
+                              <option value=""></option>
+                              <option value="0">NA</option>
+                              {% for  i in packing %}
+                              {% if i.category == 'bottle' and i.approved %}
+                              <option value="{{i.product}}-{{i.pereach}}">{{i.product}}-{{i.pereach}}</option>
+                              {% endif %}
+                              {% endfor %}
+
+
+                           </select>
+
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="final_label-eac-input" class=" form-control-label">Price Per Label</label>
+                           <!-- <input type="text" id="final_label-eac-input" name="final_label-eac-input" class="form-control"> -->
+                           <select class="form-control finalproductname-input" id="final_label-eac-input"
+                              name="final_label-eac-input">
+                              <option value=""></option>
+                              <option value="0">NA</option>
+                              {% for  i in packing %}
+                              {% if i.category == 'label' and i.approved %}
+                              <option value="{{i.product}}-{{i.pereach}}">{{i.product}}-{{i.pereach}}</option>
+                              {% endif %}
+                              {% endfor %}
+
+
+                           </select>
+                        </div>
+
+                        <div class="col col-md-4">
+                           <label for="final_price-bottlecap-input" class=" form-control-label">Price Per Bottle
+                              Cap</label>
+                           <select class="form-control finalproductname-input" id="final_price-bottlecap-input"
+                              name="final_price-bottlecap-input">
+                              <option value=""></option>
+                              <option value="0">NA</option>
+                              {% for  i in packing %}
+                              {% if i.category == 'bottle' and i.approved %}
+                              <option value="{{i.product}}-{{i.pereach}}">{{i.product}}-{{i.pereach}}</option>
+                              {% endif %}
+                              {% endfor %}
+                           </select>
+
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label for="final_bottle-case-input" class=" form-control-label">Bottle Per Case</label>
+                           <input type="text" id="final_bottle-case-input" name="final_bottle-case-input"
+                              class="form-control">
+
+                        </div>
+
+                        <div class="col col-md-4">
+                           <label for="final_label-case-input" class=" form-control-label">Label Per Case</label>
+                           <input type="text" id="final_label-case-input" name="final_label-case-input"
+                              class="form-control">
+                        </div>
+
+                        <div class="col col-md-4">
+                           <label for="final_bottlecap_per-case-input" class=" form-control-label">Bottle Cap Per
+                              Case</label>
+                           <input type="text" id="final_bottlecap_per-case-input" name="final_bottlecap_per-case-input"
+                              class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="final_cartons-input" class=" form-control-label">Price Per Cartoon</label>
+                           <!-- <input type="text" id="final_cartons-input" name="final_cartons-input" class="form-control"> -->
+                           <select class="form-control finalproductname-input" id="final_cartons-input"
+                              name="final_cartons-input">
+                              <option value="0">NA</option>
+                              {% for  i in packing %}
+                              {% if i.category == 'carton' and i.approved %}
+                              <option value="{{i.product}}-{{i.pereach}}">{{i.product}}-{{i.pereach}}</option>
+                              {% endif %}
+                              {% endfor %}
+
+
+                           </select>
+                        </div>
+
+                        <div class="col col-md-6">
+                           <label for="final_dkexPrice-input" class=" form-control-label">DK Ex Price</label>
+                           <input type="text" id="final_dkexPrice-input" name="final_dkexPrice-input"
+                              class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="final_kscost-input" class=" form-control-label">KS Cost</label>
+                           <input type="text" id="final_kscost-input" name="final_kscost-input" class="form-control">
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="final_sellingprice-input" class=" form-control-label">Total Selling Price</label>
+                           <input type="text" id="final_sellingprice-input" name="final_sellingprice-input"
+                              class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-12">
+                           <label for="final_remarks-input" class=" form-control-label">Remarks</label>
+                           <input type="text" id="final_remarks-input" name="final_remarks-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="Save Details">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                     </div>
+               </div>
+            </div>
+            </form>
+         </div>
+      </div>
+   </div>
+   <div class="modal fade" id="edit0" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h3 class="modal-title title" id="exampleModalLabel">Final Product Cost Entry Data</h3>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <div class="card-body card-block">
+                  <form action="{% url 'costmanagement:editfinalproduct' %}" method="post" enctype="multipart/form-data"
+                     class="form-horizontal">
+                     {% csrf_token %}
+                     <div class="row form-group">
+                        <div class="col-md-6">
+                           <label for="finalproduct_sn" class="form-control-label">S.N</label>
+                           <input type="text" id="edit-finalproduct_sn" readonly name="finalproduct_sn"
+                              class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                           <label for="finalproduct_date" class="form-control-label">Date</label>
+                           <!-- <input type="text" id="consumption_date" name="consumption_date" class="form-control"> -->
+                           <div class="datefield">
+                              <input type="text" class="form-control" id="edit-finalproduct_date-input"
+                                 name="finalproduct_date-input">
+                              <span>
+                                 <i class="fa fa-calendar date" id="edit-finalproduct_date-input-date"></i>
+                              </span>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="row form-group">
+
+                        <div class="col col-md-6">
+                           <label for="edit-finalproductname-input" class=" form-control-label">Product Name</label>
+                           <!--  <input type="text" id="finalproductname-input" name="finalproductname-input" class="form-control"> -->
+                           <select class="form-control" id="edit-finalproductname-input" name="finalproductname-input">
+                              <option value=""></option>
+                              {% for product in products %}
+                              {% if product.approved %}
+                              <option value="{{product.product}}">{{product.product}}</option>
+                              {% endif %}
+                              {% endfor %}
+                           </select>
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="edit-final_packingsize-input" class=" form-control-label">Packing Size</label>
+                           <select class="form-control" id="edit-final_packingsize-input"
+                              name="final_packingsize-input">
+                              <option value=""></option>
+                              <option value="208l">208 Liters</option>
+                              <option value="200l">200 Liters</option>
+                              <option value="185k">185 Kgs</option>
+                              <option value="50l">50 Liters</option>
+                              <option value="25l">25 Liters</option>
+                              <option value="20l">20 Liters</option>
+                              <option value="18k">18 Kgs</option>
+                              <option value="5l">5 Liters</option>
+                              <option value="5k">5 Kgs</option>
+                              <option value="4l">4 Liters</option>
+                              <option value="1l">1 Liter</option>
+                              <option value="1k">1 kg</option>
+                              <option value="500ml">500 ML</option>
+                              <option value="500gm">500 Grams</option>
+
+                           </select>
+                           <!-- <input type="text" id="edit-final_packingsize-...............................................................................................................................................................................////..,,................////input" name="final_packingsize-input" class="form-control"> -->
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="edit-final_bottles_perpack-input" class=" form-control-label">Bottles Per
+                              Pack</label>
+                           <input type="text" id="edit-final_bottles_perpack-input" name="final_bottles_perpack-input"
+                              class="form-control">
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="edit-final_liters_perpack-input" class=" form-control-label">Liters Per
+                              Pack</label>
+                           <input type="text" id="edit-final_liters_perpack-input" name="final_liters_perpack-input"
+                              class="form-control">
+                        </div>
+
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="edit-final_totalquantity-input" class=" form-control-label">Total
+                              Quantity</label>
+                           <input type="text" id="edit-final_totalquantity-text-input"
+                              name="final_totalquantity-text-input" class="form-control doubleinput">
+                           <!-- <input type="text"  id="final_blendingcost-input" name="final_blendingcost-input" class="form-control"> -->
+                           <select class="form-control" id="edit-final_totalquantity-input"
+                              name="final_totalquantity-input">
+                              <option value="quantityvalue" disabled="disabled" selected="true">Select Quantity Value
+                              </option>
+                              <option value="ctns">CTNS</option>
+                              <option value="jerrican">JERRICAN</option>
+                              <option value="pails">Pails</option>
+                              <option value="drums">Drums</option>
+                              <option value="jar">Jar</option>
+
+                           </select>
+
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="edit-final_qtylitrs-input" class=" form-control-label">Quantity in Liters</label>
+                           <input type="text" id="edit-final_qtylitrs-input" name="final_qtylitrs-input"
+                              class="form-control">
+                        </div>
+
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label for="edit-final_perlitercost-input" class=" form-control-label">Per Liter Cost</label>
+                           <input type="text" id="edit-final_perlitercost-input" name="final_perlitercost-input"
+                              class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="edit-final_costpercasepail-input" class=" form-control-label">Cost Per Case
+                              Pail/Drum/Jar</label>
+                           <input type="text" id="edit-final_costpercasepail-input" name="final_costpercasepail-input"
+                              class="form-control">
+                        </div>
+
+                        <div class="col col-md-4">
+                           <label for="edit-final_dkcost-input" class=" form-control-label">DK Cost</label>
+                           <input type="text" id="edit-final_dkcost-input" name="final_dkcost-input"
+                              class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label for="edit-final_bottle-eac-input" class=" form-control-label">Price Per Bottle</label>
+                           <!-- <input type="text" id="edit-final_bottle-eac-input" name="final_bottle-eac-input" class="form-control"> -->
+                           <select class="form-control" id="edit-final_bottle-eac-input" name="final_bottle-eac-input">
+                              <option value="0">NA</option>
+                              {% for  i in packing %}
+                              {% if i.category == 'bottle' and i.approved %}
+                              <option value="{{i.product}}-{{i.pereach}}">{{i.product}}-{{i.pereach}}</option>
+                              {% endif %}
+                              {% endfor %}
+
+
+                           </select>
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="edit-final_label-eac-input" class=" form-control-label">Price Per Label</label>
+                           <select class="form-control" id="edit-final_label-eac-input" name="final_label-eac-input">
+                              <option value="0">NA</option>
+                              {% for  i in packing %}
+                              {% if i.category == 'label' and i.approved %}
+                              <option value="{{i.product}}-{{i.pereach}}">{{i.product}}-{{i.pereach}}</option>
+                              {% endif %}
+                              {% endfor %}
+
+
+                           </select>
+                        </div>
+
+                        <div class="col col-md-4">
+                           <label for="edit-final_price-bottlecap-input" class=" form-control-label">Price Per Bottle
+                              Cap</label>
+                           <select class="form-control" id="edit-final_price-bottlecap-input"
+                              name="final_price-bottlecap-input">
+                              <option value="0">NA</option>
+                              {% for  i in packing %}
+                              {% if i.category == 'bottle' and i.approved %}
+                              <option value="{{i.product}}-{{i.pereach}}">{{i.product}}-{{i.pereach}}</option>
+                              {% endif %}
+                              {% endfor %}
+
+                           </select>
+
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                           <label for="edit-final_bottle-case-input" class=" form-control-label">Bottle Per Case</label>
+                           <input type="text" id="edit-final_bottle-case-input" name="final_bottle-case-input"
+                              class="form-control">
+                        </div>
+
+                        <div class="col col-md-4">
+                           <label for="edit-final_label-case-input" class=" form-control-label">Label Per Case</label>
+                           <input type="text" id="edit-final_label-case-input" name="final_label-case-input"
+                              class="form-control">
+                        </div>
+                        <div class="col col-md-4">
+                           <label for="edit-final_bottlecap_per-case-input" class=" form-control-label">Bottle Cap Per
+                              Case</label>
+                           <input type="text" id="edit-final_bottlecap_per-case-input"
+                              name="final_bottlecap_per-case-input" class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="edit-final_cartons-input" class=" form-control-label">Price Per Cartoon</label>
+                           <!-- <input type="text" id="edit-final_cartons-input" name="final_cartons-input" class="form-control"> -->
+                           <select class="form-control" id="edit-final_cartons-input" name="final_cartons-input">
+                              <option value="0">NA</option>
+                              {% for  i in packing %}
+                              {% if i.category == 'carton' and i.approved %}
+                              <option value="{{i.product}}-{{i.pereach}}">{{i.product}}-{{i.pereach}}</option>
+                              {% endif %}
+                              {% endfor %}
+
+
+                           </select>
+                        </div>
+
+                        <div class="col col-md-6">
+                           <label for="edit-final_dkexPrice-input" class=" form-control-label">DK Ex Price</label>
+                           <input type="text" id="edit-final_dkexPrice-input" name="final_dkexPrice-input"
+                              class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-6">
+                           <label for="edit-final_kscost-input" class=" form-control-label">KS Cost</label>
+                           <input type="text" id="edit-final_kscost-input" name="final_kscost-input"
+                              class="form-control">
+                        </div>
+                        <div class="col col-md-6">
+                           <label for="edit-final_sellingprice-input" class=" form-control-label">Total Selling
+                              Price</label>
+                           <input type="text" id="edit-final_sellingprice-input" name="final_sellingprice-input"
+                              class="form-control">
+                        </div>
+                     </div>
+                     <div class="row form-group">
+                        <div class="col col-md-12">
+                           <label for="edit-final_remarks-input" class=" form-control-label">Remarks</label>
+                           <input type="text" id="edit-final_remarks-input" name="final_remarks-input"
+                              class="form-control">
+                        </div>
+                     </div>
+                     <div class="modal-footer">
+                        <button value='' id="final-approve-btn" class="btn btn-primary approve">Approve</button>
+                        <input type="submit" id="final-edit-save" class="btn btn-primary" value="Save Details">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                     </div>
+               </div>
+            </div>
+            </form>
+         </div>
+      </div>
+   </div>
+
+
+
+   <div class="modal fade" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h3 class="modal-title title" id="exampleModalLabel">Final Product Cost Entry Data</h3>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <div class="card-body card-block">
+                  <table class="table tableview table-bordered">
+                     <!-- <tbody>
+                          <tr>
+                            <th scope="col">S.N</th>
+                            <td id="view-productsn"></td>
+                          </tr>
+                           <tr>
+                            <th scope="col">Packaging Date</th>
+                            <td id="view-productdate"></td>
+                          </tr>
+                            <tr>
+                                <th scope="col">Product Name</th>
+
+                                <td id="view-productname"></td>
+                            </tr>
+                            <tr>
+                                <th scope="col">Packing Size </th>
+
+                                <td id="view-packingsize"></td>
+                            </tr>
+                            <tr>
+                                <th scope="col">Bottles Per Pack</th>
+
+                                <td id="view-bottleperneck"></td>
+                            </tr>
+                            <th scope="col">Litres Per Pack</th>
+
+                            <td id="view-litersperpack"></td>
+                            </tr>
+                            <tr>
+                                <th scope="col">Total Qty</th>
+
+                                <td id="view-totalqty"></td>
+                            </tr>
+                            <tr>
+                                <th scope="col">Qty in Liters
+                                </th>
+
+                        <td id="view-qtyliters">
+                        </td>
+                     </tr>
+                     <tr>
+                        <th scope="col">Per Litre Cost</th>
+
+                        <td id="view-perlitercost"></td>
+                     </tr>
+                     <tr>
+                        <th scope="col"><span>Cost Per Case Pail
+                        </th>
+
+                        <td id="view-costpercasepail">
+                        </td>
+                     </tr>
+                     <tr>
+                        <th scope="col">DK Cost
+                        </th>
+
+                        <td id="view-dkcost">
+                        </td>
+                     </tr>
+                     <tr>
+                        <th scope="col">Bottles Per
+                        </th>
+
+                        <td>
+
+
+                            <table class="table table-bordered">
+                              <thead>
+                                <tr>
+                                  <th>EAC</th>
+                                  <th>Case </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td id="view_bottlepereac">name1</td>
+                                  <td id="view_bottlepercase">price1</td>
+                                </tr>
+                              </tbody>
+
+                            </table>
+
+                        </td>
+                        <tr>
+                          <th scope="col">Price per bottle cap</th>
+                          <td id="view_priceperbottlecap">1</td>
+                        </tr>
+                     </tr>
+                     <tr>
+                        <th scope="col"><span>Label Per
+                        </th>
+
+                        <td id="contractbalanceqnty">
+                          <table class="table table-bordered">
+                            <thead>
+                              <tr>
+                                <th>EAC</th>
+                                <th>Case </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td id="view_labelpereac">name1</td>
+                                <td id="view_labelpercase">price1</td>
+                              </tr>
+                            </tbody>
+
+                          </table>
+                        </td>
+                     </tr>
+                     <tr>
+                       <th scope="col">Bottle cap per case</th>
+                       <td id="view_bottlecappercase">200</td>
+                     </tr>
+                     <tr>
+                        <th scope="col"><span>Cartons
+                        </th>
+
+                        <td id="view_cartons">
+                        </td>
+                     </tr>
+                     <tr>
+                        <th scope="col">DK Ex Price</th>
+
+                        <td id="view_dkexprice"></td>
+                     </tr>
+                     <tr>
+                        <th scope="col">KS Cost</th>
+
+                        <td id="view_kscost"></td>
+                     </tr>
+                     <tr>
+                        <th scope="col">Total Selling Price</th>
+
+                        <td id="view_totalsellingprice"></td>
+                     </tr>
+                        </tbody> -->
+
+                     <tbody>
+                        <tr>
+                           <th scope="col">S.N</th>
+                           <td id="view-productsn"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Packaging Date</th>
+                           <td id="view-productdate"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Product Name</th>
+
+                           <td id="view-productname"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Packing Size </th>
+
+                           <td id="view-packingsize"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Bottles Per Pack</th>
+
+                           <td id="view-bottleperneck"></td>
+                        </tr>
+                        <th scope="col">Litres Per Pack</th>
+
+                        <td id="view-litersperpack"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Total Qty</th>
+
+                           <td id="view-totalqty"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Qty in Liters
+                           </th>
+
+                           <td id="view-qtyliters">
+                           </td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Per Litre Cost</th>
+
+                           <td id="view-perlitercost"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col"><span>Cost Per Case Pail/Drum/Jar
+                           </th>
+
+                           <td id="view-costpercasepail">
+                           </td>
+                        </tr>
+                        <tr>
+                           <th scope="col">DK Cost
+                           </th>
+
+                           <td id="view-dkcost">
+                           </td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Price Per Bottle
+                           </th>
+
+                           <td id="view-priceperbottle">
+                           </td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Bottle Per Case
+                           </th>
+
+                           <td id="view-bottlepercase">
+                           </td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Price Per Bottle Cap
+                           </th>
+
+                           <td id="view-priceperbottlecap">
+                           </td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Bottle Cap Per Case
+                           </th>
+
+                           <td id="view-bottlecappercase">
+                           </td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Price Per Label
+                           </th>
+
+                           <td id="view-priceperlabel">
+                           </td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Label Per Case</th>
+
+                           <td id="view_labelpercase"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Price Per Carton</th>
+
+                           <td id="view_pricepercarton"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">DK Ex-Price</th>
+
+                           <td id="view_dkexprice"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">KS Cost</th>
+
+                           <td id="view_kscost"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Total Selling Price</th>
+
+                           <td id="view_totalsellingprice"></td>
+                        </tr>
+                        <tr>
+                           <th scope="col">Remarks</th>
+
+                           <td id="view_remarks"></td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <!--	<button value='' id="final-approve-btn" class="btn btn-primary approve">Approve</button-->
+               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+         </div>
+
+      </div>
+   </div>
+</div>
+
+
+{%include 'footer.html'%}
+</div>
+</div>
+</body>
+
+</html>
+<!-- end document

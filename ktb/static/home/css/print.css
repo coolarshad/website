@@ -1,0 +1,197 @@
+
+/*body{
+    display: none;
+}*/
+
+.datesection p:nth-child(odd) {
+    float: left;
+    width: 50%;
+}
+p {
+    margin: 0;
+}
+.datesection p span {
+    margin-left: 8px;
+}
+.datesection p:nth-child(even) {
+    float: right;
+}
+.datesection::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.verification {
+    float: left!important;
+    margin-right: 12px!important;
+    padding-top: 100px!important;
+}
+.verification1 h4, .verification1 p, .verification h4, .verification p {
+    padding-bottom: 20px;
+}
+
+h4 {
+    font-size: 18px;
+}
+.verification1 {
+    float: right!important;
+    padding-top: 100px!important;
+}
+.verification1 p {
+    text-align: right;
+}
+.salesorder::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+table.table.tablesales.table-bordered, table.table.tablepurchase.table-bordered {
+    margin-top: 15px;
+}
+.table-bordered {
+    border: 1px solid #dee2e6;
+}
+.table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    background-color: transparent;
+}
+table {
+    border-collapse: collapse;
+}
+thead {
+    display: table-header-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+/*table.table.tablesales th, table.table.tablepurchase th {
+
+    background: #da3c49!important;
+    color: #fff!important;
+}*/
+table.table.table-bordered th {
+    width: 0;
+}
+.table thead th, .table td {
+    vertical-align: middle!important;
+}
+.table-bordered thead td, .table-bordered thead th {
+    border-bottom-width: 2px;
+}
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+}
+.tablesales th {
+    width: 25%!important;
+}
+th[scope="col"] {
+    font-weight: bold;
+}
+.table th {
+    padding: .75rem;
+}
+.table th {
+    vertical-align: middle!important;
+    font-weight: 500;
+}
+.table-bordered td, .table-bordered th {
+    border: 1px solid #dee2e6;
+}
+.table td, .table th {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+th {
+    text-align: inherit;
+}
+.table thead th, .table td {
+    vertical-align: middle!important;
+}
+.terms {
+    line-height: 45px;
+}
+.terms p:nth-child(odd) {
+    float: left!important;
+    width: 50%!important;
+}
+.terms p {
+    overflow: hidden;
+    line-height: 35px!important;
+}
+div#tobeprintedsales,div#tobeprintedpurchase {
+    padding-top: 0!important;
+}
+.letterhead{
+/*  margin: 0 auto!important;
+    text-align: center!important;*/
+        margin-bottom: 35px!important;
+}
+
+.description{
+	font-weight:bold!important;
+	margin-bottom:15px!important;
+	padding-bottom:15px!important;
+	
+}
+.description li:nth-child(odd){
+	float:left!important;
+	
+}
+.description li{
+	list-style-type:none!important;
+	display:block!important;
+	width:50%!important;
+
+}
+.tableview th{
+	width: 50%!important;
+}
+.description li:nth-child(even){
+	float:right!important;
+}
+.description ul{
+	padding:0!important;
+}
+.datesection {
+    padding-bottom: 12px!important;
+}
+/*july 9*/
+.letter {
+    margin-top: 20px!important;
+}
+.requireddocuments li {
+    line-height: 30px!important;
+}
+.requireddocuments{
+  margin-left: 20px;
+}
+.requireddocuments h5 {
+    display: inline-block!important;
+    border-bottom: 2px solid #000!important;
+    font-size: 18px!important;
+    margin-top: 20px!important;
+    margin-bottom: 12px!important;
+}
+.terms::after {
+    content: ""!important;
+    display: block!important;
+    clear: both!important;
+}
+
+.mainreport h4 {
+    text-align: center!important;
+    margin: 0 auto!important;
+    border: 1px solid #ccc!important;
+    padding: 12px!important;
+    margin-bottom: 12px!important;
+    margin-top: 12px!important;
+}

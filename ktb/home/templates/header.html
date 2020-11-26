@@ -1,0 +1,340 @@
+{% load staticfiles %}
+
+<body>
+   <div class="page-wrapper">
+   <!-- HEADER MOBILE-->
+   <header class="header-mobile d-block d-lg-none">
+      <div class="header-mobile__bar">
+         <div class="container-fluid">
+            <div class="header-mobile-inner">
+               <a class="logo" href="{%url 'home:dashboard'%}">
+               <img src="{% static 'home/images/kismatlogo.png' %}" alt="CoolAdmin" draggable="false"/>
+               </a>
+               <button class="hamburger hamburger--slider" type="button">
+               <span class="hamburger-box">
+               <span class="hamburger-inner"></span>
+               </span>
+               </button>
+            </div>
+         </div>
+      </div>
+      <nav class="navbar-mobile">
+         <div class="container-fluid">
+            <ul class="navbar-mobile__list list-unstyled">
+               <li class="active">
+                  <a class="js-arrow" href="{%url 'home:dashboard' %}">
+                  <i class="fas fa-tachometer-alt"></i>Dashboard</a>
+               </li>
+               
+               <li class="has-sub">
+                  <a class="js-arrow" href="#">
+                  <i class="fas fa-user"></i>User</a>
+                  <ul class="list-unstyled navbar__sub-list js-sub-list">
+                     {% if user.authority != 'Admin'%}
+                     <li>
+                        <a href="{%url 'home:users'%}">User Management</a>
+                     </li>
+                     {% endif %}
+                  </ul>
+               </li>
+               
+               <li class="has-sub">
+                  <a class="js-arrow" href="#">
+                  <i class="zmdi zmdi-file-text"></i>Company Provision</a>
+                  <ul class="list-unstyled navbar__sub-list js-sub-list">
+                     <li>
+                        <a href="{%url 'home:kyc'%}">KYC Form</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:log'%}">Log File</a>
+                     </li>
+                  </ul>
+               </li>
+               <li class="has-sub">
+                  <a class="js-arrow" href="#">
+                  <i class="fas fa-chart-bar"></i>Reports</a>
+                  <ul class="list-unstyled navbar__sub-list js-sub-list">
+                     <li class="has-sub">
+                        <a href="{%url 'home:tradeApproval'%}">Trade Approval</a>
+                        <a href="{%url 'home:tradeApproved'%}">Trade Approved</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:preDocuments' %}">Pre-Sales/ Pre-Purchase Documents</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:prepayments'%}">Pre-Payments/ LC</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:salesPurchase' %}">Sales and Purchase</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:extraCost' %}">Extra Cost Related</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:paymentFinance'%}">Payment and Finance</a>
+                     </li>
+                     <!-- <li>
+                        <a href="{%url 'home:disputes'%}">Dispute and Remarks</a>
+                     </li> -->
+                     {% if user.authority != 'Viewer'%}
+                     <li>
+                        <a href="{%url 'home:pl'%}">P&L Account</a>
+                     </li>
+                     {% endif %}
+                  </ul>
+               </li>
+               <li>
+                  <a  href="{%url 'home:inventory' %}">
+                  <i class="fas fa-desktop"></i>Inventory</a>
+               </li>
+               <li>
+                  <a href="{%url 'home:stocks'%}">
+                  <i class="fas fa-desktop"></i>Stock Journal</a>
+               </li>
+            </ul>
+         </div>
+      </nav>
+   </header>
+   <!-- END HEADER MOBILE-->
+   <!-- MENU SIDEBAR-->
+   <aside class="menu-sidebar d-none d-lg-block">
+      <div class="logo">
+         <a href="{%url 'home:dashboard'%}">
+         <img src="{% static 'home/images/kismatlogo.png' %}" alt="Our Kismat" draggable="false"/>
+         </a>
+      </div>
+      <div class="menu-sidebar__content js-scrollbar1">
+         <nav class="navbar-sidebar">
+            <ul class="list-unstyled navbar__list">
+               <li class="active">
+                  <a  href="{%url 'home:dashboard' %}">
+                  <i class="zmdi zmdi-view-dashboard"></i>Dashboard</a>
+               </li>
+               {% if user.authority == 'Manager 2' %}
+               <li class="has-sub">
+                  <a class="js-arrow" href="#">
+                  <i class="zmdi zmdi-account"></i>Users</a>
+                  <ul class="list-unstyled navbar__sub-list js-sub-list">
+                     
+                     <li>
+                        <a href="{%url 'home:users'%}">User Management</a>
+                     </li>
+                      
+                  </ul>
+               </li>
+              {% endif %}
+               <li class="has-sub">
+                  <a class="js-arrow" href="#">
+                  <i class="zmdi zmdi-file-text"></i>Company Provision</a>
+                  <ul class="list-unstyled navbar__sub-list js-sub-list">
+                     <li>
+                        <a href="{%url 'home:kyc'%}">KYC Form</a>
+                     </li>
+                     {% if user.authority == 'Manager 2'%}
+                     <li>
+                        <a href="{%url 'home:log'%}">Log File</a>
+                     </li>
+                     {% endif %}
+                  </ul>
+               </li>
+               <li class="has-sub">
+                  <a class="js-arrow" href="#">
+                  <i class="zmdi zmdi-assignment"></i>Reports</a>
+                  <ul class="list-unstyled navbar__sub-list js-sub-list">
+                     <li class="has-sub">
+                        <a  href="{%url 'home:tradeApproval'%}">
+                        Trade Approval</a>
+                        <ul class="list-unstyled navbar__sub-list js-sub-list">
+                           <li>
+                              <a href="{%url 'home:tradeApproved' %}">Trade Approved</a>
+                           </li>
+                        </ul>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:preDocuments' %}">Pre-Sales/ Pre-Purchase Documents</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:prepayments'%}">Pre-Payments/ LC</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:salesPurchase' %}">Sales and Purchase</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:extraCost' %}">Extra Cost Related</a>
+                     </li>
+                     <li>
+                        <a href="{%url 'home:paymentFinance'%}">Payment and Finance</a>
+                     </li>
+                    <!--  <li>
+                        <a href="{%url 'home:disputes'%}">Dispute and Remarks</a>
+                     </li> -->
+                      {% if user.authority != 'Viewer'%}
+                     <li>
+                        <a href="{%url 'home:pl'%}">P&L Account</a>
+                     </li>
+                     {% endif %}
+                  </ul>
+               </li>
+               <li>
+                  <a href="{%url 'home:inventory' %}">
+                  <i class="zmdi zmdi-store"></i>Inventory</a>
+               </li>
+               <!--<li>
+                  //<a href="{%url 'home:stocks'%}">
+                  //<i class="zmdi zmdi-book"></i>Stock Journal</a>
+               //</li>-->
+                <li class="has-sub">
+                  <a class="js-arrow" href="#">
+                  <i class="zmdi zmdi-money-box"></i>Cost Management</a>
+                  <ul class="list-unstyled navbar__sub-list js-sub-list">
+                     <li class="has-sub">
+                        <a  href="{% url 'costmanagement:raw' %}">
+                        Raw Materials Price</a>
+                        <ul class="list-unstyled navbar__sub-list js-sub-list">
+                           <li>
+                              <a href="{% url 'costmanagement:rawConsumption' %}">Raw Material Consumption</a>
+                           </li>
+                        </ul>
+                     </li>
+                     <li class="has-sub">
+                        <a href="{% url 'costmanagement:additives' %}">Additives Price</a>
+                        <ul class="list-unstyled navbar__sub-list js-sub-list">
+                           <li>
+                              <a href="{% url 'costmanagement:additiveConsumption' %}">Additive Consumption</a>
+                           </li>
+                        </ul>
+                     </li>
+                     <li>
+                        <a href="{% url 'costmanagement:consumption' %}">Consumption & Blending Cost</a>
+                     </li>
+                     <!-- <li>
+                        <a href="{% url 'costmanagement:blending' %}">Blending Cost </a>
+                     </li> -->
+                     <li>
+                        <a href="{% url 'costmanagement:finalproduct' %}">Final Product Cost</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'costmanagement:inventory' %}">Inventory for Production</a>
+                     </li>
+                     <li>
+                        <a href="{% url 'costmanagement:packing' %}">Packing Price</a>
+                     </li>
+                    
+                  </ul>
+               </li>
+              <!--  <li>
+                  <a href="#">
+                  <i class="zmdi zmdi-money-box"></i>Cost Management</a>
+               </li> -->
+            </ul>
+         </nav>
+      </div>
+   </aside>
+   <!-- END MENU SIDEBAR-->
+   <!-- PAGE CONTAINER-->
+   <div class="page-container">
+   <!-- HEADER DESKTOP-->
+   <header class="header-desktop">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <h2 class="mainheadertitle">Kismat Trade Book</h2>
+            <div class="header-wrap">
+               <div class="header-button">
+                  <div class="noti-wrap">
+                     <div class="noti__item js-item-menu">
+                        <i class="zmdi zmdi-notifications"></i>
+                        <span class="quantity">20</span>
+                        <div class="notifi-dropdown js-dropdown">
+                          
+                           <div class="notifi__title">
+                              <p><strong>Your 20 latest notifications</strong></p>
+                           </div>
+                           
+
+                           <div class="notifi__item" >
+                              
+                             
+                              <div class="content" id="notifications">
+                               
+                                 
+                                
+                              </div>
+                              
+                               
+                           </div>
+                         
+                           
+                        </div>
+                     </div>
+                     
+                  </div>
+               </div>
+               <div class="account-wrap">
+                  <div class="account-item clearfix js-item-menu">
+                     <div class="content">
+                        <a class="js-acc-btn" href="#">{{user.name}}</a>
+                     </div>
+                     <div class="account-dropdown js-dropdown">
+                        <div class="info clearfix">
+                           <div class="content">
+                              <h5 class="name">
+                                 <a id="authority" href="#">{{user.authority}}</a>
+                              </h5>
+                              <span class="email">{{user.email}}</span>
+                           </div>
+                        </div>
+                        <div class="account-dropdown__body">
+                           <div class="account-dropdown__footer">
+                              <a href="{% url 'logout'%}">
+                              <i class="zmdi zmdi-power"></i>Logout</a>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+             
+            </div>
+         </div>
+           <div class="export">
+                  <a class="excel"><button class="exp" >Export to Excel</button></a>
+            </div>
+      </div>
+   </header>
+   <!-- HEADER DESKTOP--> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+   $(document).ready(function(){
+      // notificationcount
+      window.noti=function(){
+         
+      }
+var notarr=[];
+var notdatearr=[];
+var notuser=[];
+var noticount=$('.notifi__item').length;
+// let noticount=msgs.count;
+// for(let i=0;i<noticount;i++){
+//   notarr.append(msgs[i]);
+// }
+{%for msg in msgs %}
+   {% if msg.action != 'Signed In' %}
+   if(notarr.length<20){
+      notarr.push('{{msg.action}}');
+       notdatearr.push('{{msg.logdate}}');
+       notuser.push('{{msg.user}}');
+   }
+   
+   {% endif %}
+{% endfor %}
+console.log(notarr);
+for(var i=0;i<20;i++){
+
+   $('#notifications').append(`<div style="border-bottom: 1px solid #e2e2e2;
+    margin-bottom: 12px;"><span style="display:inline-block;">`+notarr[i]+`</span><span class="notificationdate" style='display:inline-block;margin-bottom:13px;font-size:12px;'>`+notdatearr[i]+`</span><span style="float: right;color: #d02b3c; font-size: 13px;"> By: `+notuser[i]+`</span></div>`);
+   // $('#notificationdate').append(notdatearr[i]);
+}
+console.log(notdatearr);
+console.log(notuser);
+
+});
+</script>

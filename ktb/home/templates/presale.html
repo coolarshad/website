@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Pre-Sales/Pre-Purchase Documents</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css'%}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0-RC1/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet">
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css'%}" rel="stylesheet" media="screen">
+
+
+     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+      <script type="text/javascript">
+         $(document).ready(function(){
+
+             
+                    $("#dropdown").change(function(){
+                    var id=this.value;
+
+                    $.post("{% url 'home:getpresale'%}",
+                    {
+                        'type':id,
+                    },
+                    function(data,status){
+                      $('#rowid').empty();
+                       for (var i = 0; i < data.data.length; i++) {
+                        var str;
+                        if (data.data[i].so_number==null) {str=data.data[i].po_number+"</td><td>"+data.data[i].po_date;}
+                        else{
+                          str=data.data[i].so_number+"</td><td>"+data.data[i].so_date;
+                        }
+
+			       $("#rowid").append("<tr><td>"+data.data[i].sn+"</td><td>"+data.data[i].types+"</td><td>"+data.data[i].company+"</td><td>"+data.data[i].trn+"</td><td>"+data.data[i].client+"</td><td>"+str+"</td><td><button type='button' class='btn btn-primary view' value="+data.data[i].trn+" data-toggle='modal' data-target='#view0'>View</button></tr>");
+
+                       }
+                    });
+                });
+
+          $('#print1').click(function(){
+            $('#tobeprintedsales').printThis({
+              debug: false,               // show the iframe for debugging
+              importCSS: true,            // import parent page css
+              importStyle: false,         // import style tags
+              printContainer: true,       // print outer container/$.selector
+              loadCSS: "{% static 'home/css/print.css' %}",                // path to additional css file - use an array [] for multiple
+              pageTitle: "",              // add title to print page
+              removeInline: false,        // remove inline styles from print elements
+              removeInlineSelector: "*",  // custom selectors to filter inline styles. removeInline must be true
+              printDelay:1000 ,            // variable print delay
+              header: null,               // prefix to html
+              footer: null,               // postfix to html
+              base: false,                // preserve the BASE tag or accept a string for the URL
+              formValues: true,           // preserve input/form values
+              canvas: false,              // copy canvas content
+              doctypeString: '',       // enter a different doctype for older markup
+              removeScripts: false,       // remove script tags from print content
+              copyTagClasses: false,      // copy classes from the html & body tag
+              beforePrintEvent: null,     // function for printEvent in iframe
+              beforePrint: null,          // function called before iframe is filled
+              afterPrint: null            // function called before iframe is removed
+            });
+          });
+
+           $('#print2').click(function(){
+            $('#tobeprintedpurchase').printThis({
+              debug: false,               // show the iframe for debugging
+              importCSS: true,            // import parent page css
+              importStyle: false,         // import style tags
+              printContainer: true,       // print outer container/$.selector
+              loadCSS: "{% static 'home/css/print.css' %}",                // path to additional css file - use an array [] for multiple
+              pageTitle: "",              // add title to print page
+              removeInline: false,        // remove inline styles from print elements
+              removeInlineSelector: "*",  // custom selectors to filter inline styles. removeInline must be true
+              printDelay: 1000,            // variable print delay
+              header: null,               // prefix to html
+              footer: null,               // postfix to html
+              base: false,                // preserve the BASE tag or accept a string for the URL
+              formValues: true,           // preserve input/form values
+              canvas: false,              // copy canvas content
+              doctypeString: '',       // enter a different doctype for older markup
+              removeScripts: false,       // remove script tags from print content
+              copyTagClasses: false,      // copy classes from the html & body tag
+              beforePrintEvent: null,     // function for printEvent in iframe
+              beforePrint: null,          // function called before iframe is filled
+              afterPrint: null            // function called before iframe is removed
+            });
+          });
+
+         $('#trn').keyup(function(){
+          $.post("{%url 'home:alterTradeApproved' %}",
+          {
+            'trn':this.value,
+          },
+          function(data,status){
+            // alert(data.bank);
+            if(data.types != 'Cancel Sales' || data.types != 'Cancel Purchase'){
+              $('#purchaseorderbtn').prop('disabled','true');
+               $('#salesorderbtn').prop('disabled','true');
+            }
+            
+            if(data.types=='Sales'||data.types=='Sales Amendment')
+            {
+              $('#purchaseorderbtn').prop('disabled','true');
+              $('#salesorderbtn').removeAttr('disabled');
+            }
+            if(data.types=='Purchase'||data.types=='Purchase Amendment')
+            {
+              $('#salesorderbtn').prop('disabled','true');
+              $('#purchaseorderbtn').removeAttr('disabled');
+            }
+            if(data.company=="SL"){
+              $('#kismatcompany').text("PLATINUM RENAISSANCE SDN BHD, MALAYSIA");
+              $('#salesorderaccountname').text("PLATINUM RENAISSANCE SDN BHD, MALAYSIA");
+              $('#salesorderbankname').html(data.bank);
+              $('#salesorderaccountnum').text(data.account);
+              $('#salesorderswiftcode').text(data.swift);
+              $('#purchaseordercompany').text("PLATINUM RENAISSANCE SDN BHD, MALAYSIA");
+              $('.verificationcomp').html(` <h4><span id="kismatcompany">FOR, PLATINUM RENAISSANCE SDN BHD, MALAYSIA</span></h4><img src="{%static 'images/digitalplatinum.PNG' %}">`);
+                $('.letterheadcomp').html(`<img src="{%static 'images/platinum.PNG' %}" oncontextmenu="return false" onselectstart="return false" draggable="false">`);
+     
+            }
+            else{
+              $('#kismatcompany').text("KISMAT PETROLEUM TRADING PTE LTD");
+              $('#salesorderaccountname').text("KISMAT PETROLEUM TRADING PTE LTD");
+              // $('#salesorderbankname').html("OVERSEA CHINESE BANKING CORPORATION (OCBC) <br/>65 CHULIA STREET, SINGAPORE 049513");
+              $('#salesorderbankname').html(data.bank);
+              // $('#salesorderaccountnum').text("503-390-163-301 (USD)");
+              $('#salesorderaccountnum').text(data.account);
+              // $('#salesorderswiftcode').text("OCBCSGSG");
+               $('#salesorderswiftcode').text(data.swift);
+              $('#purchaseordercompany').text("KISMAT PETROLEUM TRADING PTE LTD");
+              $('.letterheadcomp').html(`<img src="{%static 'images/kpnew.PNG' %}" oncontextmenu="return false" onselectstart="return false" draggable="false">`);
+              $('.verificationcomp').html(` <h4><span id="kismatcompany">Kismat Petroleum Trading Pte. Ltd</span></h4><img src="{%static 'images/digital.PNG' %}" oncontextmenu="return false" onselectstart="return false" draggable="false"> `);
+              
+
+            }
+          })
+         });
+
+         $("#edit-podate-input-date").datepicker({
+
+         }).on("changeDate", function (e) {
+             var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+           $('#edit-podate-input').val(d);
+             // console.log(e.date);
+             // alert('hi');
+         });
+
+          $("#edit-contractdate-input-date").datepicker({
+
+         }).on("changeDate", function (e) {
+           var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+           $('#edit-contractdate-input').val(d);
+             // console.log(e.date);
+             // alert('hi');
+         });
+
+          $("#lc_expirydate-input-date").datepicker({
+
+         }).on("changeDate", function (e) {
+            var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+           $('#lc_expirydate-input').val(d);
+             // console.log(e.date);
+             // alert('hi');
+         });
+
+          $("#edit-duedate-date").datepicker({
+
+         }).on("changeDate", function (e) {
+             var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+           $('#edit-duedate').val(d);
+             // console.log(e.date);
+             // alert('hi');
+         });
+
+          $("#edit-paymentdate-input-date").datepicker({
+
+         }).on("changeDate", function (e) {
+            var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+           $('#edit-paymentdate-input').val(d);
+             // console.log(e.date);
+             // alert('hi');
+         });
+
+          $("#edit-lc_expirydate-input-date").datepicker({
+
+         }).on("changeDate", function (e) {
+             var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+
+           $('#edit-lc_expirydate-input').val(d);
+             // console.log(e.date);
+             // alert('hi');
+         });
+
+
+
+                  $(document).on('click','.editbtn0',function(){
+                           var trn=this.value;
+                           $.post("{% url 'home:editTradeDoc' %}",
+                           {
+                              'trn':trn
+                    },
+                     function(data,status){
+                       // alert(data.so_number);
+                             $('#edit-contractnum-input').val(data.so_number);
+                              $('#edit-contractdate-input').val(data.so_date);
+                               $('#edit-ponum-input').val(data.po_number);
+                                $('#edit-podate-input').val(data.po_date);
+                          });
+                        });
+
+                  $(document).on('click','.view',function(){
+                           var trn=this.value;
+                           // alert(trn);
+                           $.post("{% url 'home:editTradeDoc' %}",
+                           {
+                              'trn':trn
+                    },
+                     function(data,status){
+                       // alert(data.trn);
+                             $('#vsn').text(data.sn);
+                             $('#vcompany').text(data.company);
+                             $('#vtrd').text(data.trd);
+                             $('#vtrn').text(data.trn);
+                             $('#vso_number').text(data.so_number);
+                              $('#vso_date').text(data.so_date);
+                               $('#vpo_number').text(data.po_number);
+                                $('#vpo_date').text(data.po_date);
+                          });
+                        });
+
+
+                    $('#salesorderbtn').click(function(){
+                      var trn=$('#trn').val();
+                     //alert(trn);
+                      $.post("{% url 'home:getsales' %}",
+                            {
+                               'trn': trn
+                            },
+                             function(data,status){
+                                  // alert("Data: " + data.s_customer + "\nStatus: " + status);
+                                   $('#salesordernumber').text(data.so_number);
+                                  $('#salesorderdate').text(data.so_date);
+                                  $('#salesorderperson').text(data.client);
+                                  $('#salesorderaddress').text(data.address);
+
+                                  $('#salesorderproduct').text(data.product);
+                                  $('#salesorderquantity').text(parseFloat(data.tuq).toFixed(4));
+                                  $('#salesorderrateamount').text(parseFloat(data.ratePMT).toFixed(4));
+                                  $('#salesorderratepmt').text(data.incoterm);
+
+
+                                  $('#salesordervalue').text(parseFloat(data.tuq*data.ratePMT).toFixed(2));
+                                  $('#salesordertotal').text(parseFloat(data.tuq*data.ratePMT).toFixed(2));
+                                  $('#salesordertotal').text(parseFloat(data.tuq*data.ratePMT).toFixed(2));
+                                  $('#accepted_company').text(data.client);
+                                  // $('#salesinwords').val('500');
+
+                                  if(data.paymentTerm == 'Usance 30 days DLC' || data.paymentTerm == 'Sight DLC' || data.paymentTerm == 'Usance 60 days DLC' || data.paymentTerm == 'Usance 90 days DLC' )
+                                  {
+                                    // alert('yes');
+                                   $('#salesorderpaymentterm').text(data.paymentTerm+" (All LC's must be issued upon DRAFT confirmation only.)");
+                                  }
+                                else{
+                                  // alert('no');
+                                   $('#salesorderpaymentterm').text(data.paymentTerm);
+                                  
+                                }
+
+                                 // $('#salesorderpaymentterm').text(data.paymentTerm);
+                                 $('#salesordertolerance').text(data.tolerance);
+                                 $('#salesorderloadingport').text(data.pol);
+                                 $('#salesorderdischargeport').text(data.pod);
+                                 $('#salesorderorigincountry').text(data.origin);
+                                 $('#salesorderpacking').text(data.packing);
+                                 $('#salesunit1').text(data.unit);
+                                 $('#salesunit2').text(data.unit);
+                                 $('#salesunit3').text(data.unit);
+                                 $('#salesamtunit').text(data.unit);
+                                 var i=MakeInWords($('#salesordertotal').text());
+                                      // alert(i);
+                                 $('#salesinwords').text(i);
+
+
+                          });
+                      $('#Modal1').modal("show");
+
+                    });
+
+                    $('#purchaseorderbtn').click(function(){
+                      var trn=$('#trn').val();
+                      $.post("{% url 'home:getpurchase' %}",
+                            {
+                               'trn': trn,
+                            },
+                             function(data,status){
+                                  // alert("Date: " + data.po_date + "\nStatus: " + status);
+                                  $('#purchaseorderdate').text(data.po_date);
+                                  $('#purchaseordernum').text(data.po_number);
+                                  $('#purchaseordersupplier').text(data.client);
+				  $('#acknowledgeby').text(data.client);
+                                  $('#purchaseorderaddres').text(data.address);
+                                  $('#purchaseorderdescription').text(data.product);
+
+                                  $('#purchaseorderquantitymt').text(parseFloat(data.tuq).toFixed(4));
+                                  $('#purchaseorderratepmt').text(parseFloat(data.ratePMT).toFixed(4));
+                                  // $('.purchaseordercurrency').text(data.p_rateCur);
+  $('#purchaseorderamount').text(parseFloat(parseFloat($('#purchaseorderquantitymt').text())*parseFloat($('#purchaseorderratepmt').text())).toFixed(2));
+    $('#purchaseordertotal').text(parseFloat(parseFloat($('#purchaseorderquantitymt').text())*parseFloat($('#purchaseorderratepmt').text())).toFixed(2));
+                                  $('#estimateddeparture').text(data.etd);
+                                   $('#purchaseorderdeliveryterm').text(data.incoterm);
+                                   $('#purchaseordertolerance').text(data.tolerance);
+                                    $('#purchaseorderpaymentterm').text(data.paymentTerm);
+                                     $('#purchaseorderdelivery').text(data.pod);
+                                     $('#purchaseloadingport').text(data.pol);
+                                     $('#purchaseunit1').text(data.unit);
+                                     $('#purchaseunit2').text(data.unit);
+                                     var i=MakeInWords($('#purchaseordertotal').text());
+                                      // alert(i);
+                                      $('#purchaseinwords').text(i);
+
+		
+                          });
+                      $('#Modal2').modal("show");
+                    });
+
+
+                    $('.excel').click(function(){
+                        $(this).attr('href',"{% url 'home:exportDoc'%}");
+                    });
+         });
+
+
+    function MakeInWords(input){
+                     var num2words = new NumberToWords();
+                   var intl = num2words.numberToWords(input);
+                   // alert('this is :'+intl);
+                   return intl;
+                   }
+
+             function NumberToWords(){
+                     var defaults = {
+                     units: [ "", "One", "Two", "Three", "Four", "Five", "Six","Seven", "Eight", "Nine", "Ten" ],
+                     teens: [ "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen","Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty" ],
+                     tens: [ "", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty","Seventy", "Eighty", "Ninety" ],
+                     othersIntl: [ "Thousand", "Million", "Billion", "Trillion" ]};
+                     var o = defaults;
+
+                 var units = o.units;
+                 var teens = o.teens;
+                 var tens = o.tens;
+                 var othersIntl = o.othersIntl;
+
+                 var getBelowHundred = function(n) {
+                   if (n >= 100) {
+                     return "greater than or equal to 100";
+                   };
+                   if (n <= 10) {
+                     return units[n];
+                   };
+                   if (n <= 20) {
+                     return teens[n - 10 - 1];
+                   };
+                   var unit = Math.floor(n % 10);
+                   n /= 10;
+                   var ten = Math.floor(n % 10);
+                   var tenWord = (ten > 0 ? (tens[ten] + " ") : '');
+                   var unitWord = (unit > 0 ? units[unit] : '');
+                   return tenWord + unitWord;
+                 };
+
+                 var getBelowThousand = function(n) {
+                   if (n >= 1000) {
+                     return "greater than or equal to 1000";
+                   };
+                   var word = getBelowHundred(Math.floor(n % 100));
+
+                   n = Math.floor(n / 100);
+                   var hun = Math.floor(n % 10);
+                   word = (hun > 0 ? (units[hun] + " Hundred ") : '') + word;
+
+                   return word;
+                 };
+
+                 return {
+                   numberToWords : function(n) {
+                     if (isNaN(n)) {
+                       return "Not a number";
+                     };
+
+                     var word = '';
+                     var val;
+                     var word2 = '';
+                     var val2;
+                     var b = n.split(".");
+                     n = b[0];
+                     d = b[1];
+                     d = String (d);
+                     d = d.substr(0,2);
+
+                     val = Math.floor(n % 1000);
+                     n = Math.floor(n / 1000);
+
+                     val2 = Math.floor(d % 1000);
+                     d = Math.floor(d / 1000);
+
+                     word = getBelowThousand(val);
+                     word2 = getBelowThousand(val2);
+
+                     othersArr = othersIntl;
+                     divisor = 1000;
+                     func = getBelowThousand;
+
+                     var i = 0;
+                     while (n > 0) {
+                       if (i == othersArr.length - 1) {
+                         word = this.numberToWords(n) + " " + othersArr[i] + " " + word;
+                         break;
+                       };
+                       val = Math.floor(n % divisor);
+                       n = Math.floor(n / divisor);
+                       if (val != 0) {
+                         word = func(val) + " " + othersArr[i] + " " + word;
+                       };
+                       i++;
+                     };
+
+                     var i = 0;
+                     while (d > 0) {
+                       if (i == othersArr.length - 1) {
+                         word2 = this.numberToWords(d) + " " + othersArr[i] + " " + word2;
+                         break;
+                       };
+                       val2 = Math.floor(d % divisor);
+                       d = Math.floor(d / divisor);
+                       if (val2 != 0) {
+                         word2 = func(val2) + " " + othersArr[i] + " " + word2;
+                       };
+                       i++;
+                     };
+                     if (word!='') word = word.toUpperCase() + ' DOLLARS';
+                     if (word2!='') word2 = ' AND ' + word2.toUpperCase() + ' CENTS';
+                     return word+word2;
+
+                   }
+                 }
+                  $("img").on("contextmenu",function(){
+                     return false;
+                  }); 
+         }
+
+
+      </script>
+   </head>
+   {% include 'header.html' %}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Pre-Sales/Pre-Purchase Document Report Details</h3>
+               </div>
+            </div>
+         </div>
+         <div class="filter">
+            <button type="button" class="btn btn-primary" data-toggle="modal" id="salesorderbtn" data-target="#Modal1">
+            Sales Order Report
+            </button>
+            <button type="button" class="btn btn-success" data-toggle="modal" id="purchaseorderbtn" data-target="#Modal2">
+            Purchase Order Report
+            </button>
+           <input type="text" placeholder="Filter Using TRN" class='table-search presales' id="trn" data-table-search="myTable">
+                  <select class="form-control presales" id="dropdown">
+                    <option value="" id="" selected disabled >By Trade</option>
+                      <option value="salestrade" id="salestrade">By Sales Trade</option>
+                      <option value="purchasetrade" id="purchasetrade">By Purchase Trade</option>
+                      <option value="cancelsales" id="cancelsales">By Cancel Sales </option>
+                      <option value="cancelpurchase" id="cancelpurchase">By Cancel Purchase</option>
+                      <option value="salesamendment" id="salesamendment">By Sales Amendment</option>
+                      <option value="purchaseamendment" id="purchaseamendment">By Purchase Amendment</option>
+                  </select>
+                  </input>
+
+         </div>
+         <div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="Modal1" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="Modal1"></h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div id="tobeprintedsales">
+                        <div class="card-body card-block">
+                           <div class="salesorder">
+                            <div class="letterhead letterheadcomp">
+                        
+                            </div>
+                              <div class="datesection">
+
+                                 <p>PI&nbsp;:&nbsp;<span id="salesordernumber">KP/XX-MM-YY</span></p>
+                                 <p>Date&nbsp;:&nbsp;<span id="salesorderdate">XX-MM-YY</span></p>
+                              </div>
+
+                              <div class="mainreport">
+                                <h4 style="margin-top:0;"><strong>PROFORMA INVOICE</strong></h4>
+                                 <p >To:&nbsp;<span id="salesorderperson">XXXXXXXXXXXXXXXXXXXXXX</span></p>
+                                 <p>Address:&nbsp;<span id="salesorderaddress">XXXXXXXXXXXXXXXXXXXXXX</span></p>
+
+                                 <table class="table tablesales table-bordered">
+                                    <thead>
+                                       <tr>
+                                          <th scope="col">Product</th>
+                                          <th scope="col">Quantity <span id="salesunit1">MT</span></th>
+                                          <th scope="col">Rate in P<span id="salesunit2">MT</span> <span class="salesordercurrency">USD</span></th>
+                                          <th scope="col">Value in <span class="salesordercurrency">USD</span></th>
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                       <tr>
+                                          <td id="salesorderproduct">XXXXXXXXXXXX</td>
+                                          <td><span  id="salesorderquantity">XX.00 </span></td>
+                                          <td><span  id="salesorderrateamount">XXX.00</span> P<span id="salesunit3">MT</span> <span  id="salesorderratepmt">CFR XXXXXXXXXXXX </span></td>
+                                          <td id="salesordervalue">XXX.00</td>
+                                       </tr>
+                                       <tr>
+                                          <td colspan="2"></td>
+                                          <td >Total </td>
+                                          <td id="salesordertotal">XXXXXXXXXXXX </td>
+                                       </tr>
+                                       <tr>
+                                          <td colspan="4">In Words: <span id="salesinwords"> USD ONLY</span> ONLY</td>
+                                       </tr>
+                                    </tbody>
+                                 </table>
+                                 <div class="terms">
+                                    <p>PAYMENT TERMS</p>
+                                    <p id="salesorderpaymentterm">XXXXXX</p>
+                                    <p>TOLERANCE (in %)</p>
+                                    <p>+/- <span  id="salesordertolerance"></span>% IN QUANTITY AND VALUE MUST BE ACCEPTABLE</p>
+                                    <p>PORT OF LOADING</p>
+                                    <p><span id="salesorderloadingport">XXXXX</span></p>
+                                    <p>PORT OF DISCHARGE</p>
+                                    <p id="salesorderdischargeport">XXXXXXXXXXXXXX</p>
+                                    <p>COUNTRY OF ORIGIN</p>
+                                    <p id="salesorderorigincountry">XXXXXX</p>
+                                    <p>PACKING</p>
+                                    <p id="salesorderpacking">IN FLEXI BAGS</p>
+                                    <p>VALIDITY</p>
+                                    <p><span  id="salesordervalidity">3 </span>DAYS (IT MUST BE ACCEPTED WITHIN THIS TIMEFRAME)</p>
+                                    <p>ADVANCE/LC DUE DATE</p>
+                                    <p>WITHIN <span  id="salesorderadvanceduedate">5 </span>DAYS OF PI ACCEPTANCE</p>
+                                    <p>REMARK </p>
+                                    <p id="salesorderremark">THIRD PARTY DOCUMENTS MUST BE ACCEPTABLE EXCEPT COMMERCIAL INVOICE AND BILL OF EXCHANGE </p>
+                                    <p>SPECIFICATION </p>
+                                    <p id="salesorderspecification">AS PER ATTACHED ANNEXURE I</p>
+                                    <p>ACCOUNT NAME</p>
+                                    <p id="salesorderaccountname">KISMAT PETROLEUM TRADING PTE LTD</p>
+                                    <p>BANK NAME & ADDRESS </p>
+                                    <p id="salesorderbankname">OVERSEA CHINESE BANKING CORPORATION (OCBC) 65 CHULIA STREET, SINGAPORE 049513</p>
+                                    <p>ACCOUNT NO.   </p>
+                                    <p id="salesorderaccountnum">503-390-163-301 (USD)</p>
+                                    <p>SWIFT CODE</p>
+                                    <p id="salesorderswiftcode">OCBCSGSG</p>
+                                 </div>
+                              </div>
+                              <div class="verification verificationcomp">
+                                
+                                  <!-- <img src="{%static 'images/digital.PNG' %}"> -->
+                                
+                              </div>
+                              <div class="verification1">
+                                 <p>Accepted By,</p>
+                                 <h4> <span id="accepted_company">Company Name</span></h4>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="modal-footer">
+                        <button  id="print1"><i class="zmdi zmdi-print" ></i>Print</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="modal fade" id="Modal2" tabindex="-1" role="dialog" aria-labelledby="Modal2" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="Modal2"></h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <!--  <h5 class="companytitle">
+                     <p>5 Coleman Street, # 02-17 Peninsula Excelsior Hotel, Singapore (179805)</p>
+                     <p>
+                        + 65 8436 0325email: kismatmyn@gmail.com
+                     </p>
+                     </h5> -->
+                  <div class="modal-body">
+                     <div id="tobeprintedpurchase">
+                        <div class="card-body card-block">
+                           <div class="letterhead letterheadcomp">
+                        
+                            </div>
+                           <div class="purchaseorder">
+                              <div class="mainreport">
+                                 <p>Order Date&nbsp;:&nbsp;<span id="purchaseorderdate">XX-MM-YY</span></p>
+                                 <p>Order No.: &nbsp;<span id="purchaseordernum">XXXXXXXXXXXXXXXXXXXXXX</span></p>
+                                 <h4><strong>Purchase Order</strong></h4>
+                                 <p>Supplier:&nbsp;<span id="purchaseordersupplier">XXXXXXXXXXXXXXXXXXXXXX</span></p>
+                                 <p>Address:&nbsp;<span id="purchaseorderaddres">XXXXXXXXXXXXXXXXXXXXXX</span></p>
+                                 <div class="letter">
+                                 <p>Dear sir, </p>
+                                 <p>We confirm to buy the below commodity with terms and condition as stated:</p>
+                               </div>
+                                 <table class="table tablepurchase table-bordered">
+                                    <thead>
+                                       <tr>
+                                          <th scope="col">SR NO.</th>
+                                          <th scope="col">Description</th>
+                                          <th scope="col">Quantity <span id="purchaseunit1">MT</span></th>
+                                          <th scope="col">Rate P<span id="purchaseunit2">MT</span>(<span class="purchaseordercurrency">USD</span>)</th>
+                                          <th scope="col">Amount (<span class="purchaseordercurrency">USD</span>)</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                       <tr>
+                                          <td id="purchaseordersn">1</td>
+                                          <td id="purchaseorderdescription">XXXXXXXXXXXX</td>
+                                          <td id="purchaseorderquantitymt">XXX</td>
+                                          <td id="purchaseorderratepmt">XXXXXXXXXXXX </td>
+                                          <td id="purchaseorderamount">XXXXXX</td>
+                                       </tr>
+                                       <tr>
+                                          <td colspan="3"></td>
+                                          <td >Total </td>
+                                          <td id="purchaseordertotal">XXXXXXXXXXXX.00 </td>
+                                       </tr>
+                                       <td colspan="5">In Words: <span id="purchaseinwords"> USD ONLY</span> ONLY</td>
+                                    </tbody>
+                                 </table>
+                                 <div class="terms">
+                                    <p>Delivery Term</p>
+                                    <p><span id="purchaseorderdeliveryterm"></span> <span id="loadingport"></span></p>
+                                    <p>Payment Term</p>
+                                    <p id="purchaseorderpaymentterm">XXXXXXXX</p>
+                                    <p>Tolerance (in %)</p>
+                                    <p>+/- <span id="purchaseordertolerance">XXX</span> %</p>
+                                    <p>Delivery</p>
+                                    <p id="purchaseorderdelivery">XXXXX</p>
+                                    <p>Port of Loading</p>
+                                    <p id="purchaseloadingport">XXXXX</p>
+                                    <p>Specification</p>
+                                    <p>AS PER ATTACHED ANNEXURE</p>
+                                    <p>Estimated time of departure</p>
+                                    <p id="estimateddeparture"></p>
+                                 </div>
+                                 <div class="requireddocuments">
+                                   <h5>Required Documents</h5>
+                                   <ol>
+                                     <li>COMMERCIAL INVOICE</li>
+                                     <li>BILL OF LADING 3/3</li>
+                                     <li>CERTIFICATE OF ANALYSIS</li>
+                                     <li>PACKING LIST & WEIGHT LIST DOCKET</li>
+                                   </ol>
+                                 </div>
+                              </div>
+                              <div class="verification verificationcomp">
+                                  <h4 id="purchaseordercompany">For Kismat Petroleum Trading PTE LTD.</h4>
+                                 <img src="{%static 'images/digital.PNG' %}"  >
+
+                               
+                              </div>
+				<div class="verification1">
+					<p>Acknowledged By,</p>
+					<h4><span id="acknowledgeby"></span></h4>
+				</div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="modal-footer">
+                      <button  id="print2"><i class="zmdi zmdi-print" ></i>Print</button>
+                        <!-- <button id="print2"><i class="zmdi zmdi-print"></i>Print</button> -->
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="boxone drag">
+            <div class="scroller">
+               <table class="table table0 table-striped table-dark table-bordered" id="myTable">
+                  <thead>
+                     <tr>
+                        <th scope="col">S.N</th>
+                        <th scope="col">Trade Type</th>
+                        <th scope="col">Company</th>
+                        <th scope="col">TRN</th>
+                        <th scope="col">Name of the Buyer / Seller </th>
+                        <th scope="col">Order No.</th>
+                        <th scope="col">Order Date</th>
+                        <th scope="col">Status</th>
+
+                     </tr>
+                  </thead>
+                  <tbody id="rowid">
+                     {% for i in records %}
+                     {% if i.trade_status == "Approved" %}
+                     <tr>
+                        <td>{{i.sn}}</td>
+                        <td>{{i.types}}</td>
+                        <td>{{i.company}}</td>
+                        <td>{{i.trn}}</td>
+                        <td>{{i.client}}</td>
+                        {% if i.types == "Purchase" %}
+                        <td>{{i.po_number}}</td>
+                        <td>{{i.po_date}}</td>
+                        {% else %}
+                        <td>{{i.so_number}}</td>
+                        <td>{{i.so_date}}</td>
+                        {% endif %}
+                        <td>
+                           <button type="button" class="btn btn-primary view" value="{{i.trn}}" data-toggle="modal" data-target="#view0">
+                           View
+                           </button>
+                           <!--    <button type="button" disabled="disabled" class="btn btn-primary editbtn0" value="{{i.trn}}" data-toggle="modal" data-target="#edit0">
+                              Edit
+                              </button> -->
+                        </td>
+                     </tr>
+                     {% endif %}
+                     {% endfor %}
+                  </tbody>
+               </table>
+            </div>
+         </div>
+         <!-- view0 -->
+         <div class="modal fade" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Pre-Sales/Pre-Purchase Document</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <div class="displaydata">
+                           <table class="table tableview table-bordered">
+                              <div class="description companytitle">
+                                 <ul>
+                                    <li>S.N :<span id="vsn"></span></li>
+                                    <li>Company :<span id="vcompany"></span></li>
+                                    <li>Trade Ref. Date :<span id="vtrd"></span></li>
+                                    <li>Trade Ref. No :<span id="vtrn"></span></li>
+
+                                 </ul>
+                              </div>
+                              <tbody>
+                                 <tr>
+                                    <th scope="col">Purchase Order No.</th>
+                                    <th scope="row" id="vpo_number"></th>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Purchase Order Date</th>
+                                    <th scope="row" id="vpo_date"></th>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Sales Order No.</th>
+                                    <th scope="row" id="vso_number"></th>
+                                 </tr>
+                                 <tr>
+                                    <th scope="col">Sales Order Date</th>
+                                    <th scope="row" id="vso_date"></th>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- edit0 -->
+         <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="data1">Pre-Sales/Pre-Purchase Document Entry</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <h4 class="companytitle">
+                     <p>Status: Pending To Issue</p>
+                  </h4>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <div class="row form-group">
+                           <div class="col col-md-3">
+                              <label class=" form-control-label">Purchase Order No.</label>
+                              <input type="text" id="edit-ponum-input" name="ponum-input" class="form-control">
+                           </div>
+                           <div class="col col-md-3">
+                              <label for="podate-input" class=" form-control-label">Purchase Order Date</label>
+                              <!-- <input type="date" class="form-control" id="edit-podate-input" name="podate-input"/> -->
+                              <div class="datefield">
+                                 <input type="text" class="form-control" id="edit-podate-input" name="podate-input">
+                                 <span>
+                                 <i class="fa fa-calendar date" id="edit-podate-input-date"></i>
+                                 </span>
+                              </div>
+                           </div>
+                           <div class="col col-md-3">
+                              <label for="contractnum-input" class=" form-control-label">Sales Order No.</label>
+                              <input type="text" id="edit-contractnum-input" name="contractnum-input" class="form-control">
+                           </div>
+                           <div class="col col-md-3">
+                              <label for="contractdate-input" class=" form-control-label">Sales Order Date</label>
+                              <!-- <input type="date" class="form-control" id="edit-contractdate-input" name="contractdate-input"/> -->
+                              <div class="datefield">
+                                 <input type="text" class="form-control" id="edit-contractdate-input" name="podate-input">
+                                 <span>
+                                 <i class="fa fa-calendar date" id="edit-contractdate-input-date"></i>
+                                 </span>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="modal-footer">
+                           <input type="submit" class="btn btn-primary" value="Save Details">
+                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   {% include 'footer.html' %}
+   </div>
+   </div>
+   </body>
+</html>
+<!-- end document-->

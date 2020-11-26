@@ -1,0 +1,552 @@
+<!DOCTYPE html> {%load staticfiles%}
+{% load mathfilters %}
+<html lang="en">
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Title Page-->
+    <title>P&L Account</title>
+    <!-- Fontfaces CSS-->
+    <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+    <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+    <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+    <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+    <!-- Bootstrap CSS-->
+    <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+    <!-- Vendor CSS-->
+    <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+    <link href="{% static 'home/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+    <!-- Main CSS-->
+    <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+             $('#profitremarks').click(function(){
+                $(this).attr('contenteditable','true');
+            })
+
+            $(".table-search-profit").on("keyup", function() {
+                var value = $(this).val().toLowerCase(),
+                    tableattr = $(this).attr("data-table-search"),
+                    tablesearch = $('#' + tableattr).find('tbody tr');
+
+                tablesearch.hide(); //start with all rows hidden
+
+                var previousRowspan = 1; //initiate our stored rowspan with the default of 1
+
+                tablesearch.each(function() {
+                    var $row = $(this);
+                    var $firstCell = $row.find("td:nth-child(4)");
+                    var id = $firstCell.text().toLowerCase();
+                    var rowspan = $firstCell.attr('rowspan');
+
+                    if (previousRowspan > 1) {
+                        previousRowspan--;
+                        return true;
+                    }
+
+                    previousRowspan = +rowspan;
+
+                    //get the row's rowspan
+                    if (id.indexOf(value) > -1) { //if the text is found
+                        var additionalRows = previousRowspan - 1; //use our n-1 formula
+                        var $additionalRows = $row.nextAll(':lt(' + additionalRows + ')'); //select the next (n-1) rows
+                        $row.add($additionalRows).show(); //show this row, and the next (n-1) rows as well
+                    }
+
+                });
+            });
+
+          
+           
+
+            // $('.view').click(function() {
+                $(document).on('click','.view',function(){
+                // alert(this.value);
+                var trn = this.value;
+                $.post("{% url 'home:alterPL' %}", {
+                        'trn': trn
+                    },
+                    function(data, status) {
+
+                        $('#sn').text(data.sn);
+                        $('#company').text(data.company);
+                        $('#trd').text(data.trd);
+                        $('#trn').text(data.trn);
+                        $('#salesinvoicedate').text(data.invoicedate);
+                        $('#basename').text(data.baseproduct);
+                        $('#quantity').text(data.tuq+' '+data.unit);
+                        $('#p_trn').text(data.p_trn);
+                        $('#profitsellername').text(data.seller);
+                        $('#s_trn').text(data.trn);
+                        $('#profitbuyername').text(data.buyer);
+                            // $('#types').text(data.types);
+                            // $('#invoiceDate').text(data.invoiceDate);
+                        $('#s_purchaseTotalCost').text(data.s_purchaseTotalCost.toFixed(2));
+                        $('#p_purchaseTotalCost').text(data.p_purchaseTotalCost.toFixed(2));
+                        $('#totalRevenueFromSales').text(data.totalRevenueFromSales.toFixed(2));
+                        $('#grossProfit').text(data.grossProfit.toFixed(2));
+                        $('#profitPerDrum').text(data.profitPerDrum.toFixed(2));
+                        $('#profitremarks').text(data.remarks);
+                        $('#editpnl').val(data.trn);
+                    });
+            });
+
+             var plmonth=null;
+        var plyear=null;
+            $('#filter_btn').click(function() {
+
+                var month = $('#by_month').val();
+                var year = $('#by_year').val();
+                plmonth=month;
+                plyear=year;
+                $.post("{% url 'home:filterp&l' %}", {
+                        'month': month,
+                        'year': year,
+                    },
+                    function(data, status) {
+                        $('#row').empty();
+                        for (var i = 0; i < data.data.length; i++) {
+                            // alert(data.trns[i].trn);
+                            var str;
+                            $('#row').append("<tr><td>" + data.trns[i].sn + "</td><td>" + data.trns[i].types + "</td><td>" + data.trns[i].company + "</td><td>" + data.trns[i].trn + "</td><td>"+data.data[i].p_trn+"</td><td>"+data.sps[i]+"</td><td>"+data.trns[i].client+"</td><td>"+data.trns_p[i]+"</td><td>"+data.trns[i].baseproduct+"</td><td>" + data.data[i].grossProfit.toFixed(2) + "</td><td>" + data.data[i].s_purchaseTotalCost.toFixed(2) + "</td><td>"+data.data[i].remarks+"</td><td><button type='button' class='btn btn-primary view' value=" + data.trns[i].trn + " data-toggle=modal data-target=#view0>View</button>{% if user.authority == 'Manager 2'%}<button type='button' class='btn btn-danger delete' value="+data.trns[i].trn+">Delete</button>{% endif %}</tr>");
+                        }
+                    });
+            });
+
+            $(document).on('change','.trn',function(){
+                var trn=this.value;
+                var id=this.id;
+                $.post("{% url 'home:extrashelper' %}",
+                {
+                    'trn':trn,
+                },function(data,status)
+                {
+                    if(id == 'purchaseref'){
+                        $('#profitlossseller-input').val(data.client);
+                    }else{
+                        $('#profitlossbuyer-input').val(data.client);
+                    }
+                });
+            });
+
+            $('.delete').click(function(){
+                    var trn=this.value;
+                    $.post("{% url 'home:delPl' %}",
+                        {
+                            'trn':trn
+                        },
+                        function(data,status){
+                            // alert(data.result);
+                        });
+                });
+
+              $('.excel').click(function(){
+                if(plyear!=null && plmonth!=null){
+                    $(this).attr('href',"/home/exportfilterprofit/"+plyear+"/"+plmonth+"/");
+                }
+                else{
+                     $(this).attr('href',"{% url 'home:exportProfit'%}");
+                }
+                       plyear=null;plmonth=null;
+                     });
+
+
+            $('.edit').click(function(){
+                // alert($('#profitremarks').text());
+                var trn=$('#trn').text();
+                $.post("{% url 'home:editPL' %}",
+                {
+                    'trn':trn,
+                    'remarks':$('#profitremarks').text(),
+                },
+                function(data,status){
+                    location.reload();
+                });
+            });
+
+        });
+
+function Validate() {
+
+                if ($('#purchaseref').val() == "" ) {
+                    // alert($('#tradetype-input').val());
+                    $('#purchaseref').css({
+                        'background': '#ea4b4b',
+                        'color': '#fff'
+                    });
+                    return false;
+                }   else if ($('#salesref').val() == '') {
+                    $('#salesref').css({
+                        'background': '#ea4b4b',
+                        'color': '#fff'
+                    });
+                    return false;
+                } else if ($('#profitlossseller-input').val() == '') {
+                    $('#profitlossseller-input').css({
+                        'background': '#ea4b4b',
+                        'color': '#fff'
+                    });
+                    return false;
+                } else if ($('#profitlossbuyer-input').val() == '') {
+                    $('#profitlossbuyer-input').css({
+                        'background': '#ea4b4b',
+                        'color': '#fff'
+                    });
+                    return false;
+                } else if ($('#profitloss-input').val() == '') {
+                    $('#profitloss-input').css({
+                        'background': '#ea4b4b',
+                        'color': '#fff'
+                    });
+                    return false;
+                }else {
+                    return true;
+                }
+            }
+           
+    </script>
+</head>
+{% include 'header.html'%}
+<!-- MAIN CONTENT-->
+<div class="main-content">
+    <div class="section__content section__content--p30">
+        <div class="container-fluid">
+            <div class="headingrow">
+                {% if user.authority == 'Manager 2' or user.authority == 'Accounts'%}
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#basicExampleModal">
+                    New Entry
+                </button>
+                {% endif %}
+            </div>
+            <div class="headingtitle profit">
+                <div class="title">
+                    <h3>P&L Account Details</h3>
+                </div>
+                <div class="filter_year">
+                    <select class="form-control" id="by_year">
+                        <option value="2013">2013</option>
+                        <option value="2014">2014</option>
+                        <option value="2015">2015</option>
+                        <option value="2016">2016</option>
+                        <option value="2017">2017</option>
+                        <option value="2018">2018</option>
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                    </select>
+                    <select class="form-control" id="by_month">
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+
+                    </select>
+                    <button class="btn btn-primary" id="filter_btn">Filter</button>
+                </div>
+                <input type="text" placeholder="Filter Using TRN" class='table-search' id="table-search" data-table-search="myTable"> </input>
+                <select class="form-control" id="dropdown">
+                    <option value="" id="" selected disabled>By Trade</option>
+                    <option value="salestrade" id="salestrade">By Sales Trade</option>
+                    <option value="purchasetrade" id="purchasetrade">By Purchase Trade</option>
+                    <option value="cancelsales" id="cancelsales">By Cancel Sales </option>
+                    <option value="cancelpurchase" id="cancelpurchase">By Cancel Purchase</option>
+                    <option value="salesamendment" id="salesamendment">By Sales Amendment</option>
+                    <option value="purchaseamendment" id="purchaseamendment">By Purchase Amendment</option>
+                </select>
+
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="basicExampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">P&L Account Data Entry</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card-body card-block">
+                            <form action="{% url 'home:savepl'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                                {% csrf_token %}
+                                <div class="row form-group">
+                                    <div class="col col-md-6">
+                                        <label class=" form-control-label">Purchase Trade Ref. No.</label>
+                                        <!--  <input type="text" id="totalpurchasecost-input" name="totalpurchasecost-input" class="form-control doubleinput"> -->
+                                        <select class="form-control trn" id="purchaseref" name="purchaseref">
+                                            <option value="" disabled="disabled" selected="true">TRN</option>
+                                            {% for i in trns%} {% if i.trn.trade_status == 'Approved' and i.trn.types == 'Purchase' %}
+                                            <option value="{{i.trn.trn}}">{{i.trn.trn}}</option>
+                                            {% endif %} {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col col-md-6">
+                                        <label for="salesrevenue-input" class=" form-control-label">Sales Trade Ref. No.</label>
+                                        <!-- <input type="text" id="salesrevenue-input" name="salesrevenue-input" class="form-control doubleinput"> -->
+                                        <select class="form-control trn" id="salesref" name="salesref">
+                                            <option value="" disabled="disabled" selected="true">TRN</option>
+                                            {% for i in trns%} {% if i.trn.trade_status == 'Approved' and i.trn.types == 'Sales' %}
+                                            <option value="{{i.trn.trn}}">{{i.trn.trn}}</option>
+                                            {% endif %} {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <!--  <div class="row form-group">
+                              <div class="col col-md-6">
+                                 <label for="grossprofit-input" class=" form-control-label">Gross Profit</label>
+                                 <input type="text" id="grossprofit-input" name="grossprofit-input" class="form-control">
+
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="profitdrum-input" class=" form-control-label">Profit PMT/Drum</label>
+                                 <input type="text" id="profitdrum-input" name="profitdrum-input" class="form-control">
+                              </div>
+                           </div> -->
+                              <div class="row form-group">
+                                <div class="col-md-6">
+                                  <label for="profitlossseller-input" class=" form-control-label">Seller Name</label>
+                                  <input type="text" class="form-control" id="profitlossseller-input" name="profitlosssellerr-input">
+                                </div>
+                                <div class="col-md-6">
+                                  <label for="profitlossbuyer-input" class=" form-control-label">Buyer Name</label>
+                                  <input type="text" class="form-control" id="profitlossbuyer-input" name="profitlossbuyer-input">
+                                </div>
+                              </div>
+                              <div class="row form-group">
+                                <div class="col-md-12">
+                                  <label for="profitloss-input" class=" form-control-label">Remarks</label>
+                                  <input type="text" class="form-control" id="profitloss-input" name="profitloss-input">
+                                </div>
+
+                              </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <input type="submit" onclick="return Validate()" class="btn btn-primary" value="Save Details">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- view -->
+
+        <div class="modal fade" id="view0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title title" id="exampleModalLabel">P&L Account Report Detail</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card-body card-block">
+
+                            <div class="displaydata">
+
+                                <table class="table tableview table-bordered">
+
+                                    <div class="description companytitle">
+
+                                        <ul>
+                                            <li>S.N :<span id="sn"></span></li>
+                                            <li>Company :<span id="company"></span></li>
+                                            <li>Trade Ref. Date :<span id="trd"></span></li>
+                                            <li>Trade Ref. No :<span id="trn"></span></li>
+                                        </ul>
+                                    </div>
+
+                                    <tbody>
+                                        <tr>
+                                            <th scope="col">Sales Invoice Date</th>
+                                            <td id="salesinvoicedate"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">Purchase Trade Ref. Number</th>
+                                            <td id="p_trn"></td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="col">Seller Name</th>
+                                          <td id="profitsellername"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">Sales Trade Ref. Number</th>
+                                            <td id="s_trn"></td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="col">Buyer Name</th>
+                                          <td id="profitbuyername"></td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="col">Product Name</th>
+                                          <td id="basename"></td>
+                                        </tr>
+                                        <tr>
+                                          <th scope="col">Quantity</th>
+                                          <td id="quantity"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">Total Cost of Purchase(Purchase Cost,Commissions PaidBank Exp. Logistics,Insurance)</th>
+                                            <td id="p_purchaseTotalCost"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">Total Cost of Sales(Sales Cost,Commissions Paid,Bank Exp. Logistics,Insurance)</th>
+                                            <td id="s_purchaseTotalCost"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">Total Revenue From Sales</th>
+                                            <td>
+                                                <p id="totalRevenueFromSales"></p>
+                                                <!-- <p>0</p> -->
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">Gross Profit</th>
+                                            <td id="grossProfit"></td>
+
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">
+                                                Profit PMT/Drum</th>
+                                            <td id="profitPerDrum">
+
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                          <th scope="col">Remarks</th>
+                                          <td id="profitremarks"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {% if user.authority == 'Manager 2' or user.authority == 'Accounts' %}
+                        <button type="button" class="btn btn-primary edit" id="editpnl" value="">Save</button>
+                        {% endif %}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ///////////////////////////////////////////// -->
+
+        <div class="boxone drag">
+            <div class="scroller">
+                <table class="table table0 table-striped table-dark table-bordered tablecolumnfixed" id="myTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">S.N</th>
+                            <th scope="col">Trade Type</th>
+                            <th scope="col">Company</th>
+                            <th scope="col">Sales TRN</th>
+
+                             <th scope="col">Purchase TRN</th>
+                              <th scope="col">Sales Invoice Date</th>
+                            <th scope="col">Seller Name</th>
+                            <th scope="col">Buyer Name</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Gross Profit</th>
+                            <th scope="col">Profit PMT/ Drum</th>
+			    <th scope="col">Remarks</th>
+                            <!-- <th scope="col">Total Revenue From Sales</th> -->
+                            <!-- <th scope="col">Remarks</th> -->
+                            <!--  <th scope="col">Profit PMT/ Drum</th> -->
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="row">
+                        {% for i,inv in records %}
+                       {% for j in trn %}
+                       {% if j.trn == i.p_trn %}
+                       {% with a=forloop.counter0%}
+                        <tr>
+                            <td rowspan="1">{{i.trn.sn}}</td>
+                            <td rowspan="1">{{i.trn.types}}</td>
+                            <td rowspan="1">{{i.trn.company}}</td>
+                            
+                            <td rowspan="1">{{i.trn.trn}}</td>
+                            <td rowspan="1">{{i.p_trn}}</td>
+                            <td rowspan="1"> {{inv}}</td>
+                            <td rowspan="1" >{{i.trn.client}}</td>
+                            <td rowspan="1" >{{j.client}}</td>
+                            <td rowspan="1" >{{i.trn.baseproduct}}</td>
+                            <td rowspan="1">{{i.grossProfit|floatformat:2}}</td>
+                            <td rowspan="1">{{i.profitPerDrum|floatformat:2}}</td>
+                             <td rowspan="1">{{i.remarks}}</td>
+
+                            <!--  <td rowspan="2">{{i.totalRevenueFromSales}}</td>  -->
+
+                            <!--       <td rowspan="2">{{i.profitPerDrum}}</td> -->
+                            <!-- <td>{{i.remarks}}</td> -->
+                            <td rowspan="1">
+                                <button type="button" class="btn btn-primary view" value="{{i.trn.trn}}" data-toggle="modal" data-target="#view0">
+                                    View
+                                </button>
+                                {% if user.authority == 'Manager 2'%}
+                                 <button type="button" class="btn btn-danger delete" value="{{i.trn.trn}}">Delete</button>
+                                {% endif %}
+                            </td>
+                            {%endwith%}
+                        </tr>
+                        <tr>
+                            <!-- <td>{{i.trn.sn}}</td> -->
+                            <!-- <td>{{i.trn.p_type}}</td> -->
+                            <!-- <td>{{i.trn.p_company}}</td> -->
+                            
+                          
+
+                            <!-- <td>{{i.grossProfit}}</td>
+                     <td>{{i.profitPerDrum}}</td> -->
+                            <!--   <td>  <button type="button" class="btn btn-primary editbtn">
+                        Edit
+                        </button>
+                     </td> -->
+                        </tr>
+                        {% endif %}
+                     {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% include 'footer.html'%}
+</div>
+</div>
+</body>
+
+</html>
+<!-- end document-->

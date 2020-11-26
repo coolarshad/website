@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Blending Cost</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'costmanagement/css/font-face.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'costmanagement/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'costmanagement/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'costmanagement/css/style.css' %}" rel="stylesheet" media="all">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript">
+         var countadditive=1;
+         var countoil=1;
+         $(document).ready(function(){
+            $('.addadditive').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="additive-block1"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'data'+num );
+
+                  $clone.find('#blendingcost_additivesname-input').prop('name','blendingcost_additivesname-input'+num);
+                  $clone.find('#blendingcost_additivesname-input').val("").end();
+
+                  $clone.find('#blendingcost_additivesquantity_percent-input').prop('name','blendingcost_additivesquantity_percent-input'+num);
+                  $clone.find('#blendingcost_additivesquantity_percent-input').val("").end();
+
+                  $clone.find('#blendingcost_additivesvalue-input').prop('name','blendingcost_additivesvalue-input'+num);
+                  $clone.find('#blendingcost_additivesvalue-input').val("").end();
+
+                  $div.after($clone);
+
+                   countadditive=countadditive+1;
+                  $('#count-additive').val(countadditive);
+               });
+
+             $('.addbaseoil').click(function(){
+                  // alert('add entry');
+                  var $div = $('div[id^="baseoil-block1"]:last');
+                  var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+                    // alert(num);
+                  var $clone = $div.clone().prop('id', 'data'+num );
+
+                  $clone.find('#blendingcost_baseoilname-input').prop('name','blendingcost_baseoilname-input'+num);
+                  $clone.find('#blendingcost_baseoilname-input').val("").end();
+
+                  $clone.find('#blendingcost_baseoilquantity_percent-input').prop('name','blendingcost_baseoilquantity_percent-input'+num);
+                  $clone.find('#blendingcost_baseoilquantity_percent-input').val("").end();
+
+                  $clone.find('#blendingcost_baseoilsvalue-input').prop('name','blendingcost_baseoilsvalue-input'+num);
+                  $clone.find('#blendingcost_baseoilsvalue-input').val("").end();
+
+                  $div.after($clone);
+
+                    countoil=countoil+1;
+                  $('#count-oil').val(countoil);
+               });
+          });
+      </script>
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingrow">
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New Request
+               </button>
+            </div>
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Blending Cost Details</h3>
+               </div>
+
+                  <input type="text" placeholder="Filter Using Product" class='table-search-product' data-table-search="myTable"></input>
+
+            </div>
+         </div>
+          <div class="boxone drag">
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+                  <tr>
+                     <!-- <th scope="col">S.N</th> -->
+                     <th scope="col">Product Name</th>
+                     <th scope="col">Grade</th>
+                     <th scope="col">SAE/ISO</th>
+                     <th scope="col">% Cross Check</th>
+                     <th scope="col">Status</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for i in records %}
+                  <tr>
+                     <!-- <td></td> -->
+                     <td >{{i.product}}</td>
+                     <td>{{i.grade}}</td>
+                     <td>{{i.sae}}</td>
+                     <td>{{i.percentCrosscheck}}</td>
+                     <td>
+                        <input type="button" class="btn btn-primary primary" onclick='location.href="{% url 'costmanagement:blendingview' product=i.product %}"' value="View">
+                     </td>
+                  </tr>
+                 {% endfor %}
+
+               </tbody>
+            </table>
+         </div>
+      </div>
+      </div>
+      <div class="modal fade" id="entry0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h3 class="modal-title title" id="exampleModalLabel">Blending Cost Entry Data</h3>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                  <div class="card-body card-block">
+                     <form action="{% url 'costmanagement:saveblending'%}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                        {% csrf_token %}
+                        <div class="row form-group">
+                           <div class="col-12 col-md-4">
+                              <label for="blendingcostnum-input" class="form-control-label">S.N</label>
+                              <input type="text" id="blendingcostnum-input" name="blendingcostnum-input" class="form-control">
+                           </div>
+                           <div class="col col-md-4">
+                              <label for="blendingcost_productname-input" class=" form-control-label">Product Name</label>
+                              <input type="text" id="blendingcost_productname-input" name="blendingcost_productname-input" class="form-control">
+                           </div>
+                           <div class="col col-md-4">
+                              <label for="blendingcost_grade-input" class=" form-control-label">Grade</label>
+                              <input type="text" id="blendingcost_grade-input" name="blendingcost_grade-input" class="form-control">
+                           </div>
+                        </div>
+                        <div class="row form-group">
+                           <div class="col col-md-4">
+                              <label for="blendingcost_iso-input" class=" form-control-label">SAE/ISO</label>
+                              <input type="text" id="blendingcost_iso-input" name="blendingcost_iso-input" class="form-control">
+                           </div>
+                           <div class="col col-md-4">
+                              <label for="blendingcost_crosscheck-input" class=" form-control-label">% Cross Check</label>
+                              <input type="text"  id="blendingcost_crosscheck-input" name="blendingcost_crosscheck-input" class="form-control">
+                           </div>
+                           <div class="col col-md-4">
+                              <label for="blendingcost_perlitercost-input" class=" form-control-label">Per Liter Cost</label>
+                              <input type="text"  id="blendingcost_perlitercost-input" name="blendingcost_perlitercost-input" class="form-control">
+                           </div>
+                        </div>
+
+                        <div class="additives">
+                           <div class="heading">
+                              <h4 class="tradetitle"> Additives</h4>
+                           </div>
+                           <div id="additive">
+                           <div id="additive-block1">
+                           <div class="row form-group">
+                              <div class="col-md-4">
+                                 <label for="blendingcost_additivesname-input" class=" form-control-label">Name</label>
+                                 <input type="text" id="blendingcost_additivesname-input" name="blendingcost_additivesname-input1" class="form-control">
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="blendingcost_additivesquantity_percent-input" class=" form-control-label">Quantity in %</label>
+                                 <input type="text" id="blendingcost_additivesquantity_percent-input" name="blendingcost_additivesquantity_percent-input1" class="form-control">
+                              </div>
+
+                              <div class="col col-md-4">
+                                 <label for="blendingcost_additivesvalue-input" class=" form-control-label">Value</label>
+                                 <input type="text" id="blendingcost_additivesvalue-input" name="blendingcost_additivesvalue-input1" class="form-control">
+                              </div>
+                           </div>
+                           </div>
+                           </div>
+                        <input type="hidden" value="1" id="count-additive" name="count-additive"/>
+                           <input type="button" class="btn btn-primary addadditive"  value="Add More">
+                        </div>
+                        <div class="baseoils">
+                           <div class="heading">
+                              <h4 class="tradetitle"> Base oils</h4>
+                           </div>
+                           <div id="baseoil">
+                           <div id="baseoil-block1">
+                           <div class="row form-group">
+                              <div class="col col-md-4">
+                                 <label for="blendingcost_baseoilname-input" class=" form-control-label">Name</label>
+                                 <input type="text" id="blendingcost_baseoilname-input" name="blendingcost_baseoilname-input1" class="form-control">
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="blendingcost_baseoilquantity_percent-input" class=" form-control-label">Quantity in %</label>
+                                 <input type="text" id="blendingcost_baseoilquantity_percent-input" name="blendingcost_baseoilquantity_percent-input1" class="form-control">
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="blendingcost_baseoilsvalue-input" class=" form-control-label">Value</label>
+                                 <input type="text" id="blendingcost_baseoilsvalue-input" name="blendingcost_baseoilsvalue-input1" class="form-control">
+                              </div>
+                           </div>
+                           </div>
+                           </div>
+                           <input type="hidden" value="1" id="count-oil" name="count-oil"/>
+                           <input type="button" class="btn btn-primary addbaseoil"  value="Add More">
+                           <div class="modal-footer">
+                              <input type="submit" class="btn btn-primary"  value="Save Details">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                           </div>
+                        </div>
+                  </div>
+               </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+  {% include 'footer.html'%}
+   </div>
+   </div>
+   </body>
+</html>
+<!-- end document

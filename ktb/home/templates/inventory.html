@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+{%load staticfiles%}
+{% load mathfilters %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="description" content="au theme template">
+      <meta name="author" content="Hau Nguyen">
+      <meta name="keywords" content="au theme template">
+      <!-- Title Page-->
+      <title>Inventory</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'home/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'home/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'home/vendor/font-awesome-4.7/css/font-awesome.min.css'%}" rel="stylesheet" media="all">
+      <link href="{% static 'home/vendor/mdi-font/css/material-design-iconic-font.min.css'%}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'home/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'home/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+           <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0-RC1/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet">
+           <style type="text/css">
+             .headingrow {
+    float: left;
+    margin-right: -15px;
+    margin-left: -15px;
+    padding-bottom: 15px;
+    display: inline-flex;
+}
+           </style>
+      <!-- Main CSS-->
+      <link href="{% static 'home/css/style.css' %}" rel="stylesheet" media="all">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script type="text/javascript" >
+         $(document).ready(function(){
+
+          var productname=null;
+
+          $(".table-search-inventory").on("keyup", function() {
+  // alert('in lookup');
+  var value = $(this).val().toLowerCase(),
+    tableattr = $(this).attr("data-table-search"),
+    tablesearch = $('#' + tableattr).find('tbody tr');
+
+  tablesearch.hide();                           //start with all rows hidden
+                  //initiate our stored rowspan with the default of 1
+
+  tablesearch.each(function() {
+    var $row = $(this);
+    var $firstCell = $row.find("td:nth-child(15)");
+    var id = $firstCell.text().toLowerCase();
+
+    // alert($firstCell.toString());
+    if (id.indexOf(value) > -1) {               //if the text is found
+      $row.show();         //show this row, and the next (n-1) rows as well
+    }
+
+  });
+
+});
+
+              $("#entrydate-input-date").datepicker({
+              
+              }).on("changeDate", function (e) {
+                var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+              $('#entrydate-input').val(d);
+            });
+
+              $("#dodowndate-input-date").datepicker({
+     
+              }).on("changeDate", function (e) {
+                var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+              $('#dodowndate-input').val(d);
+            });
+
+             $("#refdate-input-date").datepicker({
+             
+              }).on("changeDate", function (e) {
+                var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+              $('#refdate-input').val(d);
+            });
+
+              $("#edit-entrydate-input-date").datepicker({
+             
+              }).on("changeDate", function (e) {
+                var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+              $('#edit-entrydate-input').val(d);
+            });
+
+              $("#edit-dodowndate-input-date").datepicker({
+            
+              }).on("changeDate", function (e) {
+                var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+              $('#edit-dodowndate-input').val(d);
+            });
+
+              $("#edit-refdate-input-date").datepicker({
+             
+              }).on("changeDate", function (e) {
+                var d=new Date();
+ d = e.date;
+d=(d.getDate() ) + '/' + (d.getMonth() + 1)+ '/' +  d.getFullYear();
+
+              $('#edit-refdate-input').val(d);
+            });
+            var qtyin=0;
+            var qtyout=0;
+            var types;
+
+            $('#ta_ref_no-input').change(function(){
+               var trn=this.value;
+               alert(trn);
+                $.post("{% url 'home:getInventoryData' %}",
+                  {
+                     'trn': trn                    
+                  },
+                   function(data,status){
+                      $('#product-input').val(data.product);
+                      $('#refdate-input').val(data.trd);
+                      $('#supplier-input').val(data.client);
+                      $('#qntyindrum-input').val(data.qtyin);
+                      $('#qntyoutdrum-input').val(data.qtyout);
+                      $('#cfr-input').val(data.cfr);
+                      types=data.types;
+                      qtyin=$('#qntyindrum-input').val();
+                      qtyout=$('#qntyoutdrum-input').val();
+                      $('#oldbalanceqnty-input').val(data.oldbalqtyvalue.toFixed(2));
+                      $('#oldinventoryvalue-input').val(data.oldinventoryvalue.toFixed(2));
+                       // GetData(data.product);
+                });
+            });
+
+            $('#expenses_incurred-input').keyup(function(){
+
+               var expense=parseFloat(this.value);
+               var incoterm=$('#cfr-input').val();
+               var netprice=0;
+               var balanceqty=0;
+               // alert(expense+" "+incoterm+" "+qtyin);
+               if(incoterm!=''||incoterm!=null){
+                if(types=='Sales' || types == 'Sales Amendment'){
+                  var i=parseFloat(incoterm);
+
+                  netprice=(i+expense)/qtyout;
+
+                  $('#netprice_drum-input').val(netprice.toFixed(2));
+
+                  if($('#oldbalanceqnty-input').val() == 0)
+                    { 
+                      balanceqty=0-parseFloat(qtyout).toFixed(2);
+                    }
+                  else{
+                    balanceqty=parseFloat($('#oldbalanceqnty-input').val())-parseFloat(qtyout);
+                  }
+                  
+               $('#balanceqnty-input').val(balanceqty);
+              
+              $('#inventory_value-input').val(parseFloat($('#oldbalanceqnty-input').val())+
+                i+expense);
+             }
+             if(types=='Purchase' || types == 'Purchase Amendment'){
+                    // var oldbal;
+                   var i=parseFloat(incoterm);
+                 
+                  // var j=i+expense;
+                  netprice=(i+expense)/qtyin;
+
+                   $('#netprice_drum-input').val(netprice.toFixed(2));
+                   if($('#oldbalanceqnty-input').val() == '0')
+                   {
+                    balanceqty=parseFloat(qtyin).toFixed(2);
+                  }
+                  else{
+                    balanceqty=parseFloat($('#oldbalanceqnty-input').val())+parseFloat(qtyin);
+                  }
+
+               $('#balanceqnty-input').val(parseFloat(balanceqty).toFixed(2));
+               // alert(balanceqty);
+            $('#inventory_value-input').val(parseFloat($('#oldbalanceqnty-input').val())+
+                i+expense);
+                }
+
+               }
+            $('#inventory_rate-input').val(Math.abs(parseFloat(($('#inventory_value-input').val())/parseFloat( $('#balanceqnty-input').val())).toFixed(2)));
+               // alert(qtyin+" "+qtyout)
+            });
+
+           // function GetData(product)
+           // {
+           //     var name=product;
+           //      $.post("{% url 'home:getProductData' %}",
+           //        {
+           //           'name': name                    
+           //        },
+           //         function(data,status){
+           //           if(data!=null){
+           //              $('#oldbalanceqnty-input').val(data.balanceqty.toFixed(2));
+                        
+           //              $('#oldinventoryvalue-input').val(data.inventoryvalue.toFixed(2));
+           //              alert($('#oldinventoryvalue-input').val(data.inventoryvalue.toFixed(2)));
+           //           }else{
+           //              $('#oldbalanceqnty-input').val(0);
+           //              // alert('0');
+           //              $('#oldinventoryvalue-input').val(0);
+           //           }
+                       
+                // });
+                    
+            // }
+
+
+            $('.editbtn').click(function(){
+               var text=$(this).text();
+               var type=this.value;
+               var trn=this.id;
+               if(text=='Edit'){
+                   // alert('sales'+trn+' '+type+' '+text);
+                  if(type=='sales'){
+                     alert('sales'+trn);
+                  $.post("{% url 'home:editInventory' %}",
+                  {
+                     'id':type,
+                     // 'sn': $('#sn').text(),
+                    
+                    
+                     'trn':trn,  
+                     'supplier':$('#supplier').text(),
+                     'qtyin':$('#qtyin').text(),
+                     'qtyout':$('#qtyout').text(),
+                     'incoterm':$('#incoterm').text(),
+                     'oldbalqtyvalue':$('#oldbalqtyvalue').text(),
+                     'balanceqty':$('#balanceqty').text(),
+                     'unit':$('#unit').text(),
+                     'godownlocation':$('#godownlocation').text(),
+                     'oldinventoryvalue':$('#oldinventoryvalue').text(),
+                     'inventoryvalue':$('#inventoryvalue').text(),
+
+
+                  },
+                   function(data,status){
+                     // alert(data)
+                  });
+
+                 
+                  }
+                 
+                 
+               }
+               
+            });
+            
+            $('#inventoryproduct').change(function(){
+                var value=this.value;
+                productname=this.value;
+                $.post("{% url 'home:getProductData'%}",
+                {
+                  'name':value,
+                },
+                function(data,status){
+                  // alert(data.obj[0].product);
+                  if(data.stock == 0){
+                  var inventory_qty=0;
+                  // var inventory_value=0;
+                   $('#inventory_body').empty();
+                   for (var i = 0; i < data.obj.length; i++) {
+                    if (data.trns[i].types=='Purchase' || data.trns[i].types=='Purchase Amendment') {
+                      inventory_qty=(parseFloat(inventory_qty)+parseFloat(data.obj[i].billQty)).toFixed(4);
+                    }
+                    if (data.trns[i].types=='Sales' || data.trns[i].types=='Sales Amendment') {
+                      inventory_qty=(parseFloat(inventory_qty)-parseFloat(data.obj[i].billQty)).toFixed(4);
+                    }
+
+                    $('#inventory_body').append("<tr><td>"+data.trns[i].trn+"</td><td>"+data.trns[i].types+"</td><td>"+data.trns[i].baseproduct+"</td><td>"+data.obj[i].invoiceDate+"</td><td>"+data.obj[i].invoiceNumber+"</td><td>"+data.trns[i].client+"</td><td>"+parseFloat(data.trns[i].ratePMT).toFixed(4)+"</td><td>"+data.trns[i].incoterm+"</td><td>"+data.obj[i].billQty.toFixed(4)+"</td><td>"+parseFloat(data.obj[i].invoiceAmount).toFixed(2)+"</td><td>"+data.obj[i].billNumber+"</td><td>"+data.obj[i].billDate+"</td><td>"+data.trns[i].logisticProvider+"</td><td>"+data.obj[i].liner+"</td><td>"+data.obj[i].batch_no+"</td><td>"+data.obj[i].production_date+"</td><td>"+data.trns[i].etd+"</td><td>"+data.trns[i].eta+"</td><td>"+parseFloat(inventory_qty).toFixed(4)+"</td></tr>");
+                   }
+                 }
+                 else{
+                  $('#inventory_body').empty();
+                  for (var i = 0; i < data.obj.length; i++) {
+                   $('#inventory_body').append("<tr><td>"+data.obj[i].stockno+"</td><td>"+"Stock Journal"+"</td><td>"+data.obj[i].product+"</td><td>"+data.obj[i].stockdate+"</td><td>"+0+"</td><td>"+0+"</td><td>"+0+"</td><td>"+0+"</td><td>"+data.obj[i].qty+"</td><td>"+data.obj[i].value+"</td><td>"+0+"</td><td>"+0+"</td><td>"+0+"</td><td>"+0+"</td><td>"+0+"</td><td>"+0+"</td><td>"+0+"</td></tr>");
+                 }
+               }
+                });
+            });
+             $('.excel').click(function(){
+              
+              $(this).attr('href',"{% url 'home:exportInventory'%}");
+          
+            });
+
+             
+
+
+
+              });
+         // });
+         function Validate(){
+            if($('#sn_inventory-input').val()==""){ 
+               // alert($('#tradetype-input').val());
+               $('#sn_inventory-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false; 
+            }
+
+        
+
+            else if($('#entrydate-input').val()==''){
+             $('#entrydate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#dodowndate-input').val()==''){
+             $('#dodowndate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#ta_ref_no-input').val()==''){
+             $('#ta_ref_no-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#product-input').val()==''){
+             $('#product-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#refdate-input').val()==''){
+             $('#refdate-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#supplier-input').val()==''){
+             $('#supplier-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#qntyindrum-input').val()==''){
+             $('#qntyindrum-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#unit1-input').val()==''){
+             $('#unit1-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#qntyoutdrum-input').val()==''){
+             $('#qntyoutdrum-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+
+             else if($('#unit2-input').val()==''){
+             $('#unit2-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#cfr-input').val()==''){
+             $('#cfr-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#expenses_incurred-input').val()==''){
+             $('#expenses_incurred-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#netprice_drum-input').val()==''){
+             $('#netprice_drum-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#unit3-input').val()==''){
+             $('#unit3-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#oldbalanceqnty-input').val()==''){
+             $('#oldbalanceqnty-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#balanceqnty-input').val()==''){
+             $('#balanceqnty-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#unit4-input').val()==''){
+             $('#unit4-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#godown_location-input').val()==''){
+             $('#godown_location-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else if($('#oldinventoryvalue-input').val()==''){
+             $('#oldinventoryvalue-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+              else if($('#inventory_value-input').val()==''){
+             $('#inventory_value-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+            return false;
+             }
+             else{
+               return true;
+             }
+         }
+
+      </script>
+
+   </head>
+   {% include 'header.html'%}
+   <!-- MAIN CONTENT-->
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingrow">
+            
+               <select class="form-control" id="inventoryproduct">
+                <option value="" disabled selected>select product</option>
+                {% for i in products %}
+                 <option value="{{i}}">{{i}}</option>                
+                 {% endfor %}
+                 {% for i in stock %}
+                 <option value="{{i.product}}">{{i.product}}</option> 
+                 {% endfor %}
+               </select>
+            </div>
+            <!-- Modal -->
+
+     
+
+
+<!-- inventory view -->
+
+
+
+
+<!-- ///////////////////////// -->
+
+
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Inventory Details</h3>
+               </div>
+               <input type="text" placeholder="Filter Using Product" class='table-search-inventory' data-table-search="myTable"></input>
+            </div>
+         </div>
+          <div class="boxone drag">
+		<style type="text/css">
+		th:nth-child(1), td:nth-child(1){
+		position:sticky;
+		left:0px;
+		background-color:grey;
+		}
+		th:nth-child(3), td:nth-child(3){
+                position:sticky;
+                left:90px;
+                background-color:grey;
+                }
+
+	</style>
+         <div class="scroller">
+            <table class="table table1 table-striped table-dark table-bordered table-inventory" id="myTable">
+               <thead>
+                  <tr>
+                     <th scope="col">TRN</th>
+                     <th scope="col">Trade Type</th>
+                     <th scope="col">Product</th>
+                     <th scope="col">Date of Purchase/ Sales</th>
+                     <th scope="col">Invoice No.</th>
+                     <th scope="col">Supplier/ Buyer Name</th>
+                     <th scope="col">Purchase/ Sales Price</th>
+                     <th scope="col">Incoterm</th>
+                     <th scope="col">Quantity </th>
+                     <th scope="col">Value</th>
+                     <th scope="col">BL No. </th>
+                     <th scope="col">BL Date</th>
+                     <th scope="col">Logistic Agent</th>
+                     <th scope="col">Liner</th>
+                     <th scope="col">Batch No</th>
+                     <th scope="col">Production Date</th>
+                     <th scope="col">ETD</th>
+                     <th scope="col">ETA</th>
+                     <th scope="col">Inventory</th>
+                    <!--  <th scope="col">Status</th> -->
+                  </tr>
+               </thead>
+               <tbody id="inventory_body">
+                {%for i in trades %}
+                {% if i != 'break' %}
+              
+
+                
+                  <tr>
+                     <td id="trn">{{i.trn.trn}}</td>
+                     <td id="tradetype">{{i.trn.types}}</td>
+                     <td id="product">{{i.trn.baseproduct}}</td>
+                     <td id="purchasesalesdate">{{i.invoiceDate}}</td>
+                     <td id="invoiceno">{{i.invoiceNumber}}</td>
+                     <td id="suppbuyername">{{i.trn.client}}</td>
+                     <td id="pursalesprice">{{i.trn.ratePMT|floatformat:4}}</td>
+                     <td id="incoterm">{{i.trn.incoterm}}</td>
+                     <td id="qnty">{{i.billQty|floatformat:4}}</td>
+                     <td id="value">{{i.invoiceAmount|floatformat:2}}</td>
+                     <td id="blnum">{{i.billNumber}}</td>
+                     <td id="bldate">{{i.billDate}}</td>
+                     <td id="logagent">{{i.trn.logisticProvider}}</td>
+                     <td id="liner">{{i.liner}}</td>  
+                     <td id="etd">{{i.batch_no}}</td>
+                     <td id="eta">{{i.production_date}}</td>                   
+                     <td id="etd">{{i.trn.etd}}</td>
+                     <td id="eta">{{i.trn.eta}}</td>
+                    {% if i.trn.types == 'Purchase' or i.trn.types == 'Purchase Amendment'%}
+                    <td id="inventory">{{i.billQty|floatformat:4}}</td>                    
+                    {% elif i.trn.types == 'Sales' or i.trn.types == 'Sales Amendment' %}
+                    <td id="inventory">-{{i.billQty|floatformat:4}}</td>
+                    {% endif %}    
+                  </tr>
+                 
+                  {% else %}
+                    <tr>
+                     <td id="trn">-</td>
+                     <td id="tradetype">-</td>
+                     <td id="product">-</td>
+                     <td id="purchasesalesdate">-</td>
+                     <td id="invoiceno">-</td>
+                     <td id="suppbuyername">-</td>
+                     <td id="pursalesprice">-</td>
+                     <td id="incoterm">-</td>
+                     <td id="qnty">-</td>
+                     <td id="value">-</td>
+                     <td id="blnum">-</td>
+                     <td id="bldate">-</td>
+                     <td id="logagent">-</td>
+                     <td id="liner">-</td>                     
+                     <td id="etd">-</td>
+                     <td id="eta">-</td>
+                     <td id="inventory">-</td>
+                  </tr>
+                  {% endif %}
+                 {% endfor %}
+               </tbody>
+            </table>
+         </div>
+       </div>
+</div>
+    </div>
+   {% include 'footer.html'%}
+ 
+   </body>
+</html>
+<!-- end document-->

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+   <head>
+      <!-- Required meta tags-->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Title Page-->
+      <title>Raw Materials</title>
+      <!-- Fontfaces CSS-->
+      <link href="{% static 'costmanagement/css/font-face.css' %}" rel="stylesheet" media="all">
+      <!-- <link href="{% static 'costmanagement/vendor/font-awesome-5/css/fontawesome-all.min.css' %}" rel="stylesheet" media="all"> -->
+      <link href="{% static 'costmanagement/vendor/font-awesome-4.7/css/font-awesome.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/mdi-font/css/material-design-iconic-font.min.css' %}" rel="stylesheet" media="all">
+      <!-- Bootstrap CSS-->
+      <link href="{% static 'costmanagement/vendor/bootstrap-4.1/bootstrap.min.css' %}" rel="stylesheet" media="all">
+      <!-- Vendor CSS-->
+      <link href="{% static 'costmanagement/vendor/css-hamburgers/hamburgers.min.css' %}" rel="stylesheet" media="all">
+      <link href="{% static 'costmanagement/vendor/datepicker/datepicker.css' %}" rel="stylesheet" media="all">
+      <!-- Main CSS-->
+      <link href="{% static 'costmanagement/css/style.css' %}" rel="stylesheet" media="all">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<style>
+	input[type='checkbox']{
+		height:18px;
+		width:25px;
+	}
+	</style>
+      <script type="text/javascript">
+         $(document).ready(function(){
+             $('.delete').click(function(){
+            var i=this.value;
+         $.post("{% url 'costmanagement:deleteRawMaterials'%}",
+         {
+            'product':i,
+         },
+         function(data,status){
+            // alert(data);
+         
+         });
+            
+         });
+		
+
+             $('.approve').click(function(){
+            var i=this.value;
+         $.post("{% url 'costmanagement:raw_approve'%}",
+         {
+            'product':i,
+	   'csrfmiddlewaretoken':'{{csrf_token}}',
+         },
+         function(data,status){
+            // alert(data);
+		window.location.reload();
+
+         });
+
+         });
+
+         $('.edit').click(function(){
+         var i=this.value;
+         // alert(i);
+         $.post("{% url 'costmanagement:alterRawMaterials'%}",
+         {
+            'product':i,
+         },
+         function(data,status){
+           $('#edit-rawmaterialproduct-input').val(data.product);
+            $('#edit-rawmaterial_perlitercost-input').val(data.costPerLiter.toFixed(4));
+            $('#edit-rawmaterial_buypricepmt-input').val(data.buyPricePmt.toFixed(4));
+            $('#edit-rawmaterial_addcost-input').val(data.addCost.toFixed(4));
+            $('#edit-rawmaterial_total-input').val(data.total.toFixed(4));
+            $('#edit-rawmaterial_mttokl-input').val(data.mlToKl);
+            $('#edit-rawmaterial_density-input').val(data.density);
+            $('#edit-rawmaterial-remarks_input').val(data.remarks);
+	   $('#raw-approve-btn').val(data.product);
+		if(data.approved){
+		$('#raw-approve-btn').prop("disabled","true");
+		}
+		else{
+			$('#raw-approve-btn').removeAttr("disabled");
+		}
+		{% if user.authority == 'Accounts' %}
+			if(data.approved){
+                $('#raw-material-save').prop("disabled","true");
+                }
+		else{
+			$('#raw-material-save').removeAttr("disabled");
+		}
+
+		{% endif %}
+
+		{% if user.authority == 'Manager 1' %}
+             	 $('#raw-approve-btn').prop("disabled","true");         
+                $('#raw-material-save').prop("disabled","true");
+                
+   
+             
+
+                {% endif %}
+
+
+         });
+            
+
+         });
+
+            $('#rawmaterial_buypricepmt-input').focusout(function(){
+               if($('#rawmaterial_addcost-input').val()!=''){
+               $('#rawmaterial_total-input').val(parseFloat($('#rawmaterial_addcost-input').val())+parseFloat(this.value));
+               }
+            });
+            $('#rawmaterial_addcost-input').focusout(function(){
+               if($('#rawmaterial_buypricepmt-input').val()!=''){
+               $('#rawmaterial_total-input').val(parseFloat($('#rawmaterial_buypricepmt-input').val())+parseFloat(this.value));
+               }
+            });
+
+            $('#rawmaterial_density-input').focusout(function(){
+               var ml=parseFloat(this.value)*parseFloat($('#rawmaterial_total-input').val());
+               var cost=ml/1000;
+               $('#rawmaterial_mttokl-input').val(ml.toFixed(4));
+               $('#rawmaterial_perlitercost-input').val(cost.toFixed(4));
+            });
+
+
+            $('#edit-rawmaterial_buypricepmt-input').focusout(function(){
+               if($('#edit-rawmaterial_addcost-input').val()!=''){
+               $('#edit-rawmaterial_total-input').val(parseFloat($('#edit-rawmaterial_addcost-input').val())+parseFloat(this.value));
+               }
+            });
+            $('#edit-rawmaterial_addcost-input').focusout(function(){
+               if($('#edit-rawmaterial_buypricepmt-input').val()!=''){
+               $('#edit-rawmaterial_total-input').val(parseFloat($('#edit-rawmaterial_buypricepmt-input').val())+parseFloat(this.value));
+               }
+            });
+
+            $('#edit-rawmaterial_density-input').focusout(function(){
+               var ml=parseFloat(this.value)*parseFloat($('#edit-rawmaterial_total-input').val());
+               var cost=ml/1000;
+               $('#edit-rawmaterial_mttokl-input').val(ml.toFixed(4));
+               $('#edit-rawmaterial_perlitercost-input').val(cost.toFixed(4));
+            });
+
+            $('.excel').click(function(){
+                $(this).attr('href',"{% url 'costmanagement:exportRaw'%}");
+            });
+
+
+
+         });
+         function EditRawMaterials(){
+            $('#edit-rawmaterialproduct-input').val($('#product').text());
+            $('#edit-rawmaterial_perlitercost-input').val($('#costPerLiter').text());
+            $('#edit-rawmaterial_buypricepmt-input').val($('#buyPricePmt').text());
+            $('#edit-rawmaterial_addcost-input').val($('#addCost').text());
+            $('#edit-rawmaterial_total-input').val($('#total').text());
+            $('#edit-rawmaterial_mttokl-input').val($('#mlToKl').text());
+            $('#edit-rawmaterial_density-input').val($('#density').text());
+             // $('#edit-rawmaterial-remarks_input').val($('#').text());
+          
+         }
+
+         function Validate(){
+             if($('#rawmaterialproduct-input').val() == ""){
+                $('#rawmaterialproduct-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#rawmaterial_perlitercost-input').val() == ""){
+                $('#rawmaterial_perlitercost-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#rawmaterial_buypricepmt-input').val() == ""){
+                $('#rawmaterial_buypricepmt-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#rawmaterial_addcost-input').val() == ""){
+                $('#rawmaterial_addcost-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#rawmaterial_total-input').val() == ""){
+                $('#rawmaterial_total-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#rawmaterial_density-input').val() == ""){
+                $('#rawmaterial_density-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+             else if($('#rawmaterial_mttokl-input').val() == ""){
+                $('#rawmaterial_mttokl-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+
+            else if($('#rawmaterial-remarks_input').val() == ""){
+                $('#rawmaterial-remarks_input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else{
+               return true;
+            }
+         }
+
+         function ValidateEdit(){
+             if($('#edit-rawmaterialproduct-input').val() == ""){
+                $('#edit-rawmaterialproduct-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#edit-rawmaterial_perlitercost-input').val() == ""){
+                $('#edit-rawmaterial_perlitercost-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#edit-rawmaterial_buypricepmt-input').val() == ""){
+                $('#edit-rawmaterial_buypricepmt-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#edit-rawmaterial_addcost-input').val() == ""){
+                $('#edit-rawmaterial_addcost-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#edit-rawmaterial_total-input').val() == ""){
+                $('#edit-rawmaterial_total-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#edit-rawmaterial_density-input').val() == ""){
+                $('#edit-rawmaterial_density-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+             else if($('#edit-rawmaterial_mttokl-input').val() == ""){
+                $('#edit-rawmaterial_mttokl-input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else if($('#edit-rawmaterial-remarks_input').val() == ""){
+                $('#edit-rawmaterial-remarks_input').css({
+                  'background':'#ea4b4b',
+                  'color':'#fff'
+               });
+               return false;
+            }
+            else{
+               return true;
+            }
+         }
+      </script>
+   </head>
+  {% include 'header.html' %} 
+   <div class="main-content">
+      <div class="section__content section__content--p30">
+         <div class="container-fluid">
+            <div class="headingrow">
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entry0">
+               New Request
+               </button>
+            </div>
+            <div class="headingtitle">
+               <div class="title">
+                  <h3>Raw Materials Details</h3>
+               </div>
+               
+                  <input type="text" placeholder="Filter Using Product" class='table-search-costmanagement' data-table-search="myTable"></input>
+              
+            </div>
+         </div>
+          <div class="boxone drag">
+		<style type="text/css">
+              th:nth-child(1), td:nth-child(1)
+              {
+              position:sticky;
+              left:0px;
+              background-color:grey;
+              }
+              th:nth-child(2), td:nth-child(2)
+              {
+              position:sticky;
+              left:50px;
+              background-color:grey;
+              }
+              
+            </style>
+         <div class="scroller">
+            <table class="table table0 table-striped table-dark table-bordered" id="myTable">
+               <thead>
+
+                  <tr>
+                     <th scope="col">S.N</th>
+                     <th scope="col">Product Name</th>
+                     <th scope="col">Cost Per Liter</th>
+                     <th scope="col">Buy Price PMT</th>
+                     <th scope="col">Add Cost</th>
+                     <th scope="col">Total</th>
+                     <th scope="col">MT to KL</th>
+                     <th scope="col">Density</th>
+                     <th scope="col">Remarks</th>
+		     <th scope="col">Approved</th>
+                     
+                     <th scope="col">Status</th>
+                     
+                  </tr>
+               </thead>
+               <tbody>
+                   {% for record in records %}
+                  <tr>
+                     <td>{{forloop.counter}}</td>
+                     <td id="product">{{record.product}}</td>
+                     <td id="costPerLiter">{{record.costPerLiter|floatformat:4}}</td>
+                     <td id="buyPricePmt">{{record.buyPricePmt|floatformat:4}}</td>
+                     <td id="addCost">{{record.addCost|floatformat:4}}</td>
+                     <td id="total">{{record.total|floatformat:4}}</td>
+                     <td id="mlToKl">{{record.mlToKl|floatformat:4}}</td>
+                     <td id="density">{{record.density|floatformat:4}}</td>
+                     <td id="density">{{record.remarks}}</td>
+                     {% if record.approved %}
+		     <td id="approved"><input type="checkbox" checked></td>
+		     {% else %}
+		     <td id="approved"><input type="checkbox" ></td>
+		     {% endif %}
+		<td>
+			{% if user.authority == 'Manager 2' or user.authority == 'Accounts' or user.authority == 'Manager 1' %}
+                      <button type="button" class="btn btn-primary edit" data-toggle="modal" data-target="#edit0" value="{{record.product}}" >Edit</button>
+                        {% else %}
+			
+			{%endif %}
+			{% if user.authority == 'Manager 2' %}
+                     <button type="button" class="btn btn-danger delete" value="{{record.product}}">Delete</button>
+                     {% endif %}
+		{% comment %}
+			{% if user.authority == 'Manager 2' or user.authority == 'Accounts' %}
+		<button type="button" class="btn btn-primary approve" value="{{record.product}}">Approve</button>
+			{% endif %}
+		{% endcomment %}
+	</td>
+                  </tr>
+                  {% endfor %}
+                
+                  
+               </tbody>
+            </table>
+         </div>
+      </div>
+         <div class="modal fade" id="entry0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Raw Material Entry Data</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <form action="{% url 'costmanagement:saveraw' %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                           {% csrf_token %}
+                           <div class="row form-group">
+                            <!--   <div class="col-12 col-md-4">
+                                 <label for="rawmaterialnum-input"  class="form-control-label">S.N</label>
+                                 <input type="text" id="rawmaterialnum-input" name="rawmaterialnum-input" class="form-control">
+                              </div> -->
+                              <div class="col col-md-6">
+                                 <label for="rawmaterialproduct-input" class=" form-control-label">Product</label>
+                                 <input type="text" id="rawmaterialproduct-input" name="rawmaterialproduct-input" class="form-control">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="rawmaterial_perlitercost-input" class=" form-control-label">Cost Per Liter</label>
+                                 <input type="text" id="rawmaterial_perlitercost-input" name="rawmaterial_perlitercost-input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-4">
+                                 <label for="rawmaterial_buypricepmt-input" class=" form-control-label">Buy Price PMT</label>
+                                 <input type="text" id="rawmaterial_buypricepmt-input" name="rawmaterial_buypricepmt-input" class="form-control">
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="rawmaterial_addcost-input" class=" form-control-label">Add Cost</label>
+                                 <input type="text"  id="rawmaterial_addcost-input" name="rawmaterial_addcost-input" class="form-control">
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="rawmaterial_total-input" class=" form-control-label">Total</label>
+                                 <input type="text"  id="rawmaterial_total-input" name="rawmaterial_total-input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                             
+                              <div class="col col-md-6">
+                                 <label for="rawmaterial_density-input" class=" form-control-label">Density</label>
+                                 <input type="text"  id="rawmaterial_density-input" name="rawmaterial_density-input" class="form-control">
+                              </div>
+                               <div class="col col-md-6">
+                                 <label for="rawmaterial_mttokl-input" class=" form-control-label">MT to KL</label>
+                                 <input type="text"  id="rawmaterial_mttokl-input" name="rawmaterial_mttokl-input" class="form-control">
+                              </div>
+                           </div>
+                            <div class="row form-group">
+                              <div class="col-md-12">
+                                 <label for="remarks">Remarks</label>
+                                 <input type="text" name="rawmaterial-remarks" id="rawmaterial-remarks_input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="modal-footer">
+                              <input type="submit" onclick="return Validate()" class="btn btn-primary"  value="Save Details">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                           </div>
+                     </div>
+                  </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+         <div class="modal fade" id="edit0" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h3 class="modal-title title" id="exampleModalLabel">Raw Material Entry Data</h3>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="card-body card-block">
+                        <form action="{% url 'costmanagement:editraw' %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                           {% csrf_token %}
+                           <div class="row form-group">
+                             <!--  <div class="col-12 col-md-4">
+                                 <label for="rawmaterialnum-input"  class="form-control-label">S.N</label>
+                                 <input type="text" id="edit-rawmaterialnum-input" name="rawmaterialnum-input" class="form-control">
+                              </div> -->
+                              <div class="col col-md-6">
+                                 <label for="rawmaterialproduct-input" class=" form-control-label">Product</label>
+                                 <input type="text" id="edit-rawmaterialproduct-input" name="rawmaterialproduct-input" class="form-control">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="rawmaterial_perlitercost-input" class=" form-control-label">Cost Per Liter</label>
+                                 <input type="text" id="edit-rawmaterial_perlitercost-input" name="rawmaterial_perlitercost-input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              <div class="col col-md-4">
+                                 <label for="rawmaterial_buypricepmt-input" class=" form-control-label">Buy Price PMT</label>
+                                 <input type="text" id="edit-rawmaterial_buypricepmt-input" name="rawmaterial_buypricepmt-input" class="form-control">
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="rawmaterial_addcost-input" class=" form-control-label">Add Cost</label>
+                                 <input type="text"  id="edit-rawmaterial_addcost-input" name="rawmaterial_addcost-input" class="form-control">
+                              </div>
+                              <div class="col col-md-4">
+                                 <label for="rawmaterial_total-input" class=" form-control-label">Total</label>
+                                 <input type="text"  id="edit-rawmaterial_total-input" name="rawmaterial_total-input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="row form-group">
+                              
+                              <div class="col col-md-6">
+                                 <label for="rawmaterial_density-input" class=" form-control-label">Density</label>
+                                 <input type="text"  id="edit-rawmaterial_density-input" name="rawmaterial_density-input" class="form-control">
+                              </div>
+                              <div class="col col-md-6">
+                                 <label for="rawmaterial_mttokl-input" class=" form-control-label">MT to KL</label>
+                                 <input type="text"  id="edit-rawmaterial_mttokl-input" name="rawmaterial_mttokl-input" class="form-control">
+                              </div>
+                           </div>
+                            <div class="row form-group">
+                              <div class="col-md-12">
+                                 <label for="remarks">Remarks</label>
+                                 <input type="text" name="rawmaterial-remarks" id="edit-rawmaterial-remarks_input" class="form-control">
+                              </div>
+                           </div>
+                           <div class="modal-footer">
+			<button type="button" class="btn btn-primary approve" id="raw-approve-btn" value="">Approve</button>
+			
+                              <input type="submit" onclick="return ValidateEdit()" id="raw-material-save" class="btn btn-primary"  value="Save Details">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                           </div>
+                     </div>
+                  </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+  {% include 'footer.html' %}
+   </div>
+   </div>
+   </body>
+</html>
+<!-- end document
