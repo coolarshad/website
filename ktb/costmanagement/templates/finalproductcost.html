@@ -283,18 +283,30 @@
             this.value = 0;
          } else {
             var total_str = $('#final_label-eac-input').val();
+
             var patterntext=total_str.match(/\d+ *LITRE/g);
-           
+            var stoppattern=total_str.match(/STOP/g);
+            var stopml=total_str.match(/\d+ *ML/g);
+
             var total = parseFloat(total_str.substring(total_str.lastIndexOf('-') + 1));
             var liters = parseFloat($('#final_bottles_perpack-input').val());
             if(patterntext == "1 LITRE" || patterntext == "1LITRE"){
                liters=liters+1;
+               if(stoppattern == "STOP"){
+                  liters=liters+1;
+               }
             }
             if(patterntext == "4 LITRE" || patterntext == "4LITRE"){
                liters=liters+1;
             }
             if(patterntext == "5 LITRE" || patterntext == "5LITRE"){
                liters=liters+1;
+            }
+            if(stopml == "500 ML" || patterntext == "500ML"){
+               
+               if(stoppattern == "STOP"){
+                  liters=liters+2;
+               }
             }
 
             this.value = (total * liters).toFixed(4);
